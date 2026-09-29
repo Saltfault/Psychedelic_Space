@@ -5,16 +5,14 @@
 
 [sub_resource type="ShaderMaterial" id="FarStarsMaterial"]
 shader = ExtResource("2_stars")
-shader_parameter/parallax = 0.000002
-shader_parameter/trail_strength = 0.72
+shader_parameter/layer_speed_multiplier = 0.0125
 shader_parameter/star_scale = 165.0
 shader_parameter/star_size = 0.45
 shader_parameter/brightness = 0.65
 
 [sub_resource type="ShaderMaterial" id="NearStarsMaterial"]
 shader = ExtResource("2_stars")
-shader_parameter/parallax = 0.00018
-shader_parameter/trail_strength = 0.16
+shader_parameter/layer_speed_multiplier = 1.0
 shader_parameter/star_scale = 75.0
 shader_parameter/star_size = 0.9
 shader_parameter/brightness = 1.25

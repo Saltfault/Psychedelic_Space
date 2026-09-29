@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://ntkjrfuidfp"]
+
+[ext_resource type="Script" uid="uid://dj1djuroj2tg2" path="res://scripts/world/intel_beacon.gd" id="1_djddf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g4v7s"]
+size = Vector2(53, 117)
+
+[node name="IntelBeacon" type="Area2D" unique_id=1322858274]
+script = ExtResource("1_djddf")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=749351000]
+position = Vector2(-42, 10)
+color = Color(0.9098039, 0.11372549, 0.2784314, 1)
+polygon = PackedVector2Array(18, 49, 18, -68, 71, -68, 70, 49)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=134142738]
+position = Vector2(2.5, 0.5)
+shape = SubResource("RectangleShape2D_g4v7s")

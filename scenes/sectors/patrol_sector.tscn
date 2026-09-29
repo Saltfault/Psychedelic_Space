@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+; NEW CODE STARTS HERE
+[ext_resource type="Script" path="res://scenes/world/sector_root.gd" id="1_root"]
+[ext_resource type="Script" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="2_lit"]
+[ext_resource type="PackedScene" path="res://scenes/world/space_background.tscn" id="3_background"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/patrol_group.tscn" id="4_patrol"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/caravan.tscn" id="5_caravan"]
+
+[node name="PatrolSector" type="Node2D"]
+script = ExtResource("1_root")
+sector_id = "patrol"
+sector_size = Vector2(8000, 8000)
+spawn_position = Vector2(4000, 4000)
+caravan_scene = ExtResource("5_caravan")
+caravan_spawn_position = Vector2(2500, 2500)
+
+[node name="SpaceBackground" parent="." instance=ExtResource("3_background")]
+
+[node name="LitCanvasModulate" type="Node2D" parent="."]
+script = ExtResource("2_lit")
+lit_version = "1.1.4"
+color = Color(0.09019608, 0.05882353, 0.16862746, 1)
+
+[node name="Asteroids" type="Node2D" parent="."]
+
+[node name="Encounters" type="Node2D" parent="."]
+
+[node name="PatrolGroupWest" parent="Encounters" instance=ExtResource("4_patrol")]
+position = Vector2(1900, 5700)
+
+[node name="PatrolGroupEast" parent="Encounters" instance=ExtResource("4_patrol")]
+position = Vector2(6500, 2300)
+
+[node name="Landmarks" type="Node2D" parent="."]
+; NEW CODE ENDS HERE

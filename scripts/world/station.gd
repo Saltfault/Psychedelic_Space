@@ -30,4 +30,4 @@ func _on_body_entered(body: Node) -> void:
 
 func _on_body_exited(body: Node) -> void:
 	if body == player_inside:
-		player_inside == null
+		player_inside = null

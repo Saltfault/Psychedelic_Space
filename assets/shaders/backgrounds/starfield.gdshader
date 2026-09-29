@@ -4,9 +4,12 @@ render_mode unshaded, blend_add;
 uniform vec2 camera_world_position = vec2(0.0);
 // NEW CODE STARTS HERE
 uniform vec2 camera_velocity = vec2(0.0);
-uniform float trail_strength : hint_range(0.0, 1.0) = 0.2;
+// TUNING: star_speed changes overall drift; tweak streak_length and edge_streak_boost for trails.
+uniform float star_speed : hint_range(0.0, 0.001) = 0.00024;
+uniform float layer_speed_multiplier : hint_range(0.0, 3.0) = 1.0;
+uniform float streak_length : hint_range(0.0, 1.5) = 0.32;
+uniform float edge_streak_boost : hint_range(0.0, 3.0) = 1.5;
 // NEW CODE ENDS HERE
-uniform float parallax = 0.00008;
 uniform float star_scale : hint_range(20.0, 220.0) = 110.0;
 uniform float star_size : hint_range(0.1, 1.5) = 0.6;
 uniform float brightness : hint_range(0.0, 4.0) = 1.6;
@@ -26,7 +29,8 @@ vec2 hash22(vec2 p) {
 }
 
 void fragment() {
-	vec2 world_uv = UV + camera_world_position * parallax;
+	// Player motion shifts the layers opposite travel, producing parallax.
+	vec2 world_uv = UV + camera_world_position * star_speed * layer_speed_multiplier;
 	vec2 grid = world_uv * star_scale;
 	
 	vec2 cell = floor(grid);
@@ -65,7 +69,14 @@ void fragment() {
 		}
 
 		float available_length = max(min(x_edge_distance, y_edge_distance), 0.0);
-		float trail_length = min(trail_strength * normalized_speed, available_length);
+		// Use the star's screen radius so streaks grow outward from the player-centered view.
+		vec2 star_uv = UV - (local - offset) / star_scale;
+		float screen_aspect = SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
+		vec2 center_to_star = (star_uv - vec2(0.5)) * vec2(screen_aspect, 1.0);
+		float screen_radius_max = 0.5 * length(vec2(screen_aspect, 1.0));
+		float radial_progress = clamp(length(center_to_star) / screen_radius_max, 0.0, 1.0);
+		float radial_trail_multiplier = 1.0 + edge_streak_boost * smoothstep(0.0, 1.0, radial_progress);
+		float trail_length = min(streak_length * radial_trail_multiplier * normalized_speed, available_length);
 		if (trail_length > radius * 1.5) {
 			vec2 relative = local - offset;
 			float along = dot(relative, trail_direction);

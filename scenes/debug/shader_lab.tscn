@@ -8,7 +8,7 @@
 [sub_resource type="ShaderMaterial" id="StarsMaterial"]
 shader = ExtResource("4_stars")
 shader_parameter/camera_world_position = Vector2(0, 0)
-shader_parameter/parallax = 8e-05
+shader_parameter/layer_speed_multiplier = 1.0
 shader_parameter/star_scale = 110.0
 shader_parameter/star_size = 0.6
 shader_parameter/brightness = 1.6
