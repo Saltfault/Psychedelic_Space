@@ -1,4 +1,5 @@
 extends BaseShip
+## Player-controlled BaseShip; reads input and applies the selected pilot ability.
 class_name PlayerShip
 
 const PILOTS: Registry = preload("res://assets/data/registries/pilots.tres")

@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://xntj2o1d6rnj"]
+
+[ext_resource type="Script" uid="uid://dc1b6eh8bxcxv" path="res://scripts/game.gd" id="1_lnu2h"]
+[ext_resource type="PackedScene" uid="uid://dc14blsepkf65" path="res://scenes/ships/player_ship.tscn" id="1_yqjtg"]
+[ext_resource type="PackedScene" uid="uid://22q7dgeg3fni" path="res://scenes/ui/hud.tscn" id="2_lnu2h"]
+
+[node name="Game" type="Node" unique_id=396239377]
+script = ExtResource("1_lnu2h")
+
+[node name="SectorContainer" type="Node2D" parent="." unique_id=1604525911]
+
+[node name="PlayerShip" parent="." unique_id=1367263942 instance=ExtResource("1_yqjtg")]
+position = Vector2(-1128, -677)
+
+[node name="HUD" parent="." unique_id=789571956 instance=ExtResource("2_lnu2h")]

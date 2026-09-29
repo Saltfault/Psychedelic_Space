@@ -1,4 +1,5 @@
 extends PatrolGroup
+## Patrol-group variant registered as the persistent, sensor-discoverable caravan.
 
 
 func _ready() -> void:

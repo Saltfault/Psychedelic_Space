@@ -1,4 +1,5 @@
 extends Control
+## Draws nearby sensor contacts using wrapped positions and contact metadata.
 class_name Minimap
 
 @export_range(1.0, 10000.0, 100.0) var map_range: float = 3200.0
@@ -6,7 +7,8 @@ class_name Minimap
 var player: PlayerShip
 var sensor: SensorComponent
 
-# NEW CODE STARTS HERE
+
+## Bind the player whose sensor contacts and position this minimap should display.
 func configure(target_player: PlayerShip) -> void:
 	player = target_player
 	sensor = player.get_node_or_null("SensorComponent") as SensorComponent
@@ -76,4 +78,3 @@ func _draw_marker(
 
 	var point: Vector2 = center + direction * radius * normalized_distance
 	draw_circle(point, marker_radius, color)
-# NEW CODE ENDS HERE

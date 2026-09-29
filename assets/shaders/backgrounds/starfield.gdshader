@@ -2,14 +2,12 @@ shader_type canvas_item;
 render_mode unshaded, blend_add;
 
 uniform vec2 camera_world_position = vec2(0.0);
-// NEW CODE STARTS HERE
 uniform vec2 camera_velocity = vec2(0.0);
 // TUNING: star_speed changes overall drift; tweak streak_length and edge_streak_boost for trails.
 uniform float star_speed : hint_range(0.0, 0.001) = 0.00024;
 uniform float layer_speed_multiplier : hint_range(0.0, 3.0) = 1.0;
 uniform float streak_length : hint_range(0.0, 1.5) = 0.32;
 uniform float edge_streak_boost : hint_range(0.0, 3.0) = 1.5;
-// NEW CODE ENDS HERE
 uniform float star_scale : hint_range(20.0, 220.0) = 110.0;
 uniform float star_size : hint_range(0.1, 1.5) = 0.6;
 uniform float brightness : hint_range(0.0, 4.0) = 1.6;
@@ -49,7 +47,6 @@ void fragment() {
 	float edge_width = max(fwidth(distance_to_star) * 0.25, 0.002);
 	float star_core = 1.0 - smoothstep(radius - edge_width, radius + edge_width, distance_to_star);
 
-	// NEW CODE STARTS HERE
 	// A short tapered streak extends opposite the stars' apparent screen travel.
 	float normalized_speed = clamp(length(camera_velocity), 0.0, 1.0);
 	float trail = 0.0;
@@ -90,8 +87,6 @@ void fragment() {
 		}
 	}
 	float star = max(star_core, trail * 0.55);
-	// NEW CODE ENDS HERE
-	
 	star *= step(0.94, existence);
 	
 	float color_mix = hash21(cell + vec2(20.0, 91.0));

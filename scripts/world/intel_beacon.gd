@@ -1,4 +1,5 @@
 extends Area2D
+## Completes the optional signal-recovery objective when the player reaches the beacon.
 
 
 func _ready() -> void:

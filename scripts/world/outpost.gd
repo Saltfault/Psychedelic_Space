@@ -1,10 +1,16 @@
 extends StaticBody2D
+## Stationary hostile objective with a turret attack and persistent destruction outcome.
 class_name Outpost
 
+## Hull damage required to destroy the objective structure.
 @export var max_hull: float = 260.0
+## Projectile scene used by the outpost's defensive turret.
 @export var projectile_scene: PackedScene
+## Speed assigned to outpost projectiles, in world units per second.
 @export var projectile_speed: float = 700.0
+## Damage dealt by each outpost projectile.
 @export var projectile_damage: float = 13.0
+## Maximum wrapped distance at which the outpost fires.
 @export var attack_range: float = 1350.0
 
 @onready var muzzle: Marker2D = $Muzzle
@@ -27,6 +33,7 @@ func _ready() -> void:
 	fire_timer.start()
 
 
+## Apply damage and persist the main-objective completion when hull reaches zero.
 func take_damage(amount: float) -> void:
 	if amount <= 0.0 or hull <= 0.0:
 		return

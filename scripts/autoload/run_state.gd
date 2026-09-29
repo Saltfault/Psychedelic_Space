@@ -1,8 +1,11 @@
 extends Node
 ## Owns mutable run progress and the player's persisted developer-mode preference.
 
+## Emitted after run progress or objective state changes.
 signal run_state_changed
+## Emitted after the credit balance changes.
 signal credits_changed(new_value: int)
+## Emitted whenever the persisted Dev Mode preference changes.
 signal dev_mode_changed(enabled: bool)
 
 # Registry assets are the source of truth for authored module content.
@@ -11,23 +14,21 @@ const SETTINGS_PATH: String = "user://settings.cfg"
 const SETTINGS_SECTION: String = "developer"
 const DEV_MODE_KEY: String = "dev_mode_enabled"
 
-const SYSTEM_GRAPH := {
-	"start": ["patrol", "station"],
-	"patrol": ["outpost", "nebula"],
-	"station": ["outpost", "nebula"],
-	"outpost": ["warp"],
-	"nebula": ["warp"],
-	"warp": [],
-}
-
 const CARAVAN_ROUTE := ["start", "patrol", "nebula", "warp"]
 
+## Seed shared by this run's procedurally generated route and sector layouts.
+var run_seed: int = 0
 var current_sector_id: String = "start"
+## Number of accepted sector transitions in this run.
 var world_tick: int = 0
+## Spendable credits; changes emit credits_changed and run_state_changed.
 var credits: int = 25
 
+## True once the outpost has been destroyed during this run.
 var main_objective_complete: bool = false
+## True once the optional intel objective has been collected.
 var side_objective_complete: bool = false
+## True once the optional intel deadline has passed without collection.
 var side_objective_expired: bool = false
 
 var outpost_alerted: bool = false
@@ -46,6 +47,7 @@ func _ready() -> void:
 	_load_dev_mode_setting()
 
 
+## Reset run progress to its starting values while preserving the user's Dev Mode preference.
 func reset_run() -> void:
 	# Reset only run progress; the user's developer-mode preference is not run data.
 	current_sector_id = "start"
@@ -68,6 +70,7 @@ func reset_run() -> void:
 	Log.info("Run state reset", current_sector_id, credits)
 
 
+## Add a positive credit reward; ignores zero and negative values.
 func add_credits(amount: int) -> void:
 	# Positive rewards go through this API; purchases use spend_credits instead.
 	if amount <= 0:
@@ -79,6 +82,7 @@ func add_credits(amount: int) -> void:
 	Log.debug("Credits added", amount, credits)
 
 
+## Spend a nonnegative amount; returns false and leaves credits unchanged when unaffordable.
 func spend_credits(amount: int) -> bool:
 	# Reject negative costs so a malicious or mistaken price cannot grant credits.
 	if amount < 0 or credits < amount:
@@ -90,20 +94,13 @@ func spend_credits(amount: int) -> bool:
 	Log.debug("Credits spent", amount, credits)
 	return true
 
-
-func can_travel_to(target_sector: String) -> bool:
-	# A destination is legal only when it is an outgoing edge from the current node.
-	if not SYSTEM_GRAPH.has(current_sector_id):
-		return false
-
-	return target_sector in SYSTEM_GRAPH[current_sector_id]
-
-
+## Return the caravan's true route sector, which can differ from the player's stale intel.
 func get_actual_caravan_sector() -> String:
 	# The route index advances with world time and stops at its final destination.
 	return CARAVAN_ROUTE[caravan_route_index]
 
 
+## Update last-known caravan intel to the current sector and notify UI listeners.
 func reveal_caravan_here() -> void:
 	# Update the player's last-known location without changing the caravan's route.
 	known_caravan_sector = current_sector_id
@@ -111,6 +108,7 @@ func reveal_caravan_here() -> void:
 	Log.info("Caravan location discovered", known_caravan_sector)
 
 
+## Advance discrete world systems once; the coordinator calls this on accepted travel.
 func advance_world() -> void:
 	# A sector transition is the discrete event that advances world systems.
 	world_tick += 1
@@ -128,6 +126,7 @@ func advance_world() -> void:
 	Log.debug("World advanced", world_tick, get_actual_caravan_sector())
 
 
+## Idempotently complete the main objective, persist outpost destruction, and award credits.
 func complete_main_objective() -> void:
 	# Make completion idempotent so duplicate triggers do not award credits twice.
 	if main_objective_complete:
@@ -139,6 +138,7 @@ func complete_main_objective() -> void:
 	Log.info("Main objective completed", current_sector_id)
 
 
+## Complete the optional objective once before expiry and award its credit reward.
 func complete_side_objective() -> void:
 	# The optional reward is unavailable after completion or expiration.
 	if side_objective_complete or side_objective_expired:
@@ -149,11 +149,13 @@ func complete_side_objective() -> void:
 	Log.info("Side objective completed", current_sector_id)
 
 
+## Load a module by its stable YARD ID; returns null if the registry entry is missing.
 func get_module(module_id: StringName) -> ModuleDefinition:
 	# Resolve one stable YARD ID and keep callers independent of resource paths.
 	return MODULES.load_entry(module_id) as ModuleDefinition
 
 
+## Load all valid module resources from the canonical YARD registry.
 func get_all_modules() -> Array[ModuleDefinition]:
 	# Load the small prototype catalogue and discard entries of an unexpected type.
 	var loaded: Dictionary[StringName, Resource] = MODULES.load_all_blocking()
@@ -166,6 +168,7 @@ func get_all_modules() -> Array[ModuleDefinition]:
 	return result
 
 
+## Query the YARD category index and load only matching module entries.
 func get_modules_by_category(category: String) -> Array[ModuleDefinition]:
 	# Use the registry index to load only modules matching this category.
 	var result: Array[ModuleDefinition] = []
@@ -180,6 +183,7 @@ func get_modules_by_category(category: String) -> Array[ModuleDefinition]:
 	return result
 
 
+## Return a random registered module, or null if the registry has no valid modules.
 func get_random_module() -> ModuleDefinition:
 	# Return null for an empty registry so callers can handle missing content safely.
 	var modules := get_all_modules()
@@ -190,6 +194,7 @@ func get_random_module() -> ModuleDefinition:
 	return modules.pick_random()
 
 
+## Persist and immediately apply the Developer Console preference; failures stay fail-closed.
 func set_dev_mode(enabled: bool) -> void:
 	# Load first so saving this preference does not erase unrelated game settings.
 	var config := ConfigFile.new()

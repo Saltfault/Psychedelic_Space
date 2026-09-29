@@ -1,6 +1,6 @@
 {
   "name": "Game Prototype Guide",
-  "next_id": 49,
+  "next_id": 50,
   "tags": [
     "prototype",
     "combat",
@@ -27,6 +27,7 @@
     "shaders",
     "debug-tools",
     "environment",
+    "nebula",
     "shields",
     "warp-gate",
     "sector-wrap",
@@ -119,7 +120,7 @@
   "tasks": [
     {
       "id": "task_26",
-      "title": "Build the repair station and randomized store",
+      "title": "Section 19 — Build the repair station and randomized store",
       "description": "Create the station interaction and paused shop UI, generate three offers from YARD categories, and implement purchases, slot checks, refunds on install failure, and hull repair. Verify new eligible YARD entries can appear without editing the shop script.",
       "status": "done",
       "priority": "high",
@@ -136,7 +137,7 @@
     },
     {
       "id": "task_27",
-      "title": "Build the sensor component",
+      "title": "Section 20 — Build the sensor component",
       "description": "Refresh sensor contacts periodically using wrapped distance, and update the caravan’s known location only when sensors encounter it. Verify a Long-Range Scanner extends contact discovery.",
       "status": "done",
       "priority": "high",
@@ -152,7 +153,7 @@
     },
     {
       "id": "task_19",
-      "title": "Verify sector-edge combat wrapping",
+      "title": "Section 12 — Verify sector-edge combat wrapping",
       "description": "Test enemy targeting across opposite sector edges and correct gameplay distances that do not use SectorSpace.shortest_delta().",
       "status": "done",
       "priority": "high",
@@ -170,7 +171,7 @@
     },
     {
       "id": "task_24",
-      "title": "Add shield boosters and rare module drops",
+      "title": "Section 17 — Add shield boosters and rare module drops",
       "description": "Build both pickup scenes/scripts, add enemy drop rolls, and assign the scenes to enemy variants. Verify kills award credits, shield boosters drop occasionally, and rare modules install only when a slot is free.",
       "status": "done",
       "priority": "high",
@@ -187,7 +188,7 @@
     },
     {
       "id": "task_22",
-      "title": "Add the shield shader",
+      "title": "Section 15 — Add the shield shader",
       "description": "Connect the shield shader to ship visuals and make its appearance respond to shield health, disappearing near zero.",
       "status": "done",
       "priority": "medium",
@@ -203,7 +204,7 @@
     },
     {
       "id": "task_21",
-      "title": "Build the shader-driven space background",
+      "title": "Section 14 — Build the shader-driven space background",
       "description": "Implement starfield and nebula shaders, the background scene, and parallax/evolution behavior. Verify layers move at different rates and have no collision or gameplay logic.",
       "status": "done",
       "priority": "medium",
@@ -219,7 +220,7 @@
     },
     {
       "id": "task_20",
-      "title": "Create a dedicated shader lab",
+      "title": "Section 13 — Create a dedicated shader lab",
       "description": "Build a runnable ShaderLab scene for quickly previewing and iterating on shaders.",
       "status": "done",
       "priority": "medium",
@@ -235,7 +236,7 @@
     },
     {
       "id": "task_7",
-      "title": "Build enemy ships and AI variants",
+      "title": "Section 8 — Build enemy ships and AI variants",
       "description": "Create the shared enemy scene/script, explosion, and Corsair/Cutter variants. Configure YARD IDs, collision/team rules, toroidal aggro, firing, patrol alerts, and one-time bounty rewards. Verify enemies stay passive outside aggro range and engage/fire correctly.",
       "status": "done",
       "priority": "critical",
@@ -251,7 +252,7 @@
     },
     {
       "id": "task_16",
-      "title": "Build patrol groups",
+      "title": "Section 9 — Build patrol groups",
       "description": "Create the patrol group scene/script and configure three ships to share an alert. Verify that one member detecting the player alerts the others, including members just outside their individual detection range.",
       "status": "done",
       "priority": "high",
@@ -267,7 +268,7 @@
     },
     {
       "id": "task_17",
-      "title": "Build the persistent outpost objective",
+      "title": "Section 10 — Build the persistent outpost objective",
       "description": "Create the Lit outpost, attack and destruction behavior, persistent alert/destruction state, and explosion. Verify it remains represented as the main objective outside sensor range and stays destroyed after sector reload.",
       "status": "done",
       "priority": "high",
@@ -283,7 +284,7 @@
     },
     {
       "id": "task_18",
-      "title": "Build the world-state caravan",
+      "title": "Section 11 — Build the world-state caravan",
       "description": "Create the caravan from patrol ships, configure its drift and escorts, and make it appear only in the sector selected by world state—not from a combat wave.",
       "status": "done",
       "priority": "high",
@@ -299,7 +300,7 @@
     },
     {
       "id": "task_14",
-      "title": "Create projectiles and basic combat",
+      "title": "Section 6 — Create projectiles and basic combat",
       "description": "Build projectile scenes and collision/team filtering; verify forward fire, damage, shields, hull, and death behavior.",
       "status": "done",
       "priority": "high",
@@ -315,7 +316,7 @@
     },
     {
       "id": "task_15",
-      "title": "Prove the pilot-system idea",
+      "title": "Section 7 — Prove the pilot-system idea",
       "description": "Verify the YARD-selected pilot ability changes player movement independently of the ship definition.",
       "status": "done",
       "priority": "high",
@@ -331,7 +332,7 @@
     },
     {
       "id": "task_9",
-      "title": "Create the project structure",
+      "title": "Section 1 — Create the project structure",
       "description": "Create the folder and asset structure so later scenes, scripts, registries, and resources have consistent homes.",
       "status": "done",
       "priority": "high",
@@ -346,7 +347,7 @@
     },
     {
       "id": "task_10",
-      "title": "Project settings and input map",
+      "title": "Section 2 — Project settings and input map",
       "description": "Configure project settings and required input actions, then verify the mapped controls work in-game.",
       "status": "done",
       "priority": "high",
@@ -362,7 +363,7 @@
     },
     {
       "id": "task_11",
-      "title": "Install YARD and build the data layer",
+      "title": "Section 3 — Install YARD and build the data layer",
       "description": "Install and configure YARD, create the Ship, Pilot, and Module registries, and verify stable IDs and module category indexing.",
       "status": "done",
       "priority": "critical",
@@ -378,7 +379,7 @@
     },
     {
       "id": "task_12",
-      "title": "Create global run and sector utilities",
+      "title": "Section 4 — Create global run and sector utilities",
       "description": "Implement RunState and SectorSpace utilities for persistent run data, sector transitions, world state, and wrapped-space calculations.",
       "status": "done",
       "priority": "critical",
@@ -394,7 +395,7 @@
     },
     {
       "id": "task_13",
-      "title": "Build the base ship and player ship",
+      "title": "Section 5 — Build the base ship and player ship",
       "description": "Implement BaseShip and PlayerShip with YARD-loaded stats, movement, shields, modules, groups, and required player visuals.",
       "status": "done",
       "priority": "critical",
@@ -410,9 +411,9 @@
     },
     {
       "id": "task_30",
-      "title": "Build the six authored sector scenes",
-      "description": "Create SectorRoot, then author Start, Patrol, Station, Nebula, Outpost, and Warp with their backgrounds, landmarks, encounters, and collisions. Configure the caravan, beacon, outpost, patrols, and reinforcements; verify each sector runs independently for layout testing and has quiet travel space.",
-      "status": "todo",
+      "title": "Section 23 — Build six authored sector test fixtures",
+      "description": "Create the six standalone Start, Patrol, Station, Nebula, Outpost, and Warp sector fixtures with their backgrounds, actors, and landmarks. These remain editor-run layout tests; generated map dots use seeded generated-sector content instead of loading these fixtures as campaign destinations.",
+      "status": "done",
       "priority": "critical",
       "epic_id": "epic_4",
       "due_date": 1795323600,
@@ -426,9 +427,9 @@
     },
     {
       "id": "task_31",
-      "title": "Build the FTL-style system map",
-      "description": "Create the six-node map, legal-route states, objective/side-quest/caravan information, and travel signal. Verify players can choose any legal connected destination from an uncleared sector.",
-      "status": "todo",
+      "title": "Section 24 — Build the procedural FTL-style system map",
+      "description": "Generate a seeded variable-count scatter of route dots with unique node IDs and generic solar-system attributes. Keep Start on the left and Warp fixed at the lower right; connect nearby forward dots, draw route-only navigation, and use a unique sector seed for each generated destination. The six authored sector scenes remain standalone fixtures, not map destinations.",
+      "status": "done",
       "priority": "critical",
       "epic_id": "epic_5",
       "due_date": 1795669200,
@@ -442,9 +443,9 @@
     },
     {
       "id": "task_32",
-      "title": "Verify discrete world simulation and stale information",
+      "title": "Section 25 — Verify discrete world simulation and stale information",
       "description": "Verify ticks, caravan movement, reinforcements, and intel expiry advance only on sector transitions; keep last-known caravan information stale until sensors rediscover it.",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "critical",
       "epic_id": "epic_5",
       "due_date": 1795928400,
@@ -459,8 +460,8 @@
     },
     {
       "id": "task_33",
-      "title": "Build the physical Warp Gate exit",
-      "description": "Create the gate scene, collision, shader, sensor contact, and Interact behavior. Keep it out of the main-objective group. Verify entering Warp does not end the run; the player must find, reach, and interact with the gate. Confirm optional portal-art licensing before use.",
+      "title": "Section 26 — Build the physical Warp Gate exit",
+      "description": "Create the gate scene with the downloaded animated portal sprite, collision, sensor contact, and Interact behavior. Keep it out of the main-objective group. Verify entering Warp does not end the run; the player must find, reach, and interact with the gate. Confirm portal-art licensing before distribution.",
       "status": "todo",
       "priority": "critical",
       "epic_id": "epic_6",
@@ -475,7 +476,7 @@
     },
     {
       "id": "task_34",
-      "title": "Build the game coordinator and run flow",
+      "title": "Section 27 — Build the game coordinator and run flow",
       "description": "Create the persistent Game scene; load and replace sectors while preserving player and HUD; advance world state once per valid transition; connect the gate, lock map travel in Warp, and handle death/reset and completion.",
       "status": "todo",
       "priority": "critical",
@@ -491,8 +492,8 @@
     },
     {
       "id": "task_35",
-      "title": "Run the prototype completion checklist",
-      "description": "Verify the guide’s full checklist, including YARD data, combat, drops, station, sensors, travel, persistent objectives, and wrapping. Compare a rush run with an explored/greedy run and confirm they produce meaningfully different Warp-sector difficulty.",
+      "title": "Section 28 — Run the end-to-end prototype test",
+      "description": "Verify the guide’s full checklist after Sections 25–27 are integrated, including YARD data, combat, drops, station, sensors, travel, persistent objectives, and wrapping. Compare a rush run with an explored/greedy run and confirm they produce meaningfully different Warp-sector difficulty; record any unverified or failing checks.",
       "status": "todo",
       "priority": "critical",
       "epic_id": "epic_7",
@@ -508,7 +509,7 @@
     {
       "id": "task_36",
       "title": "Verify asset rights and credits",
-      "description": "Resolve unknown terms for the enemy-ship sheet, Planetary Asset Pack, and Portal pack; retain required Super Pixel Effects and font credits/license files. Replace any asset without acceptable documented permission before release.",
+      "description": "Resolve the unverified creator/permission terms for the Shoot'em Up ship sheets and Warp Portal pack before redistribution. Preserve the required Super Pixel Effects and Pixelosopher notices; credit SteelSoldier if the animated world-object sheet is used. The Planetary Megapack and Felmir turret pack terms are documented in THIRD_PARTY_NOTICES.md.",
       "status": "todo",
       "priority": "high",
       "epic_id": "epic_7",
@@ -521,22 +522,6 @@
       ],
       "created_at": 1790276211,
       "updated_at": 1790287875
-    },
-    {
-      "id": "task_23",
-      "title": "Create the warp-gate shader",
-      "description": "Implement the gate’s shader visual and connect it to the WarpGate scene.",
-      "status": "backlog",
-      "priority": "medium",
-      "epic_id": "epic_2",
-      "due_date": 1792468800,
-      "tags": [
-        "prototype",
-        "shaders",
-        "warp-gate"
-      ],
-      "created_at": 1790275766,
-      "updated_at": 1790555277
     },
     {
       "id": "task_37",
@@ -728,9 +713,9 @@
     },
     {
       "id": "task_28",
-      "title": "Build the HUD, minimap, compass, and Dev Mode toggle",
-      "description": "Connect HUD information and objectives, sensor-limited contacts, minimap, compass, and a persistent Developer Console setting that defaults off. Verify the scanner improves minimap usefulness and the main objective remains represented outside sensor range. Retain the font license if using Pixelosopher.",
-      "status": "review",
+      "title": "Section 21 — Build the HUD, minimap, and Dev Mode toggle",
+      "description": "Connect hull, shields, credits, pilot, objectives, sensor-interference status, settings, and the sensor-limited minimap. The Developer Console remains included but defaults off until the player enables Dev Mode. Verify the main objective stays displayed independently of sensor range; retain the font license if using Pixelosopher.",
+      "status": "done",
       "priority": "critical",
       "epic_id": "epic_3",
       "due_date": 1794373200,
@@ -745,9 +730,9 @@
     },
     {
       "id": "task_25",
-      "title": "Prove YARD-driven buildcraft",
+      "title": "Section 18 — Prove YARD-driven buildcraft",
       "description": "Test that YARD-loaded modules visibly change ship behavior and that category queries use YARD’s index rather than a separately maintained module list.",
-      "status": "review",
+      "status": "done",
       "priority": "high",
       "epic_id": "epic_3",
       "due_date": 1793073600,
@@ -761,9 +746,9 @@
     },
     {
       "id": "task_29",
-      "title": "Build the timed intel side objective",
+      "title": "Section 22 — Build the timed intel side objective",
       "description": "Create the beacon and connect its availability, expiry, and reward to world ticks and RunState. Verify it can be completed early in Nebula but expires if the player advances the world too long elsewhere.",
-      "status": "in_progress",
+      "status": "done",
       "priority": "high",
       "epic_id": "epic_4",
       "due_date": 1794632400,
@@ -774,6 +759,24 @@
       ],
       "created_at": 1790276211,
       "updated_at": 1790627815
+    },
+    {
+      "id": "task_49",
+      "title": "Section 16 — Build the interactive nebula field",
+      "description": "Use the nebula shader for the irregular cloud appearance and a separate Area2D for sensor gameplay. Entering the field reduces player sensor range and attenuates ship signatures; exiting restores normal sensor values. The visual field is shader-driven rather than a circular Polygon2D.",
+      "status": "done",
+      "priority": "high",
+      "epic_id": "epic_2",
+      "due_date": 1793422800,
+      "tags": [
+        "prototype",
+        "shaders",
+        "nebula",
+        "sensors",
+        "exploration"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790703500
     }
   ]
 }

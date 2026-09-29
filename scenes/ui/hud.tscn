@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bwc3tvwye75ri" path="res://scripts/ui/hud.gd" id="1_hud"]
 [ext_resource type="Script" uid="uid://cxrv6io4piixk" path="res://scripts/ui/minimap.gd" id="2_minimap"]
+[ext_resource type="PackedScene" uid="uid://bdu2k3rton1vi" path="res://scenes/ui/system_map.tscn" id="3_8qguk"]
 [ext_resource type="PackedScene" uid="uid://ui4bronbjukn" path="res://scenes/ui/station_panel.tscn" id="5_station_panel"]
 
 [node name="HUD" type="CanvasLayer" unique_id=789571956]
@@ -122,6 +123,10 @@ offset_bottom = -54.0
 grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("2_minimap")
+
+[node name="SystemMap" parent="Root" unique_id=857440598 instance=ExtResource("3_8qguk")]
+layout_mode = 1
+anchors_preset = 15
 
 [node name="StationPanel" parent="Root" unique_id=1213040494 instance=ExtResource("5_station_panel")]
 visible = false

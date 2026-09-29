@@ -1,7 +1,6 @@
 [gd_scene format=3]
 
-; NEW CODE STARTS HERE
-[ext_resource type="Script" path="res://scenes/world/sector_root.gd" id="1_root"]
+[ext_resource type="Script" path="res://scripts/world/sector_root.gd" id="1_root"]
 [ext_resource type="Script" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="2_lit"]
 [ext_resource type="PackedScene" path="res://scenes/world/space_background.tscn" id="3_background"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/patrol_group.tscn" id="4_patrol"]
@@ -64,4 +63,3 @@ polygon = PackedVector2Array(-124, -102, -24, -143, 83, -106, 139, -12, 91, 91, 
 position = Vector2(6100, 4100)
 
 [node name="Landmarks" type="Node2D" parent="."]
-; NEW CODE ENDS HERE

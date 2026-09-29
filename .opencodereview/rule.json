@@ -1,0 +1,46 @@
+{
+  "include": [
+    "**/*.gd",
+    "**/*.gdshader",
+    "**/*.gdshaderinc",
+    "**/*.tscn",
+    "**/*.tres"
+  ],
+  "exclude": [
+    "addons/**",
+    "**/*.uid",
+    "**/*.import",
+    "assets/data/**",
+    "godoban_boards/**",
+    "project_time_tracker.json",
+    "kanban_tasks_data.kanban",
+    "**/generated_*"
+  ],
+  "rules": [
+    {
+      "path": "scripts/ships/base_ship.gd",
+      "merge_system_rule": true,
+      "rule": "BaseShip owns shared movement, combat, shields, and module application for every ship in the project, so a change here affects player and AI alike. Enforce ALL of the following:\n\n## Ownership boundaries\n- Do NOT move physics, weapon, or shield logic into subclasses. Subclasses (PlayerShip, EnemyShip) override `_gather_commands()` and nothing else about movement or damage.\n- A ship must not know whether a human or an AI is controlling it. Controller intent is expressed only through `command_heading`, `command_thrust`, and `command_fire`.\n\n## Wrapped space\n- Any distance, direction, or comparison between two positions MUST go through `SectorSpace.shortest_delta()` or `SectorSpace.wrapped_distance()`. Direct subtraction or `.distance_to()` across a sector edge is a bug.\n- `global_position` must be wrapped with `SectorSpace.wrap_position()` after motion.\n\n## Transient actors\n- Projectiles, pickups, and effects must be parented via `SectorSpace.spawn_owned()`, never `get_tree().current_scene`. The Game root survives sector transitions, so parenting there leaks actors into the next sector.\n\n## Stats and modules\n- Authored stats come only from the YARD `ShipDefinition` resolved by `ship_id`. Do not hardcode numbers that belong in data.\n- `_rebuild_stats()` must rebuild from the base definition before applying modules, so installs are order-independent.\n- Preserve the `initializing` flag semantics: a first build fills hull and shields; a later rebuild only clamps them.\n\n## Lifecycle\n- `_die()` must stay idempotent behind `is_dead`, and must emit `died` exactly once.\n- Damage must absorb into shields before hull, and only positive amounts may heal."
+    },
+    {
+      "path": "scripts/autoload/run_state.gd",
+      "merge_system_rule": true,
+      "rule": "RunState owns mutable run state only. Authored content belongs in YARD registries, never here. Enforce ALL of the following:\n\n## Content stays in YARD\n- Do NOT add arrays, dictionaries, or hardcoded lists of ships, pilots, or modules. Content is resolved through the `MODULES` registry by stable string ID, or queried through the `category` index.\n- YARD string IDs are the canonical identity. Never store or compare resource file paths.\n\n## World simulation\n- `advance_world()` is called exactly once per accepted sector transition and is the ONLY place world state advances. Do not add per-frame or timer-driven mutation.\n- Completion and reward functions must stay idempotent (guard behind the existing `*_complete` flags) so repeated triggers cannot pay out twice.\n- Deadlines and caps must use named constants, not bare literals.\n\n## Signals\n- Balance changes must emit both `credits_changed` and `run_state_changed`, since the HUD and mission systems listen to different ones.\n- `reset_run()` must reset every persistent field together so a restart is deterministic.\n\n## Settings\n- Dev-mode preference handling must fail closed: a missing file means disabled, and unreadable or wrongly-typed data must leave it disabled rather than raising."
+    },
+    {
+      "path": "scripts/autoload/sector_space.gd",
+      "merge_system_rule": true,
+      "rule": "SectorSpace defines what wrapped space means for the entire game, so every other system depends on it being correct. Enforce ALL of the following:\n\n## Correctness of the toroidal math\n- `wrap_position()` must use `fposmod` so negative coordinates wrap into the positive sector, never a plain modulo.\n- `shortest_delta()` must choose the shortest signed path independently per axis.\n- Guard against a zero or negative `sector_size` before any division, modulo, or half-sector comparison.\n\n## Ownership rules\n- `effect_parent()` and `spawn_owned()` are the only sanctioned way to introduce transient actors. They must resolve the live sector, and must never fall through to `get_tree().current_scene` when a sector group exists.\n- Sector membership must be dropped before a sector is freed, so a spawn cannot resolve to a dying sector.\n\n## Presentation vs simulation\n- Wrap-ghosting helpers are visual only. They must never create collision, affect gameplay position, or be counted as sensor contacts."
+    },
+    {
+      "path": "scripts/world/sector_root.gd",
+      "merge_system_rule": true,
+      "rule": "SectorRoot configures one authored sector scene, and its `_ready()` runs before the sector is usable. Enforce ALL of the following:\n\n## Ordering\n- Shared space must be configured first, so anything spawned afterwards uses the correct sector size.\n- Persistent objective state must be restored before actors are spawned.\n\n## Persistence\n- Content the run has already resolved must not come back. If `RunState` records an objective as destroyed or expired, the corresponding actor must be freed or not spawned.\n- World-simulation-driven actors (the caravan) appear only in the sector the simulation currently assigns them to, and reinforcement counts must be clamped to the authored spawn positions.\n\n## Authoring\n- All positions, sizes, and scene references belong in `@export` properties so they are set per-scene in the Inspector, not hardcoded in the script."
+    },
+    {
+      "path": "scripts/data/**",
+      "merge_system_rule": true,
+      "rule": "These are Resource schema classes. Their exported properties are the content-authoring surface. Enforce ALL of the following:\n\n- Changes here are a content migration: adding, removing, or renaming an exported field invalidates every existing authored `.tres`. Call this out explicitly in the review.\n- Keep field defaults matching the documented prototype values so a freshly created resource is usable without editing.\n- Do NOT add an `id` field to `ModuleDefinition`, `ShipDefinition`, or `PilotDefinition`. The YARD registry string ID is the canonical identity, and duplicating it creates two sources of truth.\n- Enum values are serialized into `.tres` files. Never reorder, insert into the middle of, or remove an enum member; append instead."
+    }
+  ]
+}

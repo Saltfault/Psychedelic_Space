@@ -1,7 +1,9 @@
 extends Area2D
+## Applies a temporary sensor-range/signature multiplier to ships inside the field.
 # NebulaField applies sensor interference to ships inside its collision shape.
 class_name NebulaField
 
+## Sensor-range and signature multiplier applied to ships while inside the Area2D.
 @export_range(0.1, 1.0, 0.05) var sensor_multiplier: float = 0.35
 
 

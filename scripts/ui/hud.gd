@@ -1,4 +1,5 @@
 extends CanvasLayer
+## Presents player status, objectives, settings, station actions, and run completion UI.
 class_name GameHUD
 
 @onready var hull_label: Label = $Root/HullLabel
@@ -18,7 +19,7 @@ class_name GameHUD
 var player: PlayerShip
 var sensor_component: SensorComponent
 
-# NEW CODE STARTS HERE
+
 func _ready() -> void:
 	settings_panel.hide()
 	station_panel.hide()
@@ -133,4 +134,3 @@ func _refresh_mission() -> void:
 
 func show_run_complete() -> void:
 	run_complete_panel.show()
-# NEW CODE ENDS HERE

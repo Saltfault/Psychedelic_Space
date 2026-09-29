@@ -1,27 +1,26 @@
 extends Area2D
-## Detects a nearby player and opens the shared station shop on interaction.
+class_name WarpGate
+
+signal warp_requested
 
 var player_inside: PlayerShip = null
 
 
 func _ready() -> void:
 	add_to_group("sensor_contact")
-	set_meta("contact_type", "station")
+	add_to_group("warp_gate")
+	set_meta("contact_type", "warp")
 
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if player_inside == null:
 		return
 
 	if Input.is_action_just_pressed("interact"):
-		var panel = get_tree().get_first_node_in_group("station_panel")
-
-		if panel != null and panel.has_method("open_for"):
-			panel.open_for(player_inside)
-			Log.info("Station shop opened", player_inside.name)
+		warp_requested.emit()
 
 
 func _on_body_entered(body: Node) -> void:
@@ -29,6 +28,6 @@ func _on_body_entered(body: Node) -> void:
 		player_inside = body
 
 
-func _on_body_exited(body: Node) -> void:
+func _on_body_exited(bode: Node) -> void:
 	if body == player_inside:
 		player_inside = null

@@ -1,38 +1,49 @@
 extends BaseShip
-# Adds enemy awareness and tactics while BaseShip owns shared ship behavior.
+## Sensor-driven hostile ship with patrol alert sharing and a bounded search state.
 class_name EnemyShip
 
-# NEW CODE STARTS HERE
-# Track sensor-confirmed pursuit and the short search after contact is lost.
+
+## Awareness state; SEARCH follows the last confirmed location without firing.
 enum State {
 	UNAWARE,
 	AGGRO,
 	SEARCH,
 }
-# NEW CODE ENDS HERE
 
+
+## Available attack patterns while the player is an active sensor contact.
 enum AIStyle {
 	STRAFE,
 	CHARGE,
 }
 
-# Keep movement style configurable independently of YARD ship statistics.
+## Tactic used while pursuing a currently detected player.
 @export var ai_style: AIStyle = AIStyle.STRAFE
+## Legacy pursuit radius, applied in addition to a live sensor contact.
 @export_range(0.0, 4000.0, 25.0) var aggro_range: float = 1250.0
-# NEW CODE STARTS HERE
+
+## Seconds to search the last confirmed position after sensor contact is lost.
 @export_range(0.0, 10.0, 0.5) var search_duration: float = 4.0
 var last_known_player_position: Vector2 = Vector2.ZERO
 var search_time_left: float = 0.0
 @onready var sensor_component: SensorComponent = $SensorComponent
-# NEW CODE ENDS HERE
+
+## Range at which this ship is allowed to fire at a live contact.
 @export_range(0.0, 4000.0, 25.0) var attack_range: float = 900.0
+## Preferred separation used by the STRAFE tactic.
 @export_range(0.0, 2500.0, 25.0) var desired_distance: float = 650.0
+## Lateral acceleration used by the STRAFE tactic.
 @export_range(0.0, 1000.0, 25.0) var strafe_acceleration: float = 220.0
+## Thrust command while unaware; patrol groups may override this value.
 @export_range(0.0, 1.0, 0.05) var unaware_thrust: float = 0.0
+## Heading maintained while unaware, before patrol-group overrides.
 @export var unaware_heading: Vector2 = Vector2.RIGHT
 
+## Optional death effect and pickups assigned by the enemy scene.
 @export var explosion_scene: PackedScene
+## Optional shield pickup spawned on death.
 @export var shield_booster_scene: PackedScene
+## Optional module pickup spawned on death.
 @export var module_pickup_scene: PackedScene
 
 # Cache the player after it joins BaseShip's player_ship group.
@@ -63,7 +74,7 @@ func _gather_commands(delta: float) -> void:
 				state = State.UNAWARE
 		return
 
-	# NEW CODE STARTS HERE
+	
 	# Keep the Step 8 aggro radius, but require the sensor refreshed contact list.
 	var player_distance: float = SectorSpace.wrapped_distance(global_position, player.global_position)
 	var has_player_contact: bool = (
@@ -126,8 +137,9 @@ func _gather_commands(delta: float) -> void:
 
 	var aim_error: float = absf(angle_difference(rotation, target_direction.angle()))
 	command_fire = distance <= attack_range and aim_error <= deg_to_rad(14.0)
-	# NEW CODE ENDS HERE
+	
 
+## Enter active pursuit after this ship's sensor confirms the player.
 func become_aggro() -> void:
 	# Run alert side effects once, even if more than one detection occurs.
 	if state == State.AGGRO:
@@ -144,6 +156,7 @@ func become_aggro() -> void:
 		parent_node.alert_all(self)
 
 
+## Receive a patrol alert; a supplied position is knowledge only, not live sensor contact.
 func force_aggro(known_player_position: Vector2 = Vector2.ZERO) -> void:
 	# Patrol alerts share the source ships confirmed location without granting contact.
 	last_known_player_position = known_player_position

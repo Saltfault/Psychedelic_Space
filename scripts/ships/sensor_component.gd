@@ -1,6 +1,8 @@
 extends Node
+## Maintains the owning ship's range-limited contact list, including nebula attenuation.
 class_name SensorComponent
 
+## Seconds between complete contact-list refreshes.
 @export var refresh_interval: float = 0.20
 
 var contacts: Array[Node2D] = []
@@ -17,6 +19,7 @@ func _process(delta: float) -> void:
 		refresh_contacts()
 
 
+## Rebuild contacts from currently eligible actors; stale contacts are removed immediately.
 func refresh_contacts() -> void:
 	contacts.clear()
 

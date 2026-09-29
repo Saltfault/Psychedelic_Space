@@ -74,9 +74,12 @@ impossible accretion disks, and violently colourful hulls.
 
 ## Current status
 
-**Vertical-slice prototype, in active development.** This is a proof of concept built to
-validate the pillars above before content production. Expect placeholder art and unbalanced
-numbers.
+**Prototype foundation, in active development.** Sections 1–24 of the external build guide have
+been statically reconciled against the project; Section 25 is the current development step.
+Gameplay has not been rerun as part of this documentation audit. Content and balance are still
+prototype quality. The procedural map and sector generator exist, but the
+campaign coordinator and complete warp/run flow described by later guide sections are not yet
+connected.
 
 ### Implemented
 
@@ -110,20 +113,24 @@ numbers.
   deadline. Known caravan position goes stale deliberately — your map shows what you last saw,
   not what is true.
 - **Dev-mode console** with run-status, credit-granting, module-testing, and reset commands.
-- **Shaders** — procedural starfield, nebula cloud, and shield.
+- **Visual effects** — procedural starfield and shield shader; nebula visuals use a shader while
+  a separate `Area2D` supplies sensor interference.
 
-### Present but not yet wired
+### Implemented foundations not yet connected to the campaign loop
 
-- `RunState.SYSTEM_GRAPH` defines the branching route between six sectors, and
-  `can_travel_to()` enforces it — but there is **no system map UI** and **no game coordinator**
-  yet. `scenes/sectors/sector.tscn` is still the main scene, so travel between sectors is not
-  reachable in-game.
-- Only one sector scene exists; the other five are authored but not built.
+- `SystemMap` generates a seeded, one-way FTL route graph with unique node IDs and a fixed lower-
+  right Warp node. `SectorGenerator` composes each destination from seeded actors and landmarks;
+  the six authored sector scenes are layout fixtures, not campaign destinations.
+- The map and generated-sector scene are not yet driven by the campaign coordinator. The project
+  main scene remains `scenes/sectors/sector.tscn`, so the generated route is not reachable in the
+  normal game flow yet. Do not treat static scene/resource inspection as proof of runtime play.
 
-### Not started
+### Not yet implemented or still in progress
 
-Meta-progression, factions as data, a mission framework, bosses, audio, and additional ship and
-pilot rosters. See [design docs](#design-documents) for the full intended scope.
+Section 25 discrete-world proof is in progress. Campaign integration and warp completion are
+later guide steps. Meta-progression, factions as data, a mission framework, bosses, audio, and
+additional ship and pilot rosters remain future work. See [design docs](#design-documents) for
+the full intended scope.
 
 ---
 
@@ -135,8 +142,9 @@ them apart:
 > Shaders create the appearance of the universe. Nodes and scripts create the rules of it.
 
 Anything whose position matters to gameplay — ships, bullets, collidable asteroids, stations,
-pickups, objectives, warp gates — is a real node. Nebulae, distant stars, accretion disks,
-distortion, and background debris are shader work and have no collision.
+pickups, objectives, and warp gates — is a real node. Nebula visuals are shader-driven, with a
+separate gameplay `Area2D` controlling sensor interference; distant stars and background debris
+have no collision.
 
 ### Ship composition
 
@@ -157,13 +165,13 @@ PlayerShip / EnemyShip            (CharacterBody2D, BaseShip)
 A **controller** supplies intent; the ship owns physics, shields, weapons, and damage:
 
 ```gdscript
-desired_heading    # Vector2
-thrust_amount      # 0..1
-fire_primary       # bool
+command_heading    # Vector2
+command_thrust     # 0..1
+command_fire       # bool
 ```
 
-`PlayerShip`, `EnemyShip`, and `Outpost` all consume the same `BaseShip` rules, which is why a
-hull swap is a data change rather than a code change.
+`PlayerShip` and `EnemyShip` share `BaseShip` rules. `Outpost` is a separate stationary objective
+and defense actor, not a `BaseShip` subclass.
 
 ### Two clocks
 
@@ -216,8 +224,12 @@ res://
 │   ├── ui/
 │   └── world/
 ├── godoban_boards/             Kanban boards (Godoban addon state)
-├── git_describe_demo/          Demo scene for the Git Describe addon
+├── build_info_demo/            Standalone editor/repository status sample
 ├── project.godot               Project config: autoloads, input map, physics layers
+├── LICENSE                     MIT license for original project code
+├── GODOT_LICENSE.txt           Godot Engine MIT license for distributed builds
+├── GODOT_COPYRIGHT.txt         Godot and bundled engine dependency notices
+├── THIRD_PARTY_NOTICES.md      Asset and addon sources, licenses, and release caveats
 └── icon.svg
 ```
 
@@ -245,8 +257,10 @@ git lfs pull             # fetch the actual binary content
 git config lfs."https://forgejo.hearthhome.lol/Saltfault/TBN-Psychedlic_Space_Game.git/info/lfs".locksverify true
 ```
 
-Then open the project in Godot and enable the plugins in **Project → Project Settings →
-Plugins**. F5 runs the current main scene (`scenes/sectors/sector.tscn`).
+Open the project in Godot 4.7.2. `project.godot` enables the bundled plugins; gameplay depends
+on Lit, the developer console, Log.gd, and YARD. The other enabled addons provide editor tools.
+F5 runs the current main scene (`scenes/sectors/sector.tscn`), which is still a prototype fixture
+and not the completed campaign flow.
 
 **Autoloads** (registered in `project.godot`): `SectorSpace`, `RunState`, `Console`,
 `LitManager`.
@@ -351,18 +365,10 @@ describes what the code actually does.
 
 ## Credits and licensing
 
-Project code is **MIT** — see [LICENSE](LICENSE).
-
-Third-party assets carry their own terms and require attribution. Licence texts are kept in
-`assets/licenses/`, and each must travel with the project:
-
-| Asset | Terms |
-|---|---|
-| Engine Flames (Dolkyns) | Free for commercial use, credit optional |
-| Warped Shooting FX (ansimuz) | CC0, credit optional |
-| Super Pixel Effects Gigapack (Will Tice / unTied Games) | **Attribution required** |
-| Pixelosopher font | SIL Open Font License 1.1 |
-| Shoot'em Up ship sheets | **Unverified** — local prototype use only until rights are confirmed |
-| Planetary Asset Pack, Portal, Sci-Fi Turret Pack | No licence text in archive — verify before public release |
-
-If you add third-party assets, add their licence text to `assets/licenses/` in the same commit.
+Project code is **MIT** — see [LICENSE](LICENSE). Asset and addon rights are not all the same as
+the project-code license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source,
+author, verified terms, required notices, and unresolved items. The downloaded ship sheets and
+portal sheet still need their original sources or licenses confirmed before redistribution.
+The animated world-object sheet is identified as SteelSoldier's Top Down Sci-fi Tileset and
+requires credit with a link if used. The Godot Engine copyright and license texts are included
+at the project root.

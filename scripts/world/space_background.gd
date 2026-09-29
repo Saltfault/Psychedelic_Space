@@ -1,16 +1,17 @@
 extends CanvasLayer
+## Screen-space star layers that respond to continuous player motion across sector wraps.
 class_name SpaceBackground
 
 @onready var far_stars: ColorRect = $FarStars
 @onready var near_stars: ColorRect = $NearStars
 
-# NEW CODE STARTS HERE
+
 var previous_camera_position: Vector2 = Vector2.ZERO
 var has_previous_camera_position: bool = false
-# NEW CODE ENDS HERE
+
 
 func _process(delta: float) -> void:
-	# NEW CODE STARTS HERE
+	
 	# The canonical position jumps at a seam; feed shaders the accumulated continuous one.
 	var player := get_tree().get_first_node_in_group("player_ship") as BaseShip
 	if not is_instance_valid(player):
@@ -29,7 +30,7 @@ func _process(delta: float) -> void:
 	_set_material_vector(near_stars, "camera_world_position", current_camera_position)
 	_set_material_vector(far_stars, "camera_velocity", normalized_camera_velocity)
 	_set_material_vector(near_stars, "camera_velocity", normalized_camera_velocity)
-	# NEW CODE ENDS HERE
+	
 
 func _set_material_vector(item: CanvasItem, parameter: StringName, value: Vector2) -> void:
 	var shader_material := item.material as ShaderMaterial

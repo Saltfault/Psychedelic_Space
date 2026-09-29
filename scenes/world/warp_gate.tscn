@@ -1,0 +1,36 @@
+[gd_scene format=4 uid="uid://cjrf1sjm060pa"]
+
+[ext_resource type="Script" uid="uid://c6mhuoolw62u4" path="res://scripts/world/warp_gate.gd" id="1_ep7gb"]
+[ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="1_xs8d5"]
+[ext_resource type="Script" uid="uid://ccbrgq2jxmujk" path="res://addons/lit/nodes/lit_animated_sprite_2d.gd" id="2_ep7gb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bo7qh"]
+shader = ExtResource("1_xs8d5")
+shader_parameter/emissive_strength = 0.0
+shader_parameter/receiver_mask = 1
+shader_parameter/self_shadow = false
+shader_parameter/self_rect_count = 0
+shader_parameter/self_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/specular_strength = 0.5
+shader_parameter/specular_k = 32.0
+shader_parameter/has_specular_map = false
+shader_parameter/metallic_value = 0.0
+shader_parameter/roughness_value = 1.0
+shader_parameter/shadow_steps = 64
+shader_parameter/shadow_min_step = 0.2
+shader_parameter/footprint_shadow = 16.0
+shader_parameter/directional_horizontal_scale = 32.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mfmwm"]
+
+[node name="WarpGate" type="Area2D" unique_id=1560342060]
+script = ExtResource("1_ep7gb")
+
+[node name="LitAnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1772559621]
+material = SubResource("ShaderMaterial_bo7qh")
+sprite_frames = SubResource("SpriteFrames_mfmwm")
+script = ExtResource("2_ep7gb")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://ccbrgq2jxmujk"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1390141061]

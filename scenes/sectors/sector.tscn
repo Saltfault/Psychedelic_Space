@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://b4d1y2vomspjd"]
 
-[ext_resource type="Script" uid="uid://cu2tosaysdsaa" path="res://scenes/world/sector_root.gd" id="1_d0w6f"]
 [ext_resource type="Script" uid="uid://dtbtq2iowg33y" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="1_lit_canvas_modulate"]
 [ext_resource type="PackedScene" uid="uid://dc14blsepkf65" path="res://scenes/ships/player_ship.tscn" id="2_player_ship"]
 [ext_resource type="PackedScene" uid="uid://bugq3l42agjob" path="res://scenes/ships/projectile.tscn" id="3_mad1q"]
@@ -11,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://22q7dgeg3fni" path="res://scenes/ui/hud.tscn" id="7_hud"]
 
 [node name="Sector" type="Node2D" unique_id=1224514204]
-script = ExtResource("1_d0w6f")
 
 [node name="SpaceBackground" parent="." unique_id=363976564 instance=ExtResource("6_space_background")]
 

@@ -5,6 +5,7 @@ extends Node
 var sector_size: Vector2 = Vector2(8000.0, 8000.0)
 
 
+## Wrap a world position into the current sector rectangle.
 func wrap_position(position: Vector2) -> Vector2:
 	# fposmod also maps negative coordinates back into the positive sector range.
 	if not _has_valid_sector_size():
@@ -12,6 +13,7 @@ func wrap_position(position: Vector2) -> Vector2:
 	return Vector2(fposmod(position.x, sector_size.x), fposmod(position.y, sector_size.y))
 
 
+## Return the shortest toroidal displacement from one position to another.
 func shortest_delta(from_position: Vector2, to_position: Vector2) -> Vector2:
 	# Choose the shorter wrapped vector independently on each axis.
 	var delta := to_position - from_position
@@ -31,6 +33,7 @@ func shortest_delta(from_position: Vector2, to_position: Vector2) -> Vector2:
 	return delta
 
 
+## Measure straight-line distance using shortest_delta across sector boundaries.
 func wrapped_distance(from_position: Vector2, to_position: Vector2) -> float:
 	# Distance uses the seam-aware delta so ships near opposite edges stay nearby.
 	return shortest_delta(from_position, to_position).length()
@@ -57,17 +60,18 @@ func spawn_owned(node: Node, at: Vector2) -> Node:
 	if node == null or parent == null:
 		return null
 
-	# NEW CODE STARTS HERE
 	# Wait until physics callbacks finish before adding areas or other gameplay nodes.
 	_attach_owned_node.call_deferred(node, parent, at)
-	# NEW CODE ENDS HERE
+
 	return node
 
 
-# NEW CODE STARTS HERE
 func _attach_owned_node(node: Node, parent: Node, at: Vector2) -> void:
 	# Discard the pending spawn if its node or owning sector has already left.
-	if not is_instance_valid(node) or not is_instance_valid(parent) or parent.is_queued_for_deletion():
+	if (
+		not is_instance_valid(node) or not is_instance_valid(parent)
+		or parent.is_queued_for_deletion()
+	):
 		if is_instance_valid(node):
 			node.queue_free()
 		return
@@ -76,9 +80,8 @@ func _attach_owned_node(node: Node, parent: Node, at: Vector2) -> void:
 	var node_2d: Node2D = node as Node2D
 	if node_2d != null:
 		node_2d.global_position = at
-# NEW CODE ENDS HERE
 
-# NEW CODE STARTS HERE
+
 # Track cloned visuals that render actors from the neighboring toroidal tiles.
 var _wrap_visual_entries: Array[Dictionary] = []
 const WRAP_VISUAL_PADDING := 256.0
@@ -88,12 +91,12 @@ func _process(_delta: float) -> void:
 	_update_wrap_visuals()
 
 
-func register_wrap_visual(owner: Node2D, source: Node2D) -> void:
+func register_wrap_visual(visual_owner: Node2D, source: Node2D) -> void:
 	# Create visual-only copies around the camera-nearest tile; physics stays on the original.
-	if owner == null or source == null or get_tree().current_scene == null:
+	if visual_owner == null or source == null or get_tree().current_scene == null:
 		return
 
-	unregister_wrap_visual(owner)
+	unregister_wrap_visual(visual_owner)
 	var copies: Array[Dictionary] = []
 	var scene_root: Node = get_tree().current_scene
 
@@ -112,13 +115,11 @@ func register_wrap_visual(owner: Node2D, source: Node2D) -> void:
 
 			var pairs: Array[Dictionary] = []
 			_collect_wrap_visual_pairs(source, ghost, pairs)
-			copies.append({
-				"node": ghost,
-				"tile_delta": Vector2i(x_offset, y_offset),
-				"pairs": pairs,
-			})
+			copies.append(
+				{ "node": ghost, "tile_delta": Vector2i(x_offset, y_offset), "pairs": pairs }
+			)
 
-	_wrap_visual_entries.append({"owner": owner, "source": source, "copies": copies})
+	_wrap_visual_entries.append({ "owner": visual_owner, "source": source, "copies": copies })
 
 
 func unregister_wrap_visual(owner: Node) -> void:
@@ -135,14 +136,17 @@ func _update_wrap_visuals() -> void:
 	# Retire stale actors before doing viewport work.
 	for index in range(_wrap_visual_entries.size() - 1, -1, -1):
 		var entry: Dictionary = _wrap_visual_entries[index]
-		var owner: Node = entry.get("owner")
+		var visual_owner: Node = entry.get("owner")
 		var source: Node2D = entry.get("source")
-		if not is_instance_valid(owner) or not is_instance_valid(source):
+		if not is_instance_valid(visual_owner) or not is_instance_valid(source):
 			_free_wrap_visual_copies(entry.get("copies", []))
 			_wrap_visual_entries.remove_at(index)
 
 	var camera := get_viewport().get_camera_2d()
-	if camera == null or camera.zoom.x <= 0.0 or camera.zoom.y <= 0.0 or not _has_valid_sector_size():
+	if (
+		camera == null or camera.zoom.x <= 0.0
+		or camera.zoom.y <= 0.0 or not _has_valid_sector_size()
+	):
 		return
 
 	var half_view := get_viewport().get_visible_rect().size * 0.5 / camera.zoom
@@ -154,7 +158,7 @@ func _update_wrap_visuals() -> void:
 		var source_position: Vector2 = source.global_position
 		var nearest_tile := Vector2i(
 			roundi((view_center.x - source_position.x) / sector_size.x),
-			roundi((view_center.y - source_position.y) / sector_size.y)
+			roundi((view_center.y - source_position.y) / sector_size.y),
 		)
 		var copies: Array = entry["copies"]
 		for copy in copies:
@@ -180,10 +184,14 @@ func _update_wrap_visuals() -> void:
 
 func _collect_wrap_visual_pairs(source: Node, ghost: Node, pairs: Array[Dictionary]) -> void:
 	# Store corresponding nodes once so animated frames and transforms stay in sync.
-	pairs.append({"source": source, "ghost": ghost})
+	pairs.append({ "source": source, "ghost": ghost })
 	var child_count: int = mini(source.get_child_count(), ghost.get_child_count())
 	for child_index in range(child_count):
-		_collect_wrap_visual_pairs(source.get_child(child_index), ghost.get_child(child_index), pairs)
+		_collect_wrap_visual_pairs(
+			source.get_child(child_index),
+			ghost.get_child(child_index),
+			pairs,
+		)
 
 
 func _sync_wrap_visual_pairs(pairs: Array[Dictionary]) -> void:
@@ -213,4 +221,3 @@ func _free_wrap_visual_copies(copies: Array) -> void:
 		var ghost: Node = copy.get("node")
 		if is_instance_valid(ghost):
 			ghost.queue_free()
-# NEW CODE ENDS HERE

@@ -1,4 +1,5 @@
 extends PanelContainer
+## Paused station interface for module purchases and paid hull repairs.
 
 @onready var credits_label: Label = $MarginContainer/VBoxContainer/Credits
 @onready var hull_label: Label = $MarginContainer/VBoxContainer/Hull
@@ -28,6 +29,7 @@ func _ready() -> void:
 	close_button.pressed.connect(close_panel)
 
 
+## Roll this visit's offers, bind the player, then pause the world while the panel is open.
 func open_for(target_player: PlayerShip) -> void:
 	player = target_player
 
@@ -38,6 +40,7 @@ func open_for(target_player: PlayerShip) -> void:
 	get_tree().paused = true
 
 
+## Hide the station interface and resume the scene tree.
 func close_panel() -> void:
 	hide()
 	get_tree().paused = false
@@ -116,6 +119,11 @@ func _buy_offer(index: int) -> void:
 
 	if player.installed_modules.size() >= player.module_slots:
 		status_label.text = "No empty module slots."
+		Log.warn("Module purchase denied: no empty slots", module.display_name)
+		return
+
+	if not RunState.spend_credits(module.price):
+		status_label.text = "Not enough credits."
 		Log.warn("Module purchase denied: insufficient credits", module.display_name, module.price)
 		return
 

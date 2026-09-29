@@ -1,20 +1,24 @@
 extends CharacterBody2D
-# BaseShip owns shared movement, combat, shields, and module application.
+## Shared ship physics, combat, defensive stats, sensors, and module application.
 class_name BaseShip
 
+## Emitted once when hull reaches zero; listeners may spawn effects or persist consequences.
 signal died(ship: BaseShip)
+## Emitted whenever current hull changes, with the current maximum as the second argument.
 signal hull_changed(current: float, maximum: float)
+## Emitted whenever current shields change, with the current maximum as the second argument.
 signal shield_changed(current: float, maximum: float)
+## Emitted after a module is installed or the ship's derived stats are rebuilt.
 signal modules_changed
 
 const SHIPS: Registry = preload("res://assets/data/registries/ships.tres")
 
-# YARD supplies the authored ship ID; the editor hint offers registry-backed selection.
+## Stable YARD ID of the ShipDefinition that provides this ship's baseline statistics.
 @export_custom(Registry.PROPERTY_HINT_CUSTOM, "res://assets/data/registries/ships.tres") var ship_id: StringName = &"prototype_ship"
 
-# Team 0 is the player; every nonzero team is treated as hostile in this prototype.
+## Combat team used by projectiles to decide whether this ship is a valid target.
 @export var team: int = 0
-# Assign a projectile scene implementing velocity, damage, team, and source properties.
+## Projectile scene with the Projectile script; required when this ship can fire.
 @export var projectile_scene: PackedScene
 
 @onready var muzzle: Marker2D = $Muzzle
@@ -50,11 +54,11 @@ var sensor_range: float
 var module_slots: int
 var installed_modules: Array[ModuleDefinition] = []
 
-# NEW CODE STARTS HERE
+
 # Preserve a smooth world-space coordinate for camera-driven background shaders.
 var unwrapped_world_position: Vector2 = Vector2.ZERO
 var _previous_wrapped_position: Vector2 = Vector2.ZERO
-# NEW CODE ENDS HERE
+
 
 
 func _ready() -> void:
@@ -70,24 +74,24 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 
-	# NEW CODE STARTS HERE
+	
 	# Normalize the spawn and seed the continuous coordinate before movement begins.
 	unwrapped_world_position = global_position
 	_previous_wrapped_position = SectorSpace.wrap_position(global_position)
 	global_position = _previous_wrapped_position
-	# NEW CODE ENDS HERE
+	
 
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 
 	add_to_group("ships")
 	add_to_group("sensor_contact")
 
-	# NEW CODE STARTS HERE
+	
 	# Display neighboring copies near sector edges without duplicating ship physics.
 	var wrap_visual := get_node_or_null("Visuals") as Node2D
 	if wrap_visual != null:
 		SectorSpace.register_wrap_visual(self, wrap_visual)
-	# NEW CODE ENDS HERE
+	
 
 	if team == 0:
 		add_to_group("player_ship")
@@ -115,7 +119,7 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# NEW CODE STARTS HERE
+	
 	# Accumulate actual movement before canonicalizing the toroidal sector position.
 	var raw_position: Vector2 = global_position
 	unwrapped_world_position += SectorSpace.shortest_delta(_previous_wrapped_position, raw_position)
@@ -125,14 +129,14 @@ func _physics_process(delta: float) -> void:
 		# Avoid rendering interpolation across the large coordinate discontinuity.
 		reset_physics_interpolation()
 	_previous_wrapped_position = wrapped_position
-	# NEW CODE ENDS HERE
+	
 
 
-# NEW CODE STARTS HERE
+
 func _exit_tree() -> void:
 	# Keep runtime render copies from outliving this ship.
 	SectorSpace.unregister_wrap_visual(self)
-# NEW CODE ENDS HERE
+
 
 
 func _gather_commands(_delta: float) -> void:
@@ -178,6 +182,7 @@ func _update_shield(delta: float) -> void:
 	_update_shield_visual()
 
 
+## Spawn one projectile if the weapon is ready and its configured scene is valid.
 func try_fire() -> void:
 	# Projectiles inherit the ship's current direction, damage, and team.
 	if projectile_scene == null or muzzle == null:
@@ -188,17 +193,20 @@ func try_fire() -> void:
 
 	weapon_cooldown_left = weapon_cooldown
 
-	var projectile = projectile_scene.instantiate()
-	projectile.global_position = muzzle.global_position
+	var projectile: Projectile = projectile_scene.instantiate() as Projectile
+	if projectile == null:
+		Log.error("Projectile scene root must use Projectile.gd", projectile_scene.resource_path)
+		return
 	projectile.rotation = rotation
 	projectile.velocity = (Vector2.RIGHT.rotated(rotation) * projectile_speed)
 	projectile.damage = projectile_damage
 	projectile.team = team
 	projectile.source = self
 
-	get_tree().current_scene.add_child(projectile)
+	SectorSpace.spawn_owned(projectile, muzzle.global_position)
 
 
+## Apply nonnegative damage to shields first, then hull; emits change and death signals.
 func take_damage(amount: float) -> void:
 	# Damage is absorbed by shields first; only overflow reaches hull.
 	if is_dead or amount <= 0.0:
@@ -226,6 +234,7 @@ func take_damage(amount: float) -> void:
 		_die()
 
 
+## Restore up to amount shield points without exceeding the current maximum.
 func restore_shield(amount: float) -> void:
 	# Ignore invalid healing values so this API cannot accidentally cause damage.
 	if is_dead or amount <= 0.0:
@@ -236,6 +245,7 @@ func restore_shield(amount: float) -> void:
 	_update_shield_visual()
 
 
+## Restore up to amount hull points without exceeding the current maximum.
 func repair_hull(amount: float) -> void:
 	# Repairs are positive-only and do not revive a ship after its death event.
 	if is_dead or amount <= 0.0:
@@ -245,6 +255,7 @@ func repair_hull(amount: float) -> void:
 	hull_changed.emit(hull, max_hull)
 
 
+## Install a module when a slot is available; returns false without changing state otherwise.
 func install_module(module: ModuleDefinition) -> bool:
 	# Slot capacity is enforced here so pickups and shops share one rule.
 	if module == null or installed_modules.size() >= module_slots:

@@ -1,4 +1,5 @@
 extends Sprite2D
+## Plays a horizontal sprite strip once, then frees the effect node.
 # Plays a horizontal sprite strip once, then removes its scene instance.
 class_name OneShotStrip
 

@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://di2pacxb5uoqk"]
+
+[ext_resource type="Script" uid="uid://cu2tosaysdsaa" path="res://scripts/world/sector_root.gd" id="1_0sov8"]
+[ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="2_qutw5"]
+[ext_resource type="Script" uid="uid://dtbtq2iowg33y" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="3_dopbe"]
+[ext_resource type="Script" uid="uid://cakbs23pu53yt" path="res://scripts/world/sector_generator.gd" id="4_utapr"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/caravan.tscn" id="5_caravan"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="6_reinforcement"]
+[ext_resource type="PackedScene" path="res://scenes/ships/projectile.tscn" id="7_projectile"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/patrol_group.tscn" id="8_patrol"]
+[ext_resource type="PackedScene" path="res://scenes/world/station.tscn" id="9_station"]
+[ext_resource type="PackedScene" path="res://scenes/world/nebula_field.tscn" id="10_nebula"]
+[ext_resource type="PackedScene" path="res://scenes/world/intel_beacon.tscn" id="11_beacon"]
+[ext_resource type="PackedScene" path="res://scenes/world/outpost.tscn" id="12_outpost"]
+
+[node name="GeneratedSector" type="Node2D" unique_id=845970153]
+script = ExtResource("1_0sov8")
+caravan_scene = ExtResource("5_caravan")
+reinforcement_enemy_scene = ExtResource("6_reinforcement")
+
+[node name="SpaceBackground" parent="." unique_id=854795771 instance=ExtResource("2_qutw5")]
+
+[node name="LitCanvasModulate" type="Node2D" parent="." unique_id=679107939]
+script = ExtResource("3_dopbe")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://dtbtq2iowg33y"
+
+[node name="Asteroids" type="Node2D" parent="." unique_id=1248844240]
+
+[node name="SectorGenerator" type="Node" parent="." unique_id=1434022841]
+script = ExtResource("4_utapr")
+patrol_group_scene = ExtResource("8_patrol")
+station_scene = ExtResource("9_station")
+nebula_scene = ExtResource("10_nebula")
+intel_beacon_scene = ExtResource("11_beacon")
+outpost_scene = ExtResource("12_outpost")
+projectile_scene = ExtResource("7_projectile")
+
+[node name="Encounters" type="Node2D" parent="." unique_id=1709771713]
+
+[node name="Landmarks" type="Node2D" parent="." unique_id=1248739591]

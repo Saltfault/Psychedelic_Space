@@ -1,4 +1,5 @@
 extends Area2D
+## Installs its configured module on the player when collected, then removes itself.
 
 var module: ModuleDefinition
 
