@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://kq14ssgpq11g"]
+
+[ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_hpaqf"]
+
+[resource]
+script = ExtResource("1_hpaqf")
+display_name = "Cutter"
+max_speed = 320.0
+thrust_acceleration = 500.0
+linear_drag = 50.0
+turn_speed_degrees = 150.0
+max_hull = 90.0
+max_shield = 75.0
+weapon_cooldown = 0.42
+projectile_speed = 780.0
+projectile_damage = 13.0
+module_slots = 6
+metadata/_custom_type_script = "uid://dtjhydxdas3kp"

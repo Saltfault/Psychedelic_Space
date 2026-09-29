@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bugq3l42agjob"]
+
+[ext_resource type="Texture2D" uid="uid://bnwdp6fj8ipmv" path="res://assets/sprites/projectiles/warped_bolt.png" id="1_dhrag"]
+[ext_resource type="Script" uid="uid://8lwpwqvqqlvd" path="res://scripts/combat/projectile.gd" id="1_vbspy"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
+radius = 25.0
+height = 50.0
+
+[node name="Projectile" type="Area2D" unique_id=32359805]
+collision_mask = 7
+script = ExtResource("1_vbspy")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1829174832]
+rotation = 3.1415927
+texture = ExtResource("1_dhrag")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2102290046]
+position = Vector2(1, 0)
+shape = SubResource("CapsuleShape2D_g4v7s")

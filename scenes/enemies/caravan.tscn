@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bleelony7g2ko"]
+
+[ext_resource type="Script" uid="uid://koqwmrqnu38c" path="res://scripts/enemies/caravan_group.gd" id="1_xpl57"]
+[ext_resource type="PackedScene" uid="uid://bev0mbgiaw2oh" path="res://scenes/enemies/enemy_ship.tscn" id="2_ulf3i"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_corsair.tscn" id="3_sdu77"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="4_us30v"]
+
+[node name="Caravan" type="Node2D" unique_id=1264120155]
+script = ExtResource("1_xpl57")
+drifting = true
+drift_heading = Vector2(1, 0.25)
+drift_thrust = 0.22
+
+[node name="EnemyShip" parent="." unique_id=1146619288 instance=ExtResource("2_ulf3i")]
+position = Vector2(-103, 146)
+
+[node name="EnemyCorsair" parent="." unique_id=1795912370 instance=ExtResource("3_sdu77")]
+position = Vector2(146, -1)
+
+[node name="EnemyCutter" parent="." unique_id=541571522 instance=ExtResource("4_us30v")]
+position = Vector2(-110, -127)

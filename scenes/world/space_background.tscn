@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://duaa6p8tt6mlj"]
+
+[ext_resource type="Script" uid="uid://8dol3ndir85g" path="res://scripts/world/space_background.gd" id="1_mpasx"]
+[ext_resource type="Shader" path="res://assets/shaders/backgrounds/starfield.gdshader" id="2_stars"]
+
+[sub_resource type="ShaderMaterial" id="FarStarsMaterial"]
+shader = ExtResource("2_stars")
+shader_parameter/parallax = 0.000002
+shader_parameter/trail_strength = 0.72
+shader_parameter/star_scale = 165.0
+shader_parameter/star_size = 0.45
+shader_parameter/brightness = 0.65
+
+[sub_resource type="ShaderMaterial" id="NearStarsMaterial"]
+shader = ExtResource("2_stars")
+shader_parameter/parallax = 0.00018
+shader_parameter/trail_strength = 0.16
+shader_parameter/star_scale = 75.0
+shader_parameter/star_size = 0.9
+shader_parameter/brightness = 1.25
+
+[node name="SpaceBackground" type="CanvasLayer" unique_id=854795771]
+layer = -1
+script = ExtResource("1_mpasx")
+
+[node name="Base" type="ColorRect" parent="." unique_id=1946446484]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03529412, 0.05882353, 0.13333334, 1)
+
+[node name="FarStars" type="ColorRect" parent="." unique_id=2073014970]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+material = SubResource("FarStarsMaterial")
+
+[node name="NearStars" type="ColorRect" parent="." unique_id=472321762]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+material = SubResource("NearStarsMaterial")

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://b4d1y2vomspjd"]
+
+[ext_resource type="Script" uid="uid://dtbtq2iowg33y" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="1_lit_canvas_modulate"]
+[ext_resource type="PackedScene" uid="uid://dc14blsepkf65" path="res://scenes/ships/player_ship.tscn" id="2_player_ship"]
+[ext_resource type="PackedScene" uid="uid://bugq3l42agjob" path="res://scenes/ships/projectile.tscn" id="3_mad1q"]
+[ext_resource type="PackedScene" uid="uid://d12i64lhwf8qf" path="res://scenes/enemies/patrol_group.tscn" id="4_mad1q"]
+[ext_resource type="PackedScene" uid="uid://bux8k5c07p8xq" path="res://scenes/world/outpost.tscn" id="5_d1pn0"]
+[ext_resource type="PackedScene" uid="uid://bleelony7g2ko" path="res://scenes/enemies/caravan.tscn" id="5_hpwix"]
+[ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="6_space_background"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="7_hud"]
+
+[node name="Sector" type="Node2D" unique_id=1224514204]
+
+[node name="SpaceBackground" parent="." unique_id=363976564 instance=ExtResource("6_space_background")]
+
+[node name="LitCanvasModulate" type="Node2D" parent="." unique_id=1223870325]
+script = ExtResource("1_lit_canvas_modulate")
+lit_version = "1.1.4"
+color = Color(0.09019608, 0.05882353, 0.16862746, 1)
+
+[node name="PlayerShip" parent="." unique_id=1418916764 instance=ExtResource("2_player_ship")]
+projectile_scene = ExtResource("3_mad1q")
+
+[node name="PatrolGroup" parent="." unique_id=1264120155 instance=ExtResource("4_mad1q")]
+position = Vector2(1922, 0)
+
+[node name="Caravan" parent="." unique_id=756265007 instance=ExtResource("5_hpwix")]
+position = Vector2(-1946, -1507)
+
+[node name="Outpost" parent="." unique_id=711302207 instance=ExtResource("5_d1pn0")]
+position = Vector2(1282, 2406)
+projectile_scene = ExtResource("3_mad1q")
+
+; NEW CODE STARTS HERE
+[node name="HUD" parent="." instance=ExtResource("7_hud")]
+; NEW CODE ENDS HERE

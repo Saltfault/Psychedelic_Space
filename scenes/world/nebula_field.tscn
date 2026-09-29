@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://bwnq1gmpu2wy"]
+
+[ext_resource type="Script" uid="uid://bktplgnct74lu" path="res://scripts/world/nebula_field.gd" id="1_c4hci"]
+[ext_resource type="Shader" uid="uid://bvjra2s1rshwl" path="res://assets/shaders/objects/nebula_cloud.gdshader" id="1_sbsph"]
+[ext_resource type="Script" uid="uid://drrhypxeb6nsg" path="res://addons/lit/nodes/lit_sprite_2d.gd" id="2_c4hci"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_nebula"]
+radius = 1200.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_nebula"]
+frequency = 0.008
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_g4v7s"]
+noise = SubResource("FastNoiseLite_nebula")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fss5y"]
+shader = ExtResource("1_sbsph")
+shader_parameter/cloud_noise = SubResource("NoiseTexture2D_g4v7s")
+shader_parameter/color_a = Color(0.18, 0.06, 0.42, 1)
+shader_parameter/color_b = Color(0.08, 0.34, 0.52, 1)
+shader_parameter/opacity = 0.82
+shader_parameter/drift_speed = 0.0018
+
+[node name="NebulaField" type="Area2D" unique_id=1700588142]
+collision_layer = 0
+collision_mask = 6
+script = ExtResource("1_c4hci")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=744078481]
+shape = SubResource("CircleShape2D_nebula")
+
+[node name="NebulaVisual" type="Sprite2D" parent="." unique_id=890616272]
+z_index = 1
+texture_filter = 2
+material = SubResource("ShaderMaterial_fss5y")
+scale = Vector2(4.6875, 4.6875)
+texture = SubResource("NoiseTexture2D_g4v7s")
+script = ExtResource("2_c4hci")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://drrhypxeb6nsg"

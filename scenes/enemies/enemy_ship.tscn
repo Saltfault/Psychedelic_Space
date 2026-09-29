@@ -1,0 +1,86 @@
+[gd_scene format=4 uid="uid://bev0mbgiaw2oh"]
+
+[ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="1_0wb5s"]
+[ext_resource type="Script" uid="uid://drrhypxeb6nsg" path="res://addons/lit/nodes/lit_sprite_2d.gd" id="3_o20jb"]
+[ext_resource type="Script" uid="uid://b7h4af38etqk6" path="res://scripts/enemies/enemy_ship.gd" id="4_enemy_script"]
+[ext_resource type="Texture2D" uid="uid://bdh06b30ouepq" path="res://assets/sprites/ships/shoot_em_up_enemy_ships.png" id="5_enemy_sheet"]
+[ext_resource type="PackedScene" uid="uid://bugq3l42agjob" path="res://scenes/ships/projectile.tscn" id="6_projectile"]
+[ext_resource type="PackedScene" path="res://scenes/effects/explosion.tscn" id="7_explosion"]
+[ext_resource type="Script" uid="uid://cpa2qb3trjq4k" path="res://addons/lit/nodes/lit_point_light_2d.gd" id="8_enemy_hull_light"]
+[ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="9_shield_shader"]
+[ext_resource type="PackedScene" path="res://scenes/world/shield_booster.tscn" id="10_shield_booster"]
+[ext_resource type="PackedScene" path="res://scenes/world/module_pickup.tscn" id="11_module_pickup"]
+[ext_resource type="Texture2D" path="res://assets/shaders/objects/shield_uv_texture.tres" id="12_shield_uv_texture"]
+[ext_resource type="Script" uid="uid://bg6o2q3cxdcr" path="res://scripts/ships/sensor_component.gd" id="13_sensor"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_awypu"]
+shader = ExtResource("1_0wb5s")
+shader_parameter/emissive_strength = 0.0
+shader_parameter/receiver_mask = 1
+shader_parameter/self_shadow = false
+shader_parameter/self_rect_count = 0
+shader_parameter/self_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/specular_strength = 0.5
+shader_parameter/specular_k = 32.0
+shader_parameter/has_specular_map = false
+shader_parameter/metallic_value = 0.0
+shader_parameter/roughness_value = 1.0
+shader_parameter/shadow_steps = 64
+shader_parameter/shadow_min_step = 0.2
+shader_parameter/footprint_shadow = 16.0
+shader_parameter/directional_horizontal_scale = 32.0
+
+[sub_resource type="ShaderMaterial" id="EnemyShieldMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("9_shield_shader")
+shader_parameter/strength = 1.0
+shader_parameter/shield_color = Color(0.7, 0.2, 1, 1)
+
+[node name="EnemyShip" type="CharacterBody2D" unique_id=2013011426]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("4_enemy_script")
+ai_style = 1
+explosion_scene = ExtResource("7_explosion")
+shield_booster_scene = ExtResource("10_shield_booster")
+module_pickup_scene = ExtResource("11_module_pickup")
+ship_id = &"corsair"
+team = 1
+projectile_scene = ExtResource("6_projectile")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1697954965]
+
+[node name="Hull" type="Sprite2D" parent="Visuals" unique_id=676939502]
+texture_filter = 1
+material = SubResource("ShaderMaterial_awypu")
+rotation = -1.5707963
+texture = ExtResource("5_enemy_sheet")
+region_enabled = true
+region_rect = Rect2(32, 10, 49, 55)
+script = ExtResource("3_o20jb")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://drrhypxeb6nsg"
+
+[node name="ShieldVisual" type="Sprite2D" parent="Visuals" unique_id=1161081465]
+visible = false
+texture_filter = 1
+material = SubResource("EnemyShieldMaterial")
+scale = Vector2(60, 60)
+texture = ExtResource("12_shield_uv_texture")
+
+[node name="HullLight" type="Node2D" parent="Visuals" unique_id=338976168]
+script = ExtResource("8_enemy_hull_light")
+lit_version = "1.1.4"
+color = Color(0.55, 0.8, 1, 1)
+energy = 0.8
+range = 280.0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=757805760]
+scale = Vector2(1.2, 1.95)
+polygon = PackedVector2Array(-22, -12, 4, -12, 22, 0, 4, 12, -22, 12)
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=726672308]
+position = Vector2(36, 0)
+
+[node name="SensorComponent" type="Node" parent="."]
+script = ExtResource("13_sensor")

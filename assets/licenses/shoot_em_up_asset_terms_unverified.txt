@@ -1,0 +1,6 @@
+Source archive: Shoot`em Up.rar
+Selected files: SpaceShips_Player-0001.png, SpaceShips_Enemy-0001.png, SpaceShip_Boss-0001.png
+
+The supplied archive contained no README, license, creator credit, or source URL.
+This note records that the terms are unverified; it is not a license grant.
+Keep these assets in the local prototype only until their creator and usage terms are confirmed.

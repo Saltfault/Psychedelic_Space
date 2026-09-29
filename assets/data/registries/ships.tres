@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://c0fub6gebc316"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_rl8fi"]
+
+[resource]
+script = ExtResource("1_rl8fi")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([".tres"]),
+&"class_restrictions": Array[StringName]([&"ShipDefinition"]),
+&"recursive_scan": false,
+&"scan_directories": Array[String](["res://assets/data/ships"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://b18tytpgt30ex": &"prototype_ship",
+&"uid://day6awcngf0ba": &"corsair",
+&"uid://kq14ssgpq11g": &"cutter"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"corsair": &"uid://day6awcngf0ba",
+&"cutter": &"uid://kq14ssgpq11g",
+&"prototype_ship": &"uid://b18tytpgt30ex"
+})

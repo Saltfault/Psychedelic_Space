@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PilotDefinition" format=3 uid="uid://gf5hi8me7wal"]
+
+[ext_resource type="Script" uid="uid://c1kvsrnt502i0" path="res://scripts/data/pilot_definition.gd" id="1_ybh1x"]
+
+[resource]
+script = ExtResource("1_ybh1x")
+metadata/_custom_type_script = "uid://c1kvsrnt502i0"
+display_name = "Slip"
+ability = 0
+cooldown = 5.0
+dash_impulse = 900.0

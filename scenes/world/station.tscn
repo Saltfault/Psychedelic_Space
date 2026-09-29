@@ -1,0 +1,42 @@
+[gd_scene format=4 uid="uid://cxqkehtk0mfbm"]
+
+[ext_resource type="Script" uid="uid://dkyyoilv8gjga" path="res://scripts/world/station.gd" id="1_6wnxa"]
+[ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="1_ugrvo"]
+[ext_resource type="Texture2D" uid="uid://dpcl2fjdem5jp" path="res://assets/sprites/ships/shoot_em_up_boss_ships.png" id="2_6wnxa"]
+[ext_resource type="Script" uid="uid://drrhypxeb6nsg" path="res://addons/lit/nodes/lit_sprite_2d.gd" id="3_xb1fo"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jmoar"]
+shader = ExtResource("1_ugrvo")
+shader_parameter/emissive_strength = 0.0
+shader_parameter/receiver_mask = 1
+shader_parameter/self_shadow = false
+shader_parameter/self_rect_count = 0
+shader_parameter/self_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/specular_strength = 0.5
+shader_parameter/specular_k = 32.0
+shader_parameter/has_specular_map = false
+shader_parameter/metallic_value = 0.0
+shader_parameter/roughness_value = 1.0
+shader_parameter/shadow_steps = 64
+shader_parameter/shadow_min_step = 0.2
+shader_parameter/footprint_shadow = 16.0
+shader_parameter/directional_horizontal_scale = 32.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lh148"]
+radius = 47.67599
+
+[node name="Station" type="Area2D" unique_id=2011792350]
+script = ExtResource("1_6wnxa")
+
+[node name="Visual" type="Sprite2D" parent="." unique_id=1736087758]
+material = SubResource("ShaderMaterial_jmoar")
+position = Vector2(8, -1)
+texture = ExtResource("2_6wnxa")
+region_enabled = true
+region_rect = Rect2(0, 152, 128, 112)
+script = ExtResource("3_xb1fo")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://drrhypxeb6nsg"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2062137619]
+shape = SubResource("CircleShape2D_lh148")

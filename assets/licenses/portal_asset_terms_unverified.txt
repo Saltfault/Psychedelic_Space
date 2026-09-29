@@ -1,0 +1,7 @@
+Portal sprite sheet license status: unverified.
+
+Source archive: Downloads/Portal.zip
+Integrated file: assets/sprites/effects/warp_portal_sheet.png
+The archive contains a 700x700 PNG sprite sheet with 41 populated 100x100 animation frames, but no author, attribution, or license statement.
+
+Use this asset for local development only until its creator and redistribution terms are verified. Do not include it in a public or commercial release without confirming permission and adding any required attribution.

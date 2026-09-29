@@ -1,0 +1,35 @@
+[gd_scene format=4 uid="uid://bux8k5c07p8xq"]
+
+[ext_resource type="Script" uid="uid://bdsjn65yjnhf6" path="res://scripts/world/outpost.gd" id="1_hc0iv"]
+[ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="2_q8uc0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nvyny"]
+shader = ExtResource("2_q8uc0")
+shader_parameter/emissive_strength = 0.0
+shader_parameter/receiver_mask = 1
+shader_parameter/self_shadow = false
+shader_parameter/self_rect_count = 0
+shader_parameter/self_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/specular_strength = 0.5
+shader_parameter/specular_k = 32.0
+shader_parameter/has_specular_map = false
+shader_parameter/metallic_value = 0.0
+shader_parameter/roughness_value = 1.0
+shader_parameter/shadow_steps = 64
+shader_parameter/shadow_min_step = 0.2
+shader_parameter/footprint_shadow = 16.0
+shader_parameter/directional_horizontal_scale = 32.0
+
+[node name="Outpost" type="StaticBody2D" unique_id=711302207]
+script = ExtResource("1_hc0iv")
+
+[node name="Visual" type="Polygon2D" parent="." unique_id=1653630075]
+material = SubResource("ShaderMaterial_nvyny")
+position = Vector2(-3, -5)
+polygon = PackedVector2Array(2, 2, 4, 2, 6, 5, 4, 8, 2, 8, 0, 5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=197859064]
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=14783624]
+
+[node name="FireTimer" type="Timer" parent="." unique_id=222654057]

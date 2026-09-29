@@ -1,0 +1,173 @@
+extends BaseShip
+# Adds enemy awareness and tactics while BaseShip owns shared ship behavior.
+class_name EnemyShip
+
+# NEW CODE STARTS HERE
+# Track sensor-confirmed pursuit and the short search after contact is lost.
+enum State {
+	UNAWARE,
+	AGGRO,
+	SEARCH,
+}
+# NEW CODE ENDS HERE
+
+enum AIStyle {
+	STRAFE,
+	CHARGE,
+}
+
+# Keep movement style configurable independently of YARD ship statistics.
+@export var ai_style: AIStyle = AIStyle.STRAFE
+@export_range(0.0, 4000.0, 25.0) var aggro_range: float = 1250.0
+# NEW CODE STARTS HERE
+@export_range(0.0, 10.0, 0.5) var search_duration: float = 4.0
+var last_known_player_position: Vector2 = Vector2.ZERO
+var search_time_left: float = 0.0
+@onready var sensor_component: SensorComponent = $SensorComponent
+# NEW CODE ENDS HERE
+@export_range(0.0, 4000.0, 25.0) var attack_range: float = 900.0
+@export_range(0.0, 2500.0, 25.0) var desired_distance: float = 650.0
+@export_range(0.0, 1000.0, 25.0) var strafe_acceleration: float = 220.0
+@export_range(0.0, 1.0, 0.05) var unaware_thrust: float = 0.0
+@export var unaware_heading: Vector2 = Vector2.RIGHT
+
+@export var explosion_scene: PackedScene
+@export var shield_booster_scene: PackedScene
+@export var module_pickup_scene: PackedScene
+
+# Cache the player after it joins BaseShip's player_ship group.
+var state: State = State.UNAWARE
+var player: Node2D = null
+
+
+func _ready() -> void:
+	# Set the hostile team before BaseShip registers this ship in groups.
+	team = 1
+	super._ready()
+
+
+func _gather_commands(delta: float) -> void:
+	# Resolve the player lazily so scene entry order does not matter.
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player_ship") as Node2D
+
+	if not is_instance_valid(player):
+		command_thrust = 0.0
+		command_fire = false
+		if state == State.AGGRO:
+			state = State.SEARCH
+			search_time_left = search_duration
+		elif state == State.SEARCH:
+			search_time_left -= delta
+			if search_time_left <= 0.0:
+				state = State.UNAWARE
+		return
+
+	# NEW CODE STARTS HERE
+	# Keep the Step 8 aggro radius, but require the sensor refreshed contact list.
+	var player_distance: float = SectorSpace.wrapped_distance(global_position, player.global_position)
+	var has_player_contact: bool = (
+		player_distance <= aggro_range and sensor_component.has_contact(player)
+	)
+	if has_player_contact:
+		# Only confirmed contacts can update the position being searched.
+		last_known_player_position = player.global_position
+		if state != State.AGGRO:
+			become_aggro()
+	elif state == State.AGGRO:
+		state = State.SEARCH
+		search_time_left = search_duration
+
+	var target_position: Vector2 = player.global_position
+	if state == State.SEARCH:
+		target_position = last_known_player_position
+
+	var to_player: Vector2 = SectorSpace.shortest_delta(global_position, target_position)
+	var distance: float = to_player.length()
+
+	if state == State.UNAWARE:
+		command_heading = unaware_heading.normalized()
+		command_thrust = unaware_thrust
+		command_fire = false
+		return
+
+	if state == State.SEARCH:
+		search_time_left -= delta
+		if search_time_left <= 0.0:
+			state = State.UNAWARE
+			command_thrust = 0.0
+			command_fire = false
+			return
+
+		# Search the last confirmed position, but never fire without live contact.
+		command_heading = to_player.normalized()
+		command_thrust = 0.35 if distance > 100.0 else 0.0
+		command_fire = false
+		return
+
+	# AGGRO keeps the Step 8 aim, strafe/charge, and firing behavior.
+	var target_direction: Vector2 = to_player.normalized()
+	command_heading = target_direction
+
+	match ai_style:
+		AIStyle.STRAFE:
+			if distance > desired_distance + 100.0:
+				command_thrust = 0.65
+			elif distance < desired_distance - 100.0:
+				command_thrust = 0.0
+				velocity -= target_direction * thrust_acceleration * 0.55 * delta
+			else:
+				command_thrust = 0.0
+				var tangent: Vector2 = target_direction.rotated(PI / 2.0)
+				velocity += tangent * strafe_acceleration * delta
+
+		AIStyle.CHARGE:
+			command_thrust = 1.0 if distance > 260.0 else 0.15
+
+	var aim_error: float = absf(angle_difference(rotation, target_direction.angle()))
+	command_fire = distance <= attack_range and aim_error <= deg_to_rad(14.0)
+	# NEW CODE ENDS HERE
+
+func become_aggro() -> void:
+	# Run alert side effects once, even if more than one detection occurs.
+	if state == State.AGGRO:
+		return
+
+	state = State.AGGRO
+	Log.info("Enemy entered aggro", name, RunState.current_sector_id)
+
+	if RunState.current_sector_id == "outpost":
+		RunState.outpost_alerted = true
+
+	var parent_node: Node = get_parent()
+	if parent_node != null and parent_node.has_method("alert_all"):
+		parent_node.alert_all(self)
+
+
+func force_aggro(known_player_position: Vector2 = Vector2.ZERO) -> void:
+	# Patrol alerts share the source ships confirmed location without granting contact.
+	last_known_player_position = known_player_position
+	state = State.AGGRO
+
+
+func _die() -> void:
+	# Prevent duplicate bounties if death is requested more than once.
+	if is_dead:
+		return
+
+	if explosion_scene != null:
+		var effect := explosion_scene.instantiate() as Node2D
+		if effect != null:
+			SectorSpace.spawn_owned(effect, global_position)
+
+	if shield_booster_scene != null and randf() < 0.18:
+		SectorSpace.spawn_owned(shield_booster_scene.instantiate(), global_position)
+
+	if module_pickup_scene != null and randf() < 0.05:
+		var pickup: Node = module_pickup_scene.instantiate()
+		pickup.set("module", RunState.get_random_module())
+		SectorSpace.spawn_owned(pickup, global_position)
+
+	RunState.add_credits(randi_range(4, 9))
+	Log.info("Enemy defeated", name, global_position)
+	super._die()

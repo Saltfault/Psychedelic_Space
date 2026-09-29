@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://day6awcngf0ba"]
+
+[ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_qwri2"]
+
+[resource]
+script = ExtResource("1_qwri2")
+display_name = "Corsair"
+max_speed = 480.0
+thrust_acceleration = 760.0
+linear_drag = 35.0
+max_hull = 55.0
+max_shield = 20.0
+weapon_cooldown = 0.24
+projectile_speed = 850.0
+projectile_damage = 8.0
+module_slots = 3
+metadata/_custom_type_script = "uid://dtjhydxdas3kp"

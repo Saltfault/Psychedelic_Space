@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=3 uid="uid://d12i64lhwf8qf"]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_ship.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://bs2fs1dmxifdv" path="res://scripts/enemies/patrol_group.gd" id="1_esiax"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_corsair.tscn" id="2_corsair"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="3_cutter"]
+
+[node name="PatrolGroup" type="Node2D" unique_id=1264120155]
+script = ExtResource("1_esiax")
+
+[node name="EnemyShip" parent="." unique_id=1146619288 instance=ExtResource("1_base")]
+position = Vector2(-103, 146)
+
+[node name="EnemyCorsair" parent="." unique_id=1795912370 instance=ExtResource("2_corsair")]
+position = Vector2(146, -1)
+
+[node name="EnemyCutter" parent="." unique_id=541571522 instance=ExtResource("3_cutter")]
+position = Vector2(-110, -127)

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://dicrvren20kkc"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_d2472"]
+
+[resource]
+script = ExtResource("1_d2472")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([".tres"]),
+&"class_restrictions": Array[StringName]([&"ModuleDefinition"]),
+&"recursive_scan": false,
+&"scan_directories": Array[String](["res://assets/data/modules"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://bnthv57camcq1": &"shield_capacitor",
+&"uid://cdq8aigdw0ij3": &"performance_thrusters",
+&"uid://cfpe6qc6x54uo": &"long_range_scanner",
+&"uid://cowrgyfdjv8e7": &"reinforced_plating",
+&"uid://dodip1q31e5yt": &"overclocked_trigger",
+&"uid://f3mekbjn107m": &"heavy_emitter"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"heavy_emitter": &"uid://f3mekbjn107m",
+&"long_range_scanner": &"uid://cfpe6qc6x54uo",
+&"overclocked_trigger": &"uid://dodip1q31e5yt",
+&"performance_thrusters": &"uid://cdq8aigdw0ij3",
+&"reinforced_plating": &"uid://cowrgyfdjv8e7",
+&"shield_capacitor": &"uid://bnthv57camcq1"
+})
+_property_index = Dictionary[StringName, Dictionary]({
+&"category": {}
+})

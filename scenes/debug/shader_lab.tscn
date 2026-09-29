@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://cnrmbngv7ry1y"]
+
+[ext_resource type="Script" uid="uid://djrtgftop1i8a" path="res://addons/lit/nodes/lit_post_process.gd" id="1_nddwi"]
+[ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="2_8x7co"]
+[ext_resource type="Script" uid="uid://3ghrmclc08m8" path="res://addons/lit/nodes/post/lit_post_bloom.gd" id="2_usejq"]
+[ext_resource type="Shader" uid="uid://oo8tup1esurh" path="res://assets/shaders/backgrounds/starfield.gdshader" id="4_stars"]
+
+[sub_resource type="ShaderMaterial" id="StarsMaterial"]
+shader = ExtResource("4_stars")
+shader_parameter/camera_world_position = Vector2(0, 0)
+shader_parameter/parallax = 8e-05
+shader_parameter/star_scale = 110.0
+shader_parameter/star_size = 0.6
+shader_parameter/brightness = 1.6
+shader_parameter/color_a = Color(0.55, 0.9, 1, 1)
+shader_parameter/color_b = Color(1, 0.45, 0.85, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lcsad"]
+shader = ExtResource("2_8x7co")
+shader_parameter/strength = 1.0
+shader_parameter/shield_color = Color(0.15, 0.8, 1, 1)
+
+[node name="ShaderLab" type="Node2D" unique_id=682971414]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2000124639]
+position = Vector2(958, 537)
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=700549459]
+
+[node name="Stars" type="ColorRect" parent="Background" unique_id=719493509]
+material = SubResource("StarsMaterial")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TestObject" type="Node2D" parent="." unique_id=194298218]
+
+[node name="ShieldVisual" type="ColorRect" parent="TestObject" unique_id=494970026]
+material = SubResource("ShaderMaterial_lcsad")
+offset_left = 33.0
+offset_top = 35.0
+offset_right = 73.0
+offset_bottom = 75.0
+
+[node name="LitPostProcess" type="CanvasLayer" parent="." unique_id=1258346338]
+script = ExtResource("1_nddwi")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://djrtgftop1i8a"
+
+[node name="LitPostBloom" type="Node2D" parent="LitPostProcess" unique_id=445184393]
+script = ExtResource("2_usejq")
+lit_version = "1.1.4"
+metadata/_custom_type_script = "uid://3ghrmclc08m8"

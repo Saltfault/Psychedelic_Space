@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_ship.tscn" id="1_enemy_ship"]
+
+[node name="EnemyCorsair" instance=ExtResource("1_enemy_ship")]
+ship_id = &"corsair"
+ai_style = 1
+
+[node name="Hull" parent="Visuals" index="0"]
+region_rect = Rect2(91, 105, 47, 38)
+
+[node name="CollisionPolygon2D" parent="." index="1"]
+scale = Vector2(0.82, 1.875)

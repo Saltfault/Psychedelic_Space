@@ -1,0 +1,86 @@
+[gd_scene format=4 uid="uid://dc14blsepkf65"]
+
+[ext_resource type="Script" uid="uid://cqc8akc33w6co" path="res://scripts/ships/player_ship.gd" id="1_rb44i"]
+[ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="2_lit_receiver"]
+[ext_resource type="Script" uid="uid://cpa2qb3trjq4k" path="res://addons/lit/nodes/lit_point_light_2d.gd" id="3_hull_light"]
+[ext_resource type="Texture2D" uid="uid://doqixtspp7crc" path="res://assets/sprites/ships/engine_flame_blue_strip.png" id="4_engine_flame"]
+[ext_resource type="Texture2D" uid="uid://c2xjy2idt2xld" path="res://assets/sprites/ships/shoot_em_up_player_ships.png" id="5_player_ships"]
+[ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="6_shield_shader"]
+[ext_resource type="Texture2D" uid="uid://c6uwg8w1t2dhm" path="res://assets/shaders/objects/shield_uv_texture.tres" id="7_shield_uv_texture"]
+[ext_resource type="Script" uid="uid://bg6o2q3cxdcr" path="res://scripts/ships/sensor_component.gd" id="8_sensor"]
+
+[sub_resource type="ShaderMaterial" id="HullLitMaterial"]
+shader = ExtResource("2_lit_receiver")
+shader_parameter/emissive_strength = 0.0
+shader_parameter/receiver_mask = 1
+shader_parameter/self_shadow = false
+shader_parameter/self_rect_count = 0
+shader_parameter/self_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/specular_strength = 0.5
+shader_parameter/specular_k = 32.0
+shader_parameter/has_specular_map = false
+shader_parameter/metallic_value = 0.0
+shader_parameter/roughness_value = 1.0
+shader_parameter/shadow_steps = 64
+shader_parameter/shadow_min_step = 0.2
+shader_parameter/footprint_shadow = 16.0
+shader_parameter/directional_horizontal_scale = 32.0
+
+[sub_resource type="ShaderMaterial" id="PlayerShieldMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("6_shield_shader")
+shader_parameter/strength = 1.0
+shader_parameter/shield_color = Color(0.15, 0.8, 1, 1)
+
+[node name="PlayerShip" type="CharacterBody2D" unique_id=1367263942]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_rb44i")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1815936448]
+
+[node name="EngineFlame" type="Sprite2D" parent="Visuals" unique_id=730986322]
+visible = false
+z_index = -1
+texture_filter = 1
+position = Vector2(-14, 0)
+rotation = 1.5707963
+scale = Vector2(0.28, 0.28)
+texture = ExtResource("4_engine_flame")
+centered = false
+offset = Vector2(-128, -29)
+hframes = 16
+
+[node name="Hull" type="Sprite2D" parent="Visuals" unique_id=1584596954]
+texture_filter = 1
+material = SubResource("HullLitMaterial")
+rotation = 1.5707963
+texture = ExtResource("5_player_ships")
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 64)
+
+[node name="ShieldVisual" type="Sprite2D" parent="Visuals" unique_id=187839014]
+texture_filter = 1
+material = SubResource("PlayerShieldMaterial")
+position = Vector2(-12, 0)
+scale = Vector2(60, 60)
+texture = ExtResource("7_shield_uv_texture")
+
+[node name="HullLight" type="Node2D" parent="Visuals" unique_id=383435688]
+script = ExtResource("3_hull_light")
+lit_version = "1.1.4"
+color = Color(0, 0.8, 1, 1)
+energy = 1.5
+range = 280.0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=952653641]
+position = Vector2(-12, 0)
+polygon = PackedVector2Array(-16, -12, 12, -12, 20, 0, 12, 12, -16, 12)
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=1459275318]
+position = Vector2(36, 0)
+
+[node name="SensorComponent" type="Node" parent="." unique_id=2098464465]
+script = ExtResource("8_sensor")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=690971959]
