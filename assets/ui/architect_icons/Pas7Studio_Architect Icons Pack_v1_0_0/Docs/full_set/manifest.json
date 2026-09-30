@@ -1,0 +1,24 @@
+{
+  "generated_by": "Rust Explorer v0.5.7",
+  "label": "full_set",
+  "layout": "dense",
+  "pack_name": "Architect Icons Pack",
+  "pages": [
+    {
+      "csv": "Architect Icons Pack_full_set_atlas_01_2048x2048_gap4_ext2_pot_dense.csv",
+      "diffuse": "Architect Icons Pack_full_set_atlas_01_2048x2048_gap4_ext2_pot_dense_diffuse.png",
+      "frames": 183,
+      "json": "Architect Icons Pack_full_set_atlas_01_2048x2048_gap4_ext2_pot_dense.json",
+      "masks": null,
+      "normals": null,
+      "page": 1,
+      "size": {
+        "h": 2048,
+        "w": 2048
+      }
+    }
+  ],
+  "schema": "pas7-pack/v1",
+  "sprites_count": 183,
+  "version": "1.0.0"
+}

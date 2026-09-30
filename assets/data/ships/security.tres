@@ -1,18 +1,22 @@
-[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://kq14ssgpq11g"]
+[gd_resource type="Resource" script_class="ShipDefinition" load_steps=4 format=3 uid="uid://kq14ssgpq11g"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_hpaqf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_violet.tres" id="2_projectile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/scifi_fx/scifx1_explosion_A_large_red/spritesheet.png" id="3_explosion"]
 
 [resource]
 script = ExtResource("1_hpaqf")
 display_name = "Cutter"
-max_speed = 320.0
-thrust_acceleration = 500.0
-linear_drag = 50.0
+max_speed = 280.0
+thrust_acceleration = 420.0
+linear_drag = 58.0
 turn_speed_degrees = 150.0
-max_hull = 90.0
-max_shield = 75.0
-weapon_cooldown = 0.42
-projectile_speed = 780.0
-projectile_damage = 13.0
+max_hull = 72.0
+max_shield = 55.0
+weapon_cooldown = 0.55
+projectile_speed = 700.0
+projectile_damage = 9.0
+projectile_visual = ExtResource("2_projectile")
+explosion_visual = ExtResource("3_explosion")
 module_slots = 6
 metadata/_custom_type_script = "uid://dtjhydxdas3kp"

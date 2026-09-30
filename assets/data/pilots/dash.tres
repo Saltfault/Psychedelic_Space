@@ -4,8 +4,5 @@
 
 [resource]
 script = ExtResource("1_ybh1x")
+display_name = "Dash"
 metadata/_custom_type_script = "uid://c1kvsrnt502i0"
-display_name = "Slip"
-ability = 0
-cooldown = 5.0
-dash_impulse = 900.0

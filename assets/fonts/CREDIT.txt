@@ -1,0 +1,3 @@
+Font: Pixelosopher, copyright Jovanny Lemonad (2008-2010) and Filip Uzunov / Helianthus Games (2026).
+License: SIL Open Font License 1.1; the complete license is preserved as License.txt. Fonts may be bundled with software under OFL conditions; the reserved font name Pixelosopher cannot be used for modified versions. Do not sell the font by itself.
+Source: https://helianthus-games.itch.io/pixelosopher

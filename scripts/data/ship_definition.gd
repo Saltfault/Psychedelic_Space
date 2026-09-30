@@ -32,6 +32,10 @@ class_name ShipDefinition
 @export var projectile_speed: float = 1000.0
 ## Damage dealt by each projectile before target defenses.
 @export var projectile_damage: float = 10.0
+## Fixed projectile artwork used by every shot from this hull; empty keeps the scene default.
+@export var projectile_visual: Texture2D
+## Fixed explosion artwork used when this hull is destroyed.
+@export var explosion_visual: Texture2D
 
 @export_group("Sensors")
 ## Maximum contact range before nebula and target-signature modifiers.

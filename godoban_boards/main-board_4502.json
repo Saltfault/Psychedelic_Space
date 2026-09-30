@@ -119,6 +119,87 @@
   ],
   "tasks": [
     {
+      "id": "task_44",
+      "title": "Improve seamless wrap presentation",
+      "description": "Improve how toroidal sector edges are rendered after gameplay confirms wrapping is worth keeping.",
+      "status": "done",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1806984000,
+      "tags": [
+        "post-prototype",
+        "sector-wrap",
+        "visuals"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742039
+    },
+    {
+      "id": "task_35",
+      "title": "Section 28 — Run the end-to-end prototype test",
+      "description": "Verify the guide’s full checklist after Sections 25–27 are integrated, including YARD data, combat, drops, station, sensors, travel, persistent objectives, and wrapping. Compare a rush run with an explored/greedy run and confirm they produce meaningfully different Warp-sector difficulty; record any unverified or failing checks.",
+      "status": "done",
+      "priority": "critical",
+      "epic_id": "epic_7",
+      "due_date": 1797310800,
+      "tags": [
+        "prototype",
+        "playtest",
+        "acceptance"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790741984
+    },
+    {
+      "id": "task_34",
+      "title": "Section 27 — Build the game coordinator and run flow",
+      "description": "Create the persistent Game scene; load and replace sectors while preserving player and HUD; advance world state once per valid transition; connect the gate, lock map travel in Warp, and handle death/reset and completion.",
+      "status": "done",
+      "priority": "critical",
+      "epic_id": "epic_6",
+      "due_date": 1796878800,
+      "tags": [
+        "prototype",
+        "integration",
+        "run-flow"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790741983
+    },
+    {
+      "id": "task_33",
+      "title": "Section 26 — Build the physical Warp Gate exit",
+      "description": "Create the gate scene with the downloaded animated portal sprite, collision, sensor contact, and Interact behavior. Keep it out of the main-objective group. Verify entering Warp does not end the run; the player must find, reach, and interact with the gate. Confirm portal-art licensing before distribution.",
+      "status": "done",
+      "priority": "critical",
+      "epic_id": "epic_6",
+      "due_date": 1796360400,
+      "tags": [
+        "prototype",
+        "warp-gate",
+        "interaction"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790741982
+    },
+    {
+      "id": "task_32",
+      "title": "Section 25 — Verify discrete world simulation and stale information",
+      "description": "Verify ticks, caravan movement, reinforcements, and intel expiry advance only on sector transitions; keep last-known caravan information stale until sensors rediscover it.",
+      "status": "done",
+      "priority": "critical",
+      "epic_id": "epic_5",
+      "due_date": 1795928400,
+      "tags": [
+        "prototype",
+        "simulation",
+        "world-state",
+        "sensors"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790741981
+    },
+    {
       "id": "task_26",
       "title": "Section 19 — Build the repair station and randomized store",
       "description": "Create the station interaction and paused shop UI, generate three offers from YARD categories, and implement purchases, slot checks, refunds on install failure, and hull repair. Verify new eligible YARD entries can appear without editing the shop script.",
@@ -442,75 +523,10 @@
       "updated_at": 1790287875
     },
     {
-      "id": "task_32",
-      "title": "Section 25 — Verify discrete world simulation and stale information",
-      "description": "Verify ticks, caravan movement, reinforcements, and intel expiry advance only on sector transitions; keep last-known caravan information stale until sensors rediscover it.",
-      "status": "in_progress",
-      "priority": "critical",
-      "epic_id": "epic_5",
-      "due_date": 1795928400,
-      "tags": [
-        "prototype",
-        "simulation",
-        "world-state",
-        "sensors"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_33",
-      "title": "Section 26 — Build the physical Warp Gate exit",
-      "description": "Create the gate scene with the downloaded animated portal sprite, collision, sensor contact, and Interact behavior. Keep it out of the main-objective group. Verify entering Warp does not end the run; the player must find, reach, and interact with the gate. Confirm portal-art licensing before distribution.",
-      "status": "todo",
-      "priority": "critical",
-      "epic_id": "epic_6",
-      "due_date": 1796360400,
-      "tags": [
-        "prototype",
-        "warp-gate",
-        "interaction"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_34",
-      "title": "Section 27 — Build the game coordinator and run flow",
-      "description": "Create the persistent Game scene; load and replace sectors while preserving player and HUD; advance world state once per valid transition; connect the gate, lock map travel in Warp, and handle death/reset and completion.",
-      "status": "todo",
-      "priority": "critical",
-      "epic_id": "epic_6",
-      "due_date": 1796878800,
-      "tags": [
-        "prototype",
-        "integration",
-        "run-flow"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_35",
-      "title": "Section 28 — Run the end-to-end prototype test",
-      "description": "Verify the guide’s full checklist after Sections 25–27 are integrated, including YARD data, combat, drops, station, sensors, travel, persistent objectives, and wrapping. Compare a rush run with an explored/greedy run and confirm they produce meaningfully different Warp-sector difficulty; record any unverified or failing checks.",
-      "status": "todo",
-      "priority": "critical",
-      "epic_id": "epic_7",
-      "due_date": 1797310800,
-      "tags": [
-        "prototype",
-        "playtest",
-        "acceptance"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
       "id": "task_36",
       "title": "Verify asset rights and credits",
       "description": "Resolve the unverified creator/permission terms for the Shoot'em Up ship sheets and Warp Portal pack before redistribution. Preserve the required Super Pixel Effects and Pixelosopher notices; credit SteelSoldier if the animated world-object sheet is used. The Planetary Megapack and Felmir turret pack terms are documented in THIRD_PARTY_NOTICES.md.",
-      "status": "todo",
+      "status": "backlog",
       "priority": "high",
       "epic_id": "epic_7",
       "due_date": 1797483600,
@@ -521,195 +537,7 @@
         "credits"
       ],
       "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_37",
-      "title": "Finalize movement tuning",
-      "description": "Tune ship handling after the prototype proves the movement design, before expanding ship content.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1798347600,
-      "tags": [
-        "post-prototype",
-        "movement",
-        "tuning"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_38",
-      "title": "Expand the weapon framework",
-      "description": "Add weapon types such as lasers, spread weapons, missiles, beams, or drones, including module interactions.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1800075600,
-      "tags": [
-        "post-prototype",
-        "weapons",
-        "combat"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_39",
-      "title": "Add a contrasting second ship",
-      "description": "Create a second ship with deliberately different handling to test ShipDefinition flexibility.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1800939600,
-      "tags": [
-        "post-prototype",
-        "ships"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_40",
-      "title": "Add a second pilot",
-      "description": "Add a pilot ability—such as time manipulation—to further test the pilot framework.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1801803600,
-      "tags": [
-        "post-prototype",
-        "pilots"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_41",
-      "title": "Build faction data and encounter preferences",
-      "description": "Add faction relationships, visuals, encounter tables, AI styles, and equipment preferences.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1803099600,
-      "tags": [
-        "post-prototype",
-        "factions",
-        "encounters"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_42",
-      "title": "Create reusable mission/objective resources",
-      "description": "Replace prototype-specific objective flags with reusable mission and objective Resources.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1804395600,
-      "tags": [
-        "post-prototype",
-        "missions",
-        "architecture"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_43",
-      "title": "Build sector-authoring tools",
-      "description": "Create editor helpers for placing contacts, encounters, objective markers, and wrap-aware previews.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1806120000,
-      "tags": [
-        "post-prototype",
-        "tools",
-        "sectors"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_44",
-      "title": "Improve seamless wrap presentation",
-      "description": "Improve how toroidal sector edges are rendered after gameplay confirms wrapping is worth keeping.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1806984000,
-      "tags": [
-        "post-prototype",
-        "sector-wrap",
-        "visuals"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_45",
-      "title": "Expand the shader library with performance budgets",
-      "description": "Add sector-specific cosmic phenomena and define performance budgets for their effects.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1808280000,
-      "tags": [
-        "post-prototype",
-        "shaders",
-        "performance"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_46",
-      "title": "Add a second solar system",
-      "description": "Test whether the run structure scales to a new faction and environment combination.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1809576000,
-      "tags": [
-        "post-prototype",
-        "world-content"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_47",
-      "title": "Prototype a boss",
-      "description": "Build a boss encounter after normal combat and buildcraft are working.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1810872000,
-      "tags": [
-        "post-prototype",
-        "boss",
-        "combat"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
-    },
-    {
-      "id": "task_48",
-      "title": "Add meta-progression and unlocks",
-      "description": "Add ship, pilot, or module unlocks without relying on permanent stat inflation.",
-      "status": "backlog",
-      "priority": "low",
-      "epic_id": "epic_9",
-      "due_date": 1811736000,
-      "tags": [
-        "post-prototype",
-        "progression"
-      ],
-      "created_at": 1790276211,
-      "updated_at": 1790287875
+      "updated_at": 1790741995
     },
     {
       "id": "task_28",
@@ -777,6 +605,178 @@
       ],
       "created_at": 1790276211,
       "updated_at": 1790703500
+    },
+    {
+      "id": "task_37",
+      "title": "Finalize movement tuning",
+      "description": "Tune ship handling after the prototype proves the movement design, before expanding ship content.",
+      "status": "review",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1798347600,
+      "tags": [
+        "post-prototype",
+        "movement",
+        "tuning"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790741999
+    },
+    {
+      "id": "task_38",
+      "title": "Expand the weapon framework",
+      "description": "Add weapon types such as lasers, spread weapons, missiles, beams, or drones, including module interactions.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1800075600,
+      "tags": [
+        "post-prototype",
+        "weapons",
+        "combat"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742001
+    },
+    {
+      "id": "task_48",
+      "title": "Add meta-progression and unlocks",
+      "description": "Add ship, pilot, or module unlocks without relying on permanent stat inflation.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1811736000,
+      "tags": [
+        "post-prototype",
+        "progression"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742048
+    },
+    {
+      "id": "task_47",
+      "title": "Prototype a boss",
+      "description": "Build a boss encounter after normal combat and buildcraft are working.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1810872000,
+      "tags": [
+        "post-prototype",
+        "boss",
+        "combat"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742046
+    },
+    {
+      "id": "task_46",
+      "title": "Add a second solar system",
+      "description": "Test whether the run structure scales to a new faction and environment combination.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1809576000,
+      "tags": [
+        "post-prototype",
+        "world-content"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742044
+    },
+    {
+      "id": "task_45",
+      "title": "Expand the shader library with performance budgets",
+      "description": "Add sector-specific cosmic phenomena and define performance budgets for their effects.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1808280000,
+      "tags": [
+        "post-prototype",
+        "shaders",
+        "performance"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742042
+    },
+    {
+      "id": "task_43",
+      "title": "Build sector-authoring tools",
+      "description": "Create editor helpers for placing contacts, encounters, objective markers, and wrap-aware previews.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1806120000,
+      "tags": [
+        "post-prototype",
+        "tools",
+        "sectors"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742034
+    },
+    {
+      "id": "task_42",
+      "title": "Create reusable mission/objective resources",
+      "description": "Replace prototype-specific objective flags with reusable mission and objective Resources.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1804395600,
+      "tags": [
+        "post-prototype",
+        "missions",
+        "architecture"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742032
+    },
+    {
+      "id": "task_41",
+      "title": "Build faction data and encounter preferences",
+      "description": "Add faction relationships, visuals, encounter tables, AI styles, and equipment preferences.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1803099600,
+      "tags": [
+        "post-prototype",
+        "factions",
+        "encounters"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742029
+    },
+    {
+      "id": "task_40",
+      "title": "Add a second pilot",
+      "description": "Add a pilot ability—such as time manipulation—to further test the pilot framework.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1801803600,
+      "tags": [
+        "post-prototype",
+        "pilots"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742026
+    },
+    {
+      "id": "task_39",
+      "title": "Add a contrasting second ship",
+      "description": "Create a second ship with deliberately different handling to test ShipDefinition flexibility.",
+      "status": "todo",
+      "priority": "low",
+      "epic_id": "epic_9",
+      "due_date": 1800939600,
+      "tags": [
+        "post-prototype",
+        "ships"
+      ],
+      "created_at": 1790276211,
+      "updated_at": 1790742024
     }
   ]
 }

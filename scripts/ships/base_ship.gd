@@ -8,13 +8,16 @@ signal died(ship: BaseShip)
 signal hull_changed(current: float, maximum: float)
 ## Emitted whenever current shields change, with the current maximum as the second argument.
 signal shield_changed(current: float, maximum: float)
-## Emitted after a module is installed or the ship's derived stats are rebuilt.
+## Emitted whenever equipped or unequipped module inventories change.
 signal modules_changed
 
 const SHIPS: Registry = preload("res://assets/data/registries/ships.tres")
 
 ## Stable YARD ID of the ShipDefinition that provides this ship's baseline statistics.
-@export_custom(Registry.PROPERTY_HINT_CUSTOM, "res://assets/data/registries/ships.tres") var ship_id: StringName = &"prototype_ship"
+@export_custom(
+	Registry.PROPERTY_HINT_CUSTOM,
+	"res://assets/data/registries/ships.tres",
+) var ship_id: StringName = &"prototype_ship"
 
 ## Combat team used by projectiles to decide whether this ship is a valid target.
 @export var team: int = 0
@@ -52,13 +55,15 @@ var weapon_cooldown_left: float = 0.0
 
 var sensor_range: float
 var module_slots: int
+## Modules currently equipped and contributing to this ship's derived stats.
 var installed_modules: Array[ModuleDefinition] = []
+## Owned modules waiting in reserve; these do not affect ship stats until equipped.
+var unequipped_modules: Array[ModuleDefinition] = []
 
 
 # Preserve a smooth world-space coordinate for camera-driven background shaders.
 var unwrapped_world_position: Vector2 = Vector2.ZERO
 var _previous_wrapped_position: Vector2 = Vector2.ZERO
-
 
 
 func _ready() -> void:
@@ -74,24 +79,20 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 
-	
 	# Normalize the spawn and seed the continuous coordinate before movement begins.
 	unwrapped_world_position = global_position
 	_previous_wrapped_position = SectorSpace.wrap_position(global_position)
 	global_position = _previous_wrapped_position
-	
 
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 
 	add_to_group("ships")
 	add_to_group("sensor_contact")
 
-	
 	# Display neighboring copies near sector edges without duplicating ship physics.
 	var wrap_visual := get_node_or_null("Visuals") as Node2D
 	if wrap_visual != null:
 		SectorSpace.register_wrap_visual(self, wrap_visual)
-	
 
 	if team == 0:
 		add_to_group("player_ship")
@@ -119,7 +120,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	
 	# Accumulate actual movement before canonicalizing the toroidal sector position.
 	var raw_position: Vector2 = global_position
 	unwrapped_world_position += SectorSpace.shortest_delta(_previous_wrapped_position, raw_position)
@@ -129,14 +129,11 @@ func _physics_process(delta: float) -> void:
 		# Avoid rendering interpolation across the large coordinate discontinuity.
 		reset_physics_interpolation()
 	_previous_wrapped_position = wrapped_position
-	
-
 
 
 func _exit_tree() -> void:
 	# Keep runtime render copies from outliving this ship.
 	SectorSpace.unregister_wrap_visual(self)
-
 
 
 func _gather_commands(_delta: float) -> void:
@@ -156,16 +153,19 @@ func _update_rotation(delta: float) -> void:
 
 
 func _update_movement(delta: float) -> void:
-	# Apply thrust, drag, and the authored speed cap in that order.
-	var forward := Vector2.RIGHT.rotated(rotation)
-
+	var forward: Vector2 = Vector2.RIGHT.rotated(rotation)
 	if command_thrust > 0.0:
 		velocity += forward * thrust_acceleration * command_thrust * delta
-
 	velocity = velocity.move_toward(Vector2.ZERO, linear_drag * delta)
 
-	if velocity.length() > max_speed:
-		velocity = velocity.normalized() * max_speed
+	# Use a virtual limit so a short player Dash is not erased by the normal hull cap.
+	var speed_limit: float = _movement_speed_limit()
+	if velocity.length() > speed_limit:
+		velocity = velocity.normalized() * speed_limit
+
+
+func _movement_speed_limit() -> float:
+	return max_speed
 
 
 func _update_shield(delta: float) -> void:
@@ -202,6 +202,8 @@ func try_fire() -> void:
 	projectile.damage = projectile_damage
 	projectile.team = team
 	projectile.source = self
+	if definition != null:
+		projectile.visual_override = definition.projectile_visual
 
 	SectorSpace.spawn_owned(projectile, muzzle.global_position)
 
@@ -255,9 +257,9 @@ func repair_hull(amount: float) -> void:
 	hull_changed.emit(hull, max_hull)
 
 
-## Install a module when a slot is available; returns false without changing state otherwise.
+## Equip a module directly when a slot is available; returns false without changing state otherwise.
 func install_module(module: ModuleDefinition) -> bool:
-	# Slot capacity is enforced here so pickups and shops share one rule.
+	# Validate slot capacity before changing equipment or rebuilding derived stats.
 	if module == null or installed_modules.size() >= module_slots:
 		return false
 
@@ -265,6 +267,48 @@ func install_module(module: ModuleDefinition) -> bool:
 	_rebuild_stats(false)
 	modules_changed.emit()
 	Log.info("Module installed", module.display_name, installed_modules.size(), module_slots)
+	return true
+
+
+## Add an acquired module to reserve without changing the ship's current stats.
+func store_module(module: ModuleDefinition) -> bool:
+	if module == null:
+		return false
+
+	unequipped_modules.append(module)
+	modules_changed.emit()
+	Log.info("Module added to unequipped inventory", module.display_name, unequipped_modules.size())
+	return true
+
+
+## Move a reserve module into an available equipment slot and apply its stats.
+func equip_module(inventory_index: int) -> bool:
+	if inventory_index < 0 or inventory_index >= unequipped_modules.size():
+		return false
+	if installed_modules.size() >= module_slots:
+		return false
+
+	var module: ModuleDefinition = unequipped_modules[inventory_index]
+	unequipped_modules.remove_at(inventory_index)
+	if not install_module(module):
+		unequipped_modules.insert(inventory_index, module)
+		return false
+
+	Log.info("Module equipped from inventory", module.display_name)
+	return true
+
+
+## Move an equipped module to reserve and rebuild stats without that module.
+func unequip_module(equipped_index: int) -> bool:
+	if equipped_index < 0 or equipped_index >= installed_modules.size():
+		return false
+
+	var module: ModuleDefinition = installed_modules[equipped_index]
+	installed_modules.remove_at(equipped_index)
+	unequipped_modules.append(module)
+	_rebuild_stats(false)
+	modules_changed.emit()
+	Log.info("Module moved to unequipped inventory", module.display_name)
 	return true
 
 

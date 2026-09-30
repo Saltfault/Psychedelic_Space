@@ -6,6 +6,8 @@
 radius = 43.104523
 
 [node name="ModulePickup" type="Area2D" unique_id=1294156965]
+collision_layer = 0
+collision_mask = 2
 script = ExtResource("1_gejgg")
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=883000980]

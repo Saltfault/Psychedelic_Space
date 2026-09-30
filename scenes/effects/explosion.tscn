@@ -1,10 +1,12 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Texture2D" uid="uid://bocbsk1moa7lm" path="res://assets/sprites/effects/symmetrical_explosion_001_small_orange.png" id="1_explosion_strip"]
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/scifi_fx/scifx1_explosion_A_large_orange/spritesheet.png" id="1_explosion"]
 [ext_resource type="Script" path="res://scripts/effects/one_shot_strip.gd" id="2_one_shot"]
 
 [node name="Explosion" type="Sprite2D"]
 texture_filter = 1
-texture = ExtResource("1_explosion_strip")
-hframes = 8
+texture = ExtResource("1_explosion")
+hframes = 10
+scale = Vector2(1.5, 1.5)
 script = ExtResource("2_one_shot")
+frames_per_second = 14.0

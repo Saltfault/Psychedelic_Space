@@ -1,0 +1,45 @@
+{
+  "frames": {
+    "Weapons/Ferny_Weapons": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 2,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    }
+  },
+  "meta": {
+    "app": "Rust Explorer",
+    "extrude": 2,
+    "gap": 4,
+    "key_format": "group/frame",
+    "label": "Weapons",
+    "layers": {
+      "diffuse": "Architect Icons Pack_Weapons_atlas_01_128x128_gap4_ext2_pot_dense_diffuse.png",
+      "masks": null,
+      "normals": null
+    },
+    "pack_name": "Architect Icons Pack",
+    "page": 1,
+    "pages": 1,
+    "pot": true,
+    "size": {
+      "h": 128,
+      "w": 128
+    },
+    "version": "1.0.0"
+  }
+}

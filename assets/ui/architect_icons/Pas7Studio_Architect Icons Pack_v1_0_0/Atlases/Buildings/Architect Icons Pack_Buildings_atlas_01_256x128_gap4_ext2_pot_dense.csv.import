@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://chmxqnjrpd54k"
+
+[deps]
+
+files=["res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.x.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.y.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.w.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.h.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.u0.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.v0.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.u1.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.v1.translation"]
+
+source_file="res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.csv"
+dest_files=["res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.x.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.y.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.w.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.h.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.u0.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.v0.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.u1.translation", "res://assets/ui/architect_icons/Pas7Studio_Architect Icons Pack_v1_0_0/Atlases/Buildings/Architect Icons Pack_Buildings_atlas_01_256x128_gap4_ext2_pot_dense.v1.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

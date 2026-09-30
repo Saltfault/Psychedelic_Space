@@ -1,41 +1,75 @@
-[gd_scene format=3 uid="uid://bdu2k3rton1vi"]
+[gd_scene load_steps=3 format=3 uid="uid://bdu2k3rton1vi"]
 
 [ext_resource type="Script" uid="uid://d6j6l4un6pl4" path="res://scripts/ui/system_map.gd" id="1_y73bs"]
+[ext_resource type="Texture2D" uid="uid://dnq1x050cwghn" path="res://assets/ui/window_theme_blue/panel_focused.png" id="2_map_panel"]
+
+[sub_resource type="StyleBoxTexture" id="MapBackground"]
+texture = ExtResource("2_map_panel")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
 
 [node name="SystemMap" type="Control" unique_id=857440598]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_y73bs")
 
+[node name="Background" type="PanelContainer" parent="." unique_id=301785019]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -816.0
+offset_top = -452.0
+offset_right = 825.0
+offset_bottom = 467.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"WindowPanel"
+theme_override_styles/panel = SubResource("MapBackground")
+
 [node name="Title" type="Label" parent="." unique_id=1051743421]
 layout_mode = 0
-offset_left = 32.0
-offset_top = 24.0
-offset_right = 920.0
-offset_bottom = 70.0
-text = "SYSTEM MAP"
+offset_left = 174.0
+offset_top = 116.0
+offset_right = 1062.0
+offset_bottom = 162.0
 theme_override_font_sizes/font_size = 28
+text = "SYSTEM MAP"
 
 [node name="Info" type="Label" parent="." unique_id=937063010]
 layout_mode = 0
-offset_left = 32.0
-offset_top = 78.0
-offset_right = 720.0
-offset_bottom = 140.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -784.0
+offset_top = 330.0
+offset_right = 784.0
+offset_bottom = 410.0
 
 [node name="Legend" type="Label" parent="." unique_id=893612116]
 layout_mode = 0
-offset_left = 32.0
-offset_top = 690.0
-offset_right = 1180.0
-offset_bottom = 730.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -784.0
+offset_top = 418.0
+offset_right = 784.0
+offset_bottom = 454.0
 
 [node name="CloseButton" type="Button" parent="." unique_id=654171605]
 layout_mode = 0
-offset_left = 1100.0
-offset_top = 24.0
-offset_right = 1248.0
-offset_bottom = 72.0
+offset_left = 1599.0
+offset_top = 125.0
+offset_right = 1747.0
+offset_bottom = 173.0
 text = "Close"

@@ -1,7 +1,10 @@
-[gd_scene format=3 uid="uid://bugq3l42agjob"]
+[gd_scene load_steps=7 format=3 uid="uid://bugq3l42agjob"]
 
-[ext_resource type="Texture2D" uid="uid://bnwdp6fj8ipmv" path="res://assets/sprites/projectiles/warped_bolt.png" id="1_dhrag"]
-[ext_resource type="Script" uid="uid://8lwpwqvqqlvd" path="res://scripts/combat/projectile.gd" id="1_vbspy"]
+[ext_resource type="Script" path="res://scripts/combat/projectile.gd" id="1_projectile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_blue.tres" id="2_blue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_orange.tres" id="3_orange"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_violet.tres" id="4_violet"]
+[ext_resource type="PackedScene" path="res://scenes/effects/hit_spark.tscn" id="5_hit_spark"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
 radius = 25.0
@@ -9,11 +12,13 @@ height = 50.0
 
 [node name="Projectile" type="Area2D" unique_id=32359805]
 collision_mask = 7
-script = ExtResource("1_vbspy")
+script = ExtResource("1_projectile")
+projectile_visuals = Array[Texture2D]([ExtResource("2_blue"), ExtResource("3_orange"), ExtResource("4_violet")])
+hit_effect_scene = ExtResource("5_hit_spark")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1829174832]
 rotation = 3.1415927
-texture = ExtResource("1_dhrag")
+texture = ExtResource("2_blue")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2102290046]
 position = Vector2(1, 0)

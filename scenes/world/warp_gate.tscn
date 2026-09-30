@@ -3,10 +3,11 @@
 [ext_resource type="Script" uid="uid://c6mhuoolw62u4" path="res://scripts/world/warp_gate.gd" id="1_ep7gb"]
 [ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="1_xs8d5"]
 [ext_resource type="Script" uid="uid://ccbrgq2jxmujk" path="res://addons/lit/nodes/lit_animated_sprite_2d.gd" id="2_ep7gb"]
+[ext_resource type="SpriteFrames" uid="uid://bt4y5l226xb20" path="res://assets/sprites/effects/warp_gate_frames.tres" id="3_frames"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bo7qh"]
 shader = ExtResource("1_xs8d5")
-shader_parameter/emissive_strength = 0.0
+shader_parameter/emissive_strength = 0.65
 shader_parameter/receiver_mask = 1
 shader_parameter/self_shadow = false
 shader_parameter/self_rect_count = 0
@@ -21,16 +22,37 @@ shader_parameter/shadow_min_step = 0.2
 shader_parameter/footprint_shadow = 16.0
 shader_parameter/directional_horizontal_scale = 32.0
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_mfmwm"]
+[sub_resource type="CircleShape2D" id="WarpGateInteractionRadius"]
+radius = 129.0155
 
 [node name="WarpGate" type="Area2D" unique_id=1560342060]
+collision_layer = 0
+collision_mask = 2
 script = ExtResource("1_ep7gb")
 
 [node name="LitAnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1772559621]
 material = SubResource("ShaderMaterial_bo7qh")
-sprite_frames = SubResource("SpriteFrames_mfmwm")
+scale = Vector2(3.2, 3.2)
+sprite_frames = ExtResource("3_frames")
+autoplay = "default"
 script = ExtResource("2_ep7gb")
 lit_version = "1.1.4"
+emissive_strength = 0.65
 metadata/_custom_type_script = "uid://ccbrgq2jxmujk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1390141061]
+position = Vector2(0, 2)
+shape = SubResource("WarpGateInteractionRadius")
+
+[node name="Prompt" type="Label" parent="." unique_id=1996577542]
+visible = false
+offset_left = -220.0
+offset_top = -260.0
+offset_right = 220.0
+offset_bottom = -220.0
+theme_override_colors/font_color = Color(1, 0.82, 1, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.02, 0.08, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "DEFEAT HOSTILES TO UNLOCK"
+horizontal_alignment = 1

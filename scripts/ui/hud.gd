@@ -3,18 +3,23 @@ extends CanvasLayer
 class_name GameHUD
 
 @onready var hull_label: Label = $Root/HullLabel
+@onready var hull_bar: TextureProgressBar = $Root/HullBar
 @onready var shield_label: Label = $Root/ShieldLabel
+@onready var shield_bar: TextureProgressBar = $Root/ShieldBar
 @onready var credits_label: Label = $Root/CreditsLabel
 @onready var sensor_status_label: Label = $Root/SensorStatusLabel
 @onready var mission_label: Label = $Root/MissionLabel
 @onready var pilot_label: Label = $Root/PilotLabel
 @onready var settings_button: Button = $Root/SettingsButton
+@onready var sector_travel_button: Button = $Root/SectorTravelButton
+@onready var system_map: SystemMap = $Root/SystemMap
 @onready var settings_panel: PanelContainer = $Root/SettingsPanel
-@onready var dev_mode_toggle: CheckButton = $Root/SettingsPanel/MarginContainer/VBoxContainer/DevModeToggle
-@onready var close_settings_button: Button = $Root/SettingsPanel/MarginContainer/VBoxContainer/CloseSettingsButton
 @onready var minimap: Minimap = $Root/Minimap
 @onready var station_panel: PanelContainer = $Root/StationPanel
 @onready var run_complete_panel: PanelContainer = $Root/RunCompletePanel
+@onready var death_panel: PanelContainer = $Root/DeathPanel
+@onready var restart_button: Button = $Root/DeathPanel/MarginContainer/VBoxContainer/RestartButton
+@onready var main_menu_button: Button = $Root/DeathPanel/MarginContainer/VBoxContainer/MainMenuButton
 
 var player: PlayerShip
 var sensor_component: SensorComponent
@@ -24,16 +29,39 @@ func _ready() -> void:
 	settings_panel.hide()
 	station_panel.hide()
 	run_complete_panel.hide()
+	death_panel.hide()
 
-	# Restore persisted state before connecting toggled so initialization does not write settings.
-	dev_mode_toggle.button_pressed = RunState.dev_mode_enabled
 	settings_button.pressed.connect(settings_panel.show)
-	close_settings_button.pressed.connect(settings_panel.hide)
-	dev_mode_toggle.toggled.connect(_on_dev_mode_toggled)
-	RunState.dev_mode_changed.connect(_sync_dev_mode_toggle)
+	sector_travel_button.pressed.connect(_on_sector_travel_pressed)
+	if not RunState.run_state_changed.is_connected(_refresh_sector_travel_button):
+		RunState.run_state_changed.connect(_refresh_sector_travel_button)
+	_refresh_sector_travel_button()
+	restart_button.pressed.connect(_restart_run)
+	main_menu_button.pressed.connect(_return_to_main_menu)
+	GameSettings.settings_changed.connect(_sync_game_settings)
+	_sync_game_settings()
 
 	# The HUD is a sibling of PlayerShip in Sector; defer until every sibling is ready.
 	call_deferred("_configure_player_from_tree")
+
+
+func _refresh_sector_travel_button() -> void:
+	# The final warp sector is exited through its physical gate, not the route map.
+	sector_travel_button.visible = (
+		RunState.current_sector_clear and RunState.current_sector_id != "warp"
+	)
+
+
+func _sync_game_settings() -> void:
+	minimap.visible = GameSettings.show_minimap
+
+
+func _on_sector_travel_pressed() -> void:
+	# Keep the action guarded even if another script invokes the button signal directly.
+	# The warp sector is exited through its gate only, mirroring the button's visibility rule.
+	if not RunState.current_sector_clear or RunState.current_sector_id == "warp":
+		return
+	system_map.open_map()
 
 
 func _configure_player_from_tree() -> void:
@@ -42,16 +70,6 @@ func _configure_player_from_tree() -> void:
 		Log.error("HUD could not find a player_ship to configure")
 		return
 	configure(target_player)
-
-
-func _on_dev_mode_toggled(enabled: bool) -> void:
-	# RunState persists the preference and enables or disables the shipped console immediately.
-	RunState.set_dev_mode(enabled)
-	Log.info("Developer console setting changed", enabled)
-
-
-func _sync_dev_mode_toggle(enabled: bool) -> void:
-	dev_mode_toggle.set_pressed_no_signal(enabled)
 
 
 func configure(target_player: PlayerShip) -> void:
@@ -103,10 +121,14 @@ func _process(_delta: float) -> void:
 
 
 func _on_hull_changed(current: float, maximum: float) -> void:
+	hull_bar.max_value = maxf(maximum, 1.0)
+	hull_bar.value = current
 	hull_label.text = "HULL %d / %d" % [roundi(current), roundi(maximum)]
 
 
 func _on_shield_changed(current: float, maximum: float) -> void:
+	shield_bar.max_value = maxf(maximum, 1.0)
+	shield_bar.value = current
 	shield_label.text = "SHIELD %d / %d" % [roundi(current), roundi(maximum)]
 
 
@@ -134,3 +156,18 @@ func _refresh_mission() -> void:
 
 func show_run_complete() -> void:
 	run_complete_panel.show()
+
+
+## Show end-of-run choices without silently resetting the player's progress.
+func show_death_screen() -> void:
+	settings_panel.hide()
+	station_panel.hide()
+	death_panel.show()
+
+
+func _restart_run() -> void:
+	get_tree().reload_current_scene()
+
+
+func _return_to_main_menu() -> void:
+	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")

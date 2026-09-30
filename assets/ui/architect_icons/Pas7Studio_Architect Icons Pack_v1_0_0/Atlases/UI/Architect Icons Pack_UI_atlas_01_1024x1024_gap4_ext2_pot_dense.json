@@ -1,0 +1,3325 @@
+{
+  "frames": {
+    "UI/ASFstorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Anomaly": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/BedroomTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Biotech": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/BiotechnologyDesignation": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Blueprints": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Cluster": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/DE_Fungal": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/DecorationTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Eaves": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/ExtraIcon01": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/ExtraIcon02": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/ExtraIcon04": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/ExtraIcon05": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Fences": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_AerialTransport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_AirManagement": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_AmmunitionNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Androids": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Aquarium": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_AstrofuelNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Athletics": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Automation": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Auxiliaries": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Barricades": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 930,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Bedroom": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Biohazards": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Biotech": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ChemfuelNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Childhood": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Colony": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ColonyLocations": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_CombatEquipment": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_CombatInfrastructure": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Concealed": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Control": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Cooling": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_CreativeProduction": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 858,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Deathrest": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_DecoArt": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_DecoHanging": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_DecoOutdoor": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_DecoRugs": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Decorations": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Doors": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Doors Old": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Drones": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_DyeNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Elevation": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Enhancement": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Explosives": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 786,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Farming": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Filth": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Firefoam": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Fixtures": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FloorsCarpet": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FloorsConcrete": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FloorsMetal": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FloorsStone": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FloorsWood": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_FoundationalProduction": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Foundations": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Framing": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_GearStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 714,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_GeneralStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_GroundTransport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Hacking": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Heating": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_HelixienGasNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_HemogenNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Hosting": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_InformationStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Jousting": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Kitchen": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Life": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Lighting": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_LuciferiumNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 642,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Management": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Market": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Mechanoids": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Medical": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Meditation": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Memorial": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_MilitaryTransport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_MilkPipeNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Museum": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_NavalTransport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_NeutroamineNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_NutrientPasteNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Outreach": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 570,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_OxygenNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Personas": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_PlatformTransport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Pollution": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_PowerGeneration": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_PowerManagement": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_PowerStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Prisoners": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ProcessingProduction": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ProcessingProductionOld": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Production": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ProductionInfrastructure": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Ranching": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 498,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ResearchProduction": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ResourcesStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Seating": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Sleeving": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Space": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SpaceCombat": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SpacePlatform": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SpacePower": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SpaceProduction": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SpaceVacuum": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Spaceport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SteamConstructs": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_SteelNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 426,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Storage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Summon": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Supports": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Tables": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Terraforming": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_ToxicWasteNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Transport": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_TransportInfrastructure": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Traps": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_UraniumNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_VehicleStorage": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Walls": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_Windows": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 354,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_WoodNetwork": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ferny_World": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Floors": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Free": {
+      "frame": {
+        "h": 128,
+        "w": 128,
+        "x": 2,
+        "y": 2
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 128,
+        "w": 128
+      },
+      "spriteSourceSize": {
+        "h": 128,
+        "w": 128,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/GasChem": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/HospitalTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Hygiene": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ideology": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Intelligences": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Joy": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/KitchenTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/LightsTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/MapEdit": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Misc": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 282,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/MultiFloors": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/NutrientSolutionPipeSystem": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Odyssey": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Orders": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Pathing": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Planning": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Power": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Production": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Radiology": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/ResearchTab": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 722
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Security": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 794
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Ship": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 866
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Spots": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 210,
+        "y": 938
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Structure": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 74
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Temperature": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 146
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/VFEFactory_Factories": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 218
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/VFEI2_Insectoids": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 290
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/VF_Vehicles": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 362
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/VR_Artifice": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 434
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/Zone": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 506
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/skylights": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 578
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    },
+    "UI/wrongsign": {
+      "frame": {
+        "h": 64,
+        "w": 64,
+        "x": 138,
+        "y": 650
+      },
+      "rotated": false,
+      "sourceSize": {
+        "h": 64,
+        "w": 64
+      },
+      "spriteSourceSize": {
+        "h": 64,
+        "w": 64,
+        "x": 0,
+        "y": 0
+      },
+      "trimmed": false
+    }
+  },
+  "meta": {
+    "app": "Rust Explorer",
+    "extrude": 2,
+    "gap": 4,
+    "key_format": "group/frame",
+    "label": "UI",
+    "layers": {
+      "diffuse": "Architect Icons Pack_UI_atlas_01_1024x1024_gap4_ext2_pot_dense_diffuse.png",
+      "masks": null,
+      "normals": null
+    },
+    "pack_name": "Architect Icons Pack",
+    "page": 1,
+    "pages": 1,
+    "pot": true,
+    "size": {
+      "h": 1024,
+      "w": 1024
+    },
+    "version": "1.0.0"
+  }
+}

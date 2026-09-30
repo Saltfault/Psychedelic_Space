@@ -14,11 +14,14 @@ const SETTINGS_PATH: String = "user://settings.cfg"
 const SETTINGS_SECTION: String = "developer"
 const DEV_MODE_KEY: String = "dev_mode_enabled"
 
-const CARAVAN_ROUTE := ["start", "patrol", "nebula", "warp"]
+## Semantic sectors visited by the caravan; it never occupies the player start or warp exit.
+const CARAVAN_ROUTE: Array[String] = ["patrol", "nebula", "station", "outpost"]
 
 ## Seed shared by this run's procedurally generated route and sector layouts.
 var run_seed: int = 0
 var current_sector_id: String = "start"
+## True when the active sector's required objective and hostile ships are resolved for route travel.
+var current_sector_clear: bool = false
 ## Number of accepted sector transitions in this run.
 var world_tick: int = 0
 ## Spendable credits; changes emit credits_changed and run_state_changed.
@@ -36,7 +39,7 @@ var outpost_destroyed: bool = false
 var outpost_reinforcement_level: int = 0
 
 var caravan_route_index: int = 0
-var known_caravan_sector: String = "start"
+var known_caravan_sector: String = CARAVAN_ROUTE[0]
 var dev_mode_enabled: bool = false
 
 
@@ -51,8 +54,12 @@ func _ready() -> void:
 func reset_run() -> void:
 	# Reset only run progress; the user's developer-mode preference is not run data.
 	current_sector_id = "start"
+	current_sector_clear = false
 	world_tick = 0
 	credits = 25
+	# A fresh run rolls a fresh map; without this the seed stays 0 across runs
+	# and system_map.generate_new_map() would rebuild the identical route.
+	run_seed = randi()
 
 	main_objective_complete = false
 	side_objective_complete = false
@@ -63,11 +70,21 @@ func reset_run() -> void:
 	outpost_reinforcement_level = 0
 
 	caravan_route_index = 0
-	known_caravan_sector = "start"
+	known_caravan_sector = CARAVAN_ROUTE[0]
 
 	run_state_changed.emit()
 	credits_changed.emit(credits)
 	Log.info("Run state reset", current_sector_id, credits)
+
+
+## Publish the active sector's objective-and-hostile clear state when it changes.
+func set_current_sector_clear(is_clear: bool) -> void:
+	if current_sector_clear == is_clear:
+		return
+
+	current_sector_clear = is_clear
+	run_state_changed.emit()
+	Log.info("Sector clear state changed", current_sector_id, current_sector_clear)
 
 
 ## Add a positive credit reward; ignores zero and negative values.

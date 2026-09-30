@@ -1,5 +1,5 @@
 extends Area2D
-## Installs its configured module on the player when collected, then removes itself.
+## Adds its configured module to the player's unequipped inventory when collected.
 
 var module: ModuleDefinition
 
@@ -9,11 +9,10 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-	if not body is PlayerShip:
+	var player: PlayerShip = body as PlayerShip
+	if player == null or module == null:
 		return
 
-	if module == null:
-		return
-
-	if body.install_module(module):
+	if player.store_module(module):
+		Log.info("Module pickup collected", module.display_name)
 		queue_free()

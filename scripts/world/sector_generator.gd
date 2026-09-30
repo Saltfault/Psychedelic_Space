@@ -14,7 +14,7 @@ class_name SectorGenerator
 @export var outpost_scene: PackedScene
 ## Projectile dependency assigned to generated outposts before they enter the tree.
 @export var projectile_scene: PackedScene
-## Optional warp landmark; assigned when the warp-gate guide step is implemented.
+## Animated physical exit gate instantiated in the final warp sector.
 @export var warp_gate_scene: PackedScene
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -43,14 +43,14 @@ func generate_sector(sector: SectorRoot) -> void:
 			_spawn_sensor_area(
 				station_scene,
 				sector.get_node("Landmarks"),
-				_random_open_position(sector),
+				_random_open_position(sector, 800.0, 950.0),
 			)
 			_spawn_patrol(sector, _random_open_position(sector))
 		"nebula":
 			_spawn_nebula_objective(sector)
 			_spawn_patrol(sector, _random_open_position(sector))
 		"outpost":
-			_spawn_outpost(sector, _random_open_position(sector))
+			_spawn_outpost(sector, _random_open_position(sector, 900.0, 1050.0))
 			_spawn_patrol(sector, _random_open_position(sector))
 			for index in range(3):
 				var reinforcement_position: Vector2 = _random_open_position(sector)
@@ -140,28 +140,34 @@ func _system_attribute(sector: SectorRoot, key: StringName, fallback: Variant) -
 func _spawn_outpost(sector: SectorRoot, at: Vector2) -> void:
 	# Assign its weapon before adding it so the firing timer never sees an unset scene.
 	if outpost_scene == null:
+		Log.error("Generated outpost is not configured on SectorGenerator", sector.sector_id)
 		return
 	var outpost: Outpost = outpost_scene.instantiate() as Outpost
 	if outpost == null:
+		Log.error("Configured outpost scene is not an Outpost", outpost_scene.resource_path)
 		return
 	outpost.projectile_scene = projectile_scene
 	outpost.position = at
 	sector.get_node("Landmarks").add_child(outpost)
 	reserved_positions.append(at)
+	Log.info("Generated enemy outpost", sector.map_node_id, at)
 
 
 func _spawn_sensor_area(scene: PackedScene, parent: Node, at: Vector2) -> void:
 	# Station and IntelBeacon must monitor the PlayerShip's physics layer (2).
 	if scene == null:
+		Log.error("Required sector landmark scene is not configured", parent.name)
 		return
 	var area: Area2D = scene.instantiate() as Area2D
 	if area == null:
+		Log.error("Configured sensor landmark is not an Area2D", scene.resource_path)
 		return
 	area.collision_layer = 0
 	area.collision_mask = 2
 	area.position = at
 	parent.add_child(area)
 	reserved_positions.append(at)
+	Log.info("Generated sector landmark", scene.resource_path, at)
 
 
 func _spawn_patrol(sector: SectorRoot, at: Vector2) -> void:
@@ -201,4 +207,18 @@ func _random_open_position(
 				break
 		if not blocked:
 			return candidate
-	return Vector2(sector.sector_size.x * 0.75, sector.sector_size.y * 0.75)
+	# Failed random placement must not hide required content on the far edge of the sector.
+	var fallback_radius: float = maxf(minimum_spawn_distance + 150.0, clearance + 250.0)
+	for index in range(16):
+		var angle: float = TAU * float(index) / 16.0
+		var fallback: Vector2 = sector.spawn_position + Vector2.RIGHT.rotated(angle) * fallback_radius
+		fallback.x = clampf(fallback.x, 250.0, sector.sector_size.x - 250.0)
+		fallback.y = clampf(fallback.y, 250.0, sector.sector_size.y - 250.0)
+		var blocked: bool = false
+		for reserved in reserved_positions:
+			if fallback.distance_to(reserved) < clearance:
+				blocked = true
+				break
+		if not blocked:
+			return fallback
+	return sector.spawn_position + Vector2(fallback_radius, 0.0)

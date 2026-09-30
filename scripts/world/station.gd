@@ -5,6 +5,8 @@ var player_inside: PlayerShip = null
 
 
 func _ready() -> void:
+	# The player is on physics layer 2; include it so this Area2D can detect approach.
+	set_collision_mask_value(2, true)
 	add_to_group("sensor_contact")
 	set_meta("contact_type", "station")
 

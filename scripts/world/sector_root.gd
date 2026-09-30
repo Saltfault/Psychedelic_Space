@@ -2,6 +2,9 @@ extends Node2D
 ## Owns a sector's bounds, generated content, and persistent actors restored for this visit.
 class_name SectorRoot
 
+## Emitted when this sector transitions between uncleared and cleared.
+signal clear_state_changed(is_clear: bool)
+
 ## Semantic role used by mission logic and deterministic sector generation.
 @export var sector_id: String = "start"
 ## World-space dimensions shared with SectorSpace for wrapped movement and queries.
@@ -26,6 +29,12 @@ var map_node_id: String = ""
 var sector_seed: int = 0
 var solar_system_id: String = "generic_system"
 var solar_system_attributes: Dictionary = {}
+## Current route-clear result, derived from this sector's required objective and live enemies.
+var is_clear: bool:
+	get:
+		return _mandatory_objectives_resolved() and _living_enemy_count() == 0
+
+var _last_published_clear_state: bool = false
 
 
 ## Apply map data before adding this scene to the active scene tree.
@@ -51,8 +60,69 @@ func _ready() -> void:
 	_spawn_caravan_if_present()
 	_spawn_outpost_reinforcements()
 
+	if not RunState.run_state_changed.is_connected(_refresh_clear_state):
+		RunState.run_state_changed.connect(_refresh_clear_state)
+	_connect_enemy_death_signals()
+	_last_published_clear_state = is_clear
 
-## Return the arrival point used by the run coordinator when entering this sector.
+
+## Return whether this sector's role objective is resolved and no hostile ships remain.
+func _mandatory_objectives_resolved() -> bool:
+	match sector_id:
+		"outpost":
+			return RunState.main_objective_complete
+		# Intel is optional; blocking departure would prevent its world-tick deadline from advancing.
+		_:
+			return true
+
+
+func _living_enemy_count() -> int:
+	# Inspect this sector's descendants directly: clear state is also queried while
+	# a newly-instantiated sector is detached from the SceneTree.
+	return _count_living_enemies(self)
+
+
+func _count_living_enemies(parent: Node) -> int:
+	var living_count: int = 0
+	for child in parent.get_children():
+		var enemy: BaseShip = child as BaseShip
+		if enemy != null and (enemy.team != 0 or enemy.is_in_group("enemy_ship")) and not enemy.is_dead:
+			living_count += 1
+		living_count += _count_living_enemies(child)
+	return living_count
+
+
+func _connect_enemy_death_signals() -> void:
+	# Traverse the sector itself so the same logic works during scene setup and in-tree.
+	_connect_enemy_signals_under(self)
+
+
+func _connect_enemy_signals_under(parent: Node) -> void:
+	for child in parent.get_children():
+		var enemy: BaseShip = child as BaseShip
+		if enemy != null and (enemy.team != 0 or enemy.is_in_group("enemy_ship")):
+			if not enemy.died.is_connected(_on_enemy_died):
+				enemy.died.connect(_on_enemy_died)
+			if not enemy.tree_exited.is_connected(_refresh_clear_state):
+				enemy.tree_exited.connect(_refresh_clear_state)
+		_connect_enemy_signals_under(child)
+
+
+func _on_enemy_died(_enemy: BaseShip) -> void:
+	# Wait until the death handler marks the ship dead and queues it for removal.
+	call_deferred("_refresh_clear_state")
+
+
+func _refresh_clear_state() -> void:
+	var next_clear_state: bool = is_clear
+	if next_clear_state == _last_published_clear_state:
+		return
+	_last_published_clear_state = next_clear_state
+	clear_state_changed.emit(next_clear_state)
+	Log.info("Sector clear state updated", map_node_id, sector_id, next_clear_state)
+
+
+## Return this sector's arrival point for the run coordinator.
 func get_spawn_position() -> Vector2:
 	return spawn_position
 

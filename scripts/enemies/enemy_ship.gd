@@ -2,6 +2,7 @@ extends BaseShip
 ## Sensor-driven hostile ship with patrol alert sharing and a bounded search state.
 class_name EnemyShip
 
+const MODULE_DROP_CHANCE: float = 0.35
 
 ## Awareness state; SEARCH follows the last confirmed location without firing.
 enum State {
@@ -171,15 +172,25 @@ func _die() -> void:
 	if explosion_scene != null:
 		var effect := explosion_scene.instantiate() as Node2D
 		if effect != null:
+			# The ship definition selects one fixed explosion look for this enemy type.
+			if definition != null and definition.explosion_visual != null:
+				var explosion_sprite: Sprite2D = effect as Sprite2D
+				if explosion_sprite != null:
+					explosion_sprite.texture = definition.explosion_visual
 			SectorSpace.spawn_owned(effect, global_position)
 
 	if shield_booster_scene != null and randf() < 0.18:
 		SectorSpace.spawn_owned(shield_booster_scene.instantiate(), global_position)
 
-	if module_pickup_scene != null and randf() < 0.05:
-		var pickup: Node = module_pickup_scene.instantiate()
-		pickup.set("module", RunState.get_random_module())
-		SectorSpace.spawn_owned(pickup, global_position)
+	if module_pickup_scene != null and randf() < MODULE_DROP_CHANCE:
+		var dropped_module: ModuleDefinition = RunState.get_random_module()
+		if dropped_module != null:
+			var pickup: Node = module_pickup_scene.instantiate()
+			pickup.set("module", dropped_module)
+			SectorSpace.spawn_owned(pickup, global_position)
+			Log.info("Enemy dropped a module", name, dropped_module.display_name)
+	elif module_pickup_scene == null:
+		Log.error("Enemy has no module pickup scene assigned", name)
 
 	RunState.add_credits(randi_range(4, 9))
 	Log.info("Enemy defeated", name, global_position)

@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/nebula_field.tscn" id="10_nebula"]
 [ext_resource type="PackedScene" path="res://scenes/world/intel_beacon.tscn" id="11_beacon"]
 [ext_resource type="PackedScene" path="res://scenes/world/outpost.tscn" id="12_outpost"]
+[ext_resource type="PackedScene" path="res://scenes/world/warp_gate.tscn" id="13_warp_gate"]
 
 [node name="GeneratedSector" type="Node2D" unique_id=845970153]
 script = ExtResource("1_0sov8")
@@ -35,6 +36,7 @@ nebula_scene = ExtResource("10_nebula")
 intel_beacon_scene = ExtResource("11_beacon")
 outpost_scene = ExtResource("12_outpost")
 projectile_scene = ExtResource("7_projectile")
+warp_gate_scene = ExtResource("13_warp_gate")
 
 [node name="Encounters" type="Node2D" parent="." unique_id=1709771713]
 

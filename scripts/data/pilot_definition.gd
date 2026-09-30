@@ -13,5 +13,7 @@ enum ActiveAbility {
 @export var ability: ActiveAbility = ActiveAbility.DASH
 ## Minimum seconds between successful ability activations.
 @export var cooldown: float = 5.0
-## Forward impulse added to the ship when Dash activates.
-@export var dash_impulse: float = 900.0
+## Target forward speed during the short Dash burst, in world units per second.
+@export var dash_speed: float = 900.0
+## Duration of the temporary speed limit that preserves the Dash burst.
+@export_range(0.05, 1.0, 0.05) var dash_duration: float = 0.22

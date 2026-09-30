@@ -1,0 +1,24 @@
+{
+  "generated_by": "Rust Explorer v0.5.7",
+  "label": "Animals",
+  "layout": "dense",
+  "pack_name": "Architect Icons Pack",
+  "pages": [
+    {
+      "csv": "Architect Icons Pack_Animals_atlas_01_256x256_gap4_ext2_pot_dense.csv",
+      "diffuse": "Architect Icons Pack_Animals_atlas_01_256x256_gap4_ext2_pot_dense_diffuse.png",
+      "frames": 5,
+      "json": "Architect Icons Pack_Animals_atlas_01_256x256_gap4_ext2_pot_dense.json",
+      "masks": null,
+      "normals": null,
+      "page": 1,
+      "size": {
+        "h": 256,
+        "w": 256
+      }
+    }
+  ],
+  "schema": "pas7-pack/v1",
+  "sprites_count": 5,
+  "version": "1.0.0"
+}

@@ -8,10 +8,13 @@ signal travel_requested(node_id: String)
 const MIN_INTERMEDIATE_NODES: int = 10
 const MAX_INTERMEDIATE_NODES: int = 14
 const LINK_RADIUS: float = 18.0
+const MAP_CONTENT_INSET: Vector2 = Vector2(72.0, 80.0)
+const MAP_CONTENT_BOTTOM_RESERVED: float = 220.0
 
 @onready var info: Label = $Info
 @onready var legend: Label = $Legend
 @onready var close_button: Button = $CloseButton
+@onready var background: Control = $Background
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var nodes_by_id: Dictionary = { }
@@ -95,6 +98,63 @@ func generate_new_map(seed_value: int) -> void:
 	queue_redraw()
 
 
+## Find the nearest matching sector/system or add a debug destination connected to the current node.
+func debug_find_or_create_node(kind: String, target: String) -> String:
+	var wanted_kind: String = kind.to_lower()
+	var wanted_target: String = target.to_lower()
+	var origin_data: Dictionary = nodes_by_id.get(current_node_id, {})
+	var origin_position: Vector2 = origin_data.get("map_position", Vector2(0.5, 0.5))
+	var nearest_id: String = ""
+	var nearest_distance: float = INF
+
+	for candidate_id in node_order:
+		var candidate: Dictionary = nodes_by_id[candidate_id]
+		var matches: bool = false
+		if wanted_kind == "sector":
+			matches = String(candidate.get("role", "")).to_lower() == wanted_target
+		elif wanted_kind == "system":
+			matches = String(candidate.get("solar_system_id", "")).to_lower() == wanted_target
+		if matches:
+			var candidate_position: Vector2 = candidate.get("map_position", Vector2.ZERO)
+			var candidate_distance: float = origin_position.distance_squared_to(candidate_position)
+			if candidate_distance < nearest_distance:
+				nearest_distance = candidate_distance
+				nearest_id = candidate_id
+
+	if not nearest_id.is_empty():
+		return nearest_id
+
+	var role: String = wanted_target if wanted_kind == "sector" else "generic"
+	var node_id: String = "debug_node_%d" % nodes_by_id.size()
+	while nodes_by_id.has(node_id):
+		node_id += "_new"
+	var occupied_positions: Array[Vector2] = []
+	for existing_id in node_order:
+		var existing_data: Dictionary = nodes_by_id[existing_id]
+		occupied_positions.append(existing_data.get("map_position", Vector2.ZERO))
+	var position: Vector2 = _random_intermediate_position(occupied_positions)
+	_add_node(node_id, position, role, nodes_by_id.size())
+	if wanted_kind == "system":
+		nodes_by_id[node_id]["solar_system_id"] = wanted_target
+	outgoing_links[node_id] = []
+	if not outgoing_links.has(current_node_id):
+		outgoing_links[current_node_id] = []
+	_add_link(current_node_id, node_id)
+	node_order.append(node_id)
+	queue_redraw()
+	Log.info("Developer map destination created", wanted_kind, wanted_target, node_id)
+	return node_id
+
+
+## Set map focus for a dev teleport without applying the regular clear/link travel gates.
+func debug_set_current_node(node_id: String) -> bool:
+	if not nodes_by_id.has(node_id):
+		return false
+	current_node_id = node_id
+	queue_redraw()
+	return true
+
+
 func _add_node(node_id: String, map_position: Vector2, role: String, ordinal: int) -> void:
 	nodes_by_id[node_id] = {
 		"id": node_id,
@@ -135,9 +195,11 @@ func _sort_candidates_by_distance(a: Dictionary, b: Dictionary) -> bool:
 	return float(a["distance"]) < float(b["distance"])
 
 
-## Return whether node_id is a currently available outgoing edge from the current node.
+## Return whether the sector is clear and node_id is a legal outgoing edge.
 func can_travel_to_node(node_id: String) -> bool:
-	# The live generated graph is the only authority for legal travel.
+	# Required local objectives and hostile ships must be resolved before route travel is enabled.
+	if not RunState.current_sector_clear:
+		return false
 	if not outgoing_links.has(current_node_id):
 		return false
 	return node_id in outgoing_links[current_node_id]
@@ -149,11 +211,14 @@ func get_node_data(node_id: String) -> Dictionary:
 	return node_data.duplicate(true)
 
 
-## Update the map's current node only when node_id is a legal outgoing link.
-func commit_travel(node_id: String) -> void:
-	if can_travel_to_node(node_id):
-		current_node_id = node_id
-		queue_redraw()
+## Commit a legal outgoing route and return false without changing the map otherwise.
+func commit_travel(node_id: String) -> bool:
+	if not can_travel_to_node(node_id):
+		return false
+
+	current_node_id = node_id
+	queue_redraw()
+	return true
 
 
 ## Display the map and pause gameplay until the player closes it or chooses a route.
@@ -191,7 +256,14 @@ func _node_at(mouse_position: Vector2) -> String:
 
 
 func _screen_position(node_id: String) -> Vector2:
-	var bounds: Rect2 = Rect2(Vector2(56.0, 116.0), size - Vector2(112.0, 176.0))
+	# Keep generated routes inside the user's smaller framed map, above its footer labels.
+	var bounds: Rect2 = Rect2(
+		background.position + MAP_CONTENT_INSET,
+		background.size - Vector2(
+			MAP_CONTENT_INSET.x * 2.0,
+			MAP_CONTENT_INSET.y + MAP_CONTENT_BOTTOM_RESERVED,
+		)
+	)
 	return bounds.position + nodes_by_id[node_id]["map_position"] * bounds.size
 
 
@@ -257,10 +329,11 @@ func _draw_route_link(from_position: Vector2, to_position: Vector2, color: Color
 
 func _refresh_info() -> void:
 	var node_data: Dictionary = get_node_data(current_node_id)
-	info.text = "World Tick: %d | Node: %s (%s)\nOutpost: %s | Nebula signal: %s\nCaravan last known: %s" % [
+	info.text = "Tick %d | %s (%s) | Sector %s\nOutpost: %s | Intel: %s\nCaravan last known: %s" % [
 		RunState.world_tick,
 		current_node_id,
 		String(node_data.get("role", "unknown")).to_upper(),
+		"CLEAR" if RunState.current_sector_clear else "UNCLEARED",
 		"complete" if RunState.main_objective_complete else "active",
 		(
 			"complete"

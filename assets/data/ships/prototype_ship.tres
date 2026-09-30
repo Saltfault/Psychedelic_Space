@@ -5,3 +5,15 @@
 [resource]
 script = ExtResource("1_hhr8s")
 metadata/_custom_type_script = "uid://dtjhydxdas3kp"
+display_name = "Prototype"
+max_speed = 610.0
+thrust_acceleration = 850.0
+linear_drag = 34.0
+max_hull = 200.0
+max_shield = 100.0
+shield_regen_per_second = 12.0
+shield_regen_delay = 1.8
+weapon_cooldown = 0.15
+projectile_speed = 1150.0
+projectile_damage = 14.0
+sensor_range = 2100.0

@@ -1,0 +1,215 @@
+extends PanelContainer
+## Reusable settings dialog shared by the main menu and in-game HUD.
+class_name GameSettingsPanel
+
+signal close_requested
+
+@onready var volume_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Audio/VolumeSlider
+@onready var volume_value: Label = $MarginContainer/VBoxContainer/Tabs/Audio/VolumeValue
+@onready var resolution_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/ResolutionOption
+@onready var fullscreen_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/FullscreenToggle
+@onready var borderless_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/BorderlessToggle
+@onready var vsync_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/VSyncToggle
+@onready var fps_limit_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/FPSLimitOption
+@onready var dev_mode_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/DevModeToggle
+@onready var pause_focus_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/PauseFocusToggle
+@onready var auto_fire_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/AutoFireToggle
+@onready var master_mute_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Audio/MuteToggle
+@onready var minimap_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Other/MinimapToggle
+@onready var profily_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Other/ProfilyOption
+@onready var profily_description: Label = $MarginContainer/VBoxContainer/Tabs/Other/ProfilyDescription
+@onready var shake_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Other/ScreenShakeSlider
+@onready var shake_value: Label = $MarginContainer/VBoxContainer/Tabs/Other/ScreenShakeValue
+@onready var reset_button: Button = $MarginContainer/VBoxContainer/Tabs/Other/ResetDefaultsButton
+@onready var close_button: Button = $MarginContainer/VBoxContainer/CloseButton
+@onready var key_buttons: Dictionary = {
+	&"thrust": $MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow/KeyButton,
+	&"fire": $MarginContainer/VBoxContainer/Tabs/Controls/FireRow/KeyButton,
+	&"pilot_ability": $MarginContainer/VBoxContainer/Tabs/Controls/DashRow/KeyButton,
+	&"interact": $MarginContainer/VBoxContainer/Tabs/Controls/InteractRow/KeyButton,
+	&"system_map": $MarginContainer/VBoxContainer/Tabs/Controls/MapRow/KeyButton,
+}
+
+const RESOLUTIONS: Array[Vector2i] = [
+	Vector2i(1280, 720), Vector2i(1366, 768), Vector2i(1600, 900),
+	Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160),
+]
+const FPS_LIMITS: Array[int] = [0, 30, 45, 60, 90, 120, 144, 165, 240, 360]
+const PROFILY_PROFILE_NAMES: Array[String] = [
+	"Off",
+	"Level 1 — FPS number",
+	"Level 2 — FPS graph",
+	"Level 3 — FPS, RAM, audio, and scene stats",
+	"Level 4 — Full diagnostics",
+]
+const PROFILY_PROFILE_DESCRIPTIONS: Array[String] = [
+	"Hide the Profily overlay and stop its monitors.",
+	"Show only the current frame rate, with minimal overlay detail.",
+	"Show the frame-rate graph without the other monitor panels.",
+	"Show FPS graphs plus RAM, audio, and current-scene statistics.",
+	"Show every Profily monitor, including advanced metrics and full graphs.",
+]
+
+var awaiting_key_action: StringName = &""
+
+
+func _ready() -> void:
+	for resolution in RESOLUTIONS:
+		resolution_option.add_item("%d x %d" % [resolution.x, resolution.y])
+	for limit in FPS_LIMITS:
+		fps_limit_option.add_item("Unlimited" if limit == 0 else "%d FPS" % limit, limit)
+	for profile_name in PROFILY_PROFILE_NAMES:
+		profily_option.add_item(profile_name)
+	volume_slider.set_value_no_signal(GameSettings.master_volume_db)
+	volume_value.text = _format_volume(GameSettings.master_volume_db)
+	_select_resolution()
+	_sync_controls()
+	volume_slider.value_changed.connect(_on_volume_changed)
+	shake_slider.value_changed.connect(GameSettings.set_screen_shake_strength)
+	resolution_option.item_selected.connect(_on_resolution_selected)
+	fps_limit_option.item_selected.connect(_on_fps_limit_selected)
+	fullscreen_toggle.toggled.connect(GameSettings.set_fullscreen)
+	borderless_toggle.toggled.connect(GameSettings.set_borderless)
+	vsync_toggle.toggled.connect(GameSettings.set_vsync)
+	master_mute_toggle.toggled.connect(GameSettings.set_master_muted)
+	pause_focus_toggle.toggled.connect(GameSettings.set_pause_on_focus_loss)
+	auto_fire_toggle.toggled.connect(GameSettings.set_auto_fire)
+	minimap_toggle.toggled.connect(GameSettings.set_show_minimap)
+	profily_option.item_selected.connect(GameSettings.set_performance_profile)
+	profily_option.item_selected.connect(_on_profily_profile_selected)
+	dev_mode_toggle.toggled.connect(RunState.set_dev_mode)
+	for action in key_buttons:
+		var button: Button = key_buttons[action] as Button
+		button.pressed.connect(_begin_key_rebind.bind(action))
+	close_button.pressed.connect(_on_close_pressed)
+	reset_button.pressed.connect(_on_reset_defaults)
+	RunState.dev_mode_changed.connect(_sync_dev_mode)
+	_sync_dev_mode(RunState.dev_mode_enabled)
+	GameSettings.settings_changed.connect(_sync_controls)
+	_refresh_key_labels()
+
+
+func _on_volume_changed(value: float) -> void:
+	GameSettings.set_master_volume(value)
+	volume_value.text = _format_volume(value)
+
+
+func _on_resolution_selected(index: int) -> void:
+	if index >= 0 and index < RESOLUTIONS.size():
+		GameSettings.set_window_size(RESOLUTIONS[index])
+
+
+func _on_fps_limit_selected(index: int) -> void:
+	if index >= 0 and index < FPS_LIMITS.size():
+		GameSettings.set_fps_limit(FPS_LIMITS[index])
+
+
+func _select_resolution() -> void:
+	var nearest_index: int = 0
+	var nearest_distance: int = 2147483647
+	for index in range(RESOLUTIONS.size()):
+		var candidate: Vector2i = RESOLUTIONS[index]
+		var distance: int = absi(candidate.x - GameSettings.window_size.x) + absi(candidate.y - GameSettings.window_size.y)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest_index = index
+	# Programmatic selection must not re-fire item_selected on every settings sync.
+	if resolution_option.selected != nearest_index:
+		resolution_option.select(nearest_index)
+
+
+func _sync_dev_mode(enabled: bool) -> void:
+	dev_mode_toggle.set_pressed_no_signal(enabled)
+
+
+func _sync_controls() -> void:
+	fullscreen_toggle.set_pressed_no_signal(GameSettings.fullscreen)
+	borderless_toggle.set_pressed_no_signal(GameSettings.borderless)
+	vsync_toggle.set_pressed_no_signal(GameSettings.vsync_enabled)
+	master_mute_toggle.set_pressed_no_signal(GameSettings.master_muted)
+	pause_focus_toggle.set_pressed_no_signal(GameSettings.pause_on_focus_loss)
+	auto_fire_toggle.set_pressed_no_signal(GameSettings.auto_fire)
+	minimap_toggle.set_pressed_no_signal(GameSettings.show_minimap)
+	shake_slider.set_value_no_signal(GameSettings.screen_shake_strength)
+	shake_value.text = "%d%%" % roundi(GameSettings.screen_shake_strength * 100.0)
+	for index in range(FPS_LIMITS.size()):
+		if FPS_LIMITS[index] == GameSettings.fps_limit:
+			# Only reselect on an actual change so item_selected never loops back
+			# into a setter while the panel syncs from settings_changed.
+			if fps_limit_option.selected != index:
+				fps_limit_option.select(index)
+			break
+	if profily_option.selected != GameSettings.performance_profile:
+		profily_option.select(GameSettings.performance_profile)
+	_sync_profily_description(GameSettings.performance_profile)
+	_select_resolution()
+
+
+func _on_profily_profile_selected(index: int) -> void:
+	_sync_profily_description(index)
+
+
+func _sync_profily_description(index: int) -> void:
+	if index >= 0 and index < PROFILY_PROFILE_DESCRIPTIONS.size():
+		profily_description.text = PROFILY_PROFILE_DESCRIPTIONS[index]
+
+
+func _on_reset_defaults() -> void:
+	GameSettings.reset_to_defaults()
+	RunState.set_dev_mode(false)
+	volume_slider.set_value_no_signal(GameSettings.master_volume_db)
+	volume_value.text = _format_volume(GameSettings.master_volume_db)
+	_refresh_key_labels()
+	_sync_controls()
+
+
+func _begin_key_rebind(action: StringName) -> void:
+	awaiting_key_action = action
+	var button: Button = key_buttons[action] as Button
+	button.text = "PRESS A KEY…"
+
+
+func _input(event: InputEvent) -> void:
+	if awaiting_key_action.is_empty() or not visible:
+		return
+	if not event is InputEventKey:
+		return
+	var key_event: InputEventKey = event as InputEventKey
+	if not key_event.pressed or key_event.echo:
+		return
+	if key_event.keycode == KEY_ESCAPE:
+		awaiting_key_action = &""
+		_refresh_key_labels()
+		get_viewport().set_input_as_handled()
+		return
+	var physical_code: int = key_event.physical_keycode
+	if physical_code == KEY_NONE:
+		physical_code = key_event.keycode
+	GameSettings.set_key_binding(awaiting_key_action, physical_code)
+	awaiting_key_action = &""
+	_refresh_key_labels()
+	get_viewport().set_input_as_handled()
+
+
+func _refresh_key_labels() -> void:
+	for action in key_buttons:
+		var button: Button = key_buttons[action] as Button
+		if action == awaiting_key_action:
+			button.text = "PRESS A KEY…"
+		else:
+			button.text = OS.get_keycode_string(GameSettings.get_key_binding(action))
+
+
+func _format_volume(value: float) -> String:
+	if value <= -39.9:
+		return "Muted"
+	return "%d dB" % roundi(value)
+
+
+func _on_close_pressed() -> void:
+	#Cancel any pending rebind so reopening the panel does not show a stale prompt.
+	if not awaiting_key_action.is_empty():
+		awaiting_key_action = &""
+		_refresh_key_labels()
+	hide()
+	close_requested.emit()
