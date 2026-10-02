@@ -175,6 +175,7 @@ func configure(target_player: PlayerShip) -> void:
 func _process(_delta: float) -> void:
 	if not is_instance_valid(player):
 		return
+	pilot_label.visible = true
 
 	if sensor_component != null:
 		var interference: float = sensor_component.nebula_sensor_multiplier
@@ -185,7 +186,9 @@ func _process(_delta: float) -> void:
 	if player.pilot == null:
 		pilot_label.text = "Pilot: none"
 	elif player.pilot.ability == PilotDefinition.ActiveAbility.RAM_SHIELD:
-		pilot_label.text = "%s shield: %d%%" % [player.pilot.display_name, roundi(player.ram_shield.get_charge_ratio() * 100.0)]
+		# Ram's ability icon fill communicates shield charge without a redundant text label.
+		pilot_label.text = ""
+		pilot_label.visible = false
 	elif player.pilot_cooldown_left <= 0.0:
 		pilot_label.text = "%s ability: READY" % player.pilot.display_name
 	else:

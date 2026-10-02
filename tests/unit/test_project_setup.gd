@@ -55,20 +55,34 @@ func test_main_menu_background_uses_saved_star_shader_material() -> void:
 	menu.free()
 
 
-func test_shield_pickups_share_the_blue_shader() -> void:
-	for path in [
-		"res://scenes/pickups/shield_booster.tscn",
-		"res://scenes/pickups/large_shield_booster.tscn",
-	]:
+func test_shield_pickups_use_blue_source_sprites_without_recolor_shaders() -> void:
+	var expected_textures: Dictionary = {
+		"res://scenes/pickups/shield_booster.tscn": "res://assets/sprites/pickups/shield_small_blue.png",
+		"res://scenes/pickups/large_shield_booster.tscn": "res://assets/sprites/pickups/shield_large_blue.png",
+	}
+	for path: String in expected_textures:
 		var pickup_scene: PackedScene = load(path) as PackedScene
 		var pickup: Area2D = pickup_scene.instantiate() as Area2D
 		var icon: Sprite2D = pickup.get_node("Icon") as Sprite2D
-		var material: ShaderMaterial = icon.material as ShaderMaterial
-		assert_that(material).is_not_null()
-		assert_that(material.shader.resource_path).is_equal(
-			"res://assets/shaders/objects/shield_pickup_blue.gdshader"
-		)
+		assert_that(icon.texture.resource_path).is_equal(expected_textures[path])
+		assert_that(icon.material).is_null()
 		pickup.free()
+
+
+func test_every_authored_ship_definition_has_a_distinct_engine_profile() -> void:
+	var definition_paths: Array[String] = [
+		"res://assets/data/ships/prototype_ship.tres",
+		"res://assets/data/ships/corsair.tres",
+		"res://assets/data/ships/security.tres",
+	]
+	var profiles: Dictionary = {}
+	for path in definition_paths:
+		var definition: ShipDefinition = load(path) as ShipDefinition
+		assert_that(definition).is_not_null()
+		assert_that(definition.engine_loop).is_not_null()
+		var profile: String = "%s|%.2f" % [definition.engine_loop.resource_path, definition.engine_pitch_scale]
+		profiles[profile] = true
+	assert_that(profiles.size()).is_equal(definition_paths.size())
 
 
 func test_generated_route_contains_a_labeled_asteroid_ring() -> void:

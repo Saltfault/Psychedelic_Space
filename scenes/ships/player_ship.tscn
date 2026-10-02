@@ -3,11 +3,17 @@
 [ext_resource type="Script" uid="uid://cqc8akc33w6co" path="res://scripts/ships/player_ship.gd" id="1_rb44i"]
 [ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="2_lit_receiver"]
 [ext_resource type="Script" uid="uid://cpa2qb3trjq4k" path="res://addons/lit/nodes/lit_point_light_2d.gd" id="3_hull_light"]
-[ext_resource type="Texture2D" uid="uid://doqixtspp7crc" path="res://assets/sprites/ships/engine_flame_blue_strip.png" id="4_engine_flame"]
+[ext_resource type="Texture2D" uid="uid://doqixtspp7crc" path="res://assets/effects/engine_flames/engine_flame_blue_strip.png" id="4_engine_flame"]
 [ext_resource type="Texture2D" uid="uid://c2xjy2idt2xld" path="res://assets/sprites/ships/shoot_em_up_player_ships.png" id="5_player_ships"]
 [ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="6_shield_shader"]
 [ext_resource type="Texture2D" uid="uid://c6uwg8w1t2dhm" path="res://assets/shaders/objects/shield_uv_texture.tres" id="7_shield_uv_texture"]
 [ext_resource type="Script" uid="uid://bg6o2q3cxdcr" path="res://scripts/ships/sensor_component.gd" id="8_sensor"]
+[ext_resource type="Script" path="res://scripts/ships/ram_shield.gd" id="9_ram_shield"]
+[ext_resource type="Texture2D" path="res://assets/effects/ram_shield/pipo-btleffect208h_192.png" id="10_ram_visual"]
+
+[sub_resource type="AtlasTexture" id="RamShieldTexture"]
+atlas = ExtResource("10_ram_visual")
+region = Rect2(0, 0, 192, 192)
 
 [sub_resource type="ShaderMaterial" id="HullLitMaterial"]
 shader = ExtResource("2_lit_receiver")
@@ -82,5 +88,23 @@ position = Vector2(36, 0)
 
 [node name="SensorComponent" type="Node" parent="." unique_id=2098464465]
 script = ExtResource("8_sensor")
+
+[node name="RamShield" type="Area2D" parent="." unique_id=1326100741]
+position = Vector2(26, 0)
+collision_layer = 0
+collision_mask = 12
+monitoring = false
+monitorable = false
+script = ExtResource("9_ram_shield")
+
+[node name="ShieldVisual" type="Sprite2D" parent="RamShield" unique_id=1326100742]
+visible = false
+position = Vector2(34, 0)
+scale = Vector2(0.5, 0.5)
+flip_h = true
+texture = SubResource("RamShieldTexture")
+
+[node name="ShieldArea" type="CollisionPolygon2D" parent="RamShield" unique_id=1326100743]
+polygon = PackedVector2Array(-8, -16, 22, -30, 58, -24, 78, 0, 58, 24, 22, 30, -8, 16)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=690971959]

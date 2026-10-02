@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="ShipDefinition" load_steps=4 format=3 uid="uid://day6awcngf0ba"]
+[gd_resource type="Resource" script_class="ShipDefinition" load_steps=5 format=3 uid="uid://day6awcngf0ba"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_qwri2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_orange.tres" id="2_projectile"]
-[ext_resource type="Texture2D" path="res://assets/sprites/effects/scifi_fx/scifx1_explosion_A_large_blue/spritesheet.png" id="3_explosion"]
+[ext_resource type="Texture2D" path="res://assets/effects/scifi_fx/scifx1_explosion_A_large_blue/spritesheet.png" id="3_explosion"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Green.png" id="4_hull"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
 
 [resource]
 script = ExtResource("1_qwri2")
@@ -12,10 +13,11 @@ thrust_acceleration = 620.0
 linear_drag = 42.0
 max_hull = 48.0
 max_shield = 15.0
-weapon_cooldown = 0.34
-projectile_speed = 760.0
-projectile_damage = 6.0
-projectile_visual = ExtResource("2_projectile")
 explosion_visual = ExtResource("3_explosion")
 module_slots = 3
+hull_texture = ExtResource("4_hull")
+hull_region = Rect2(64, 0, 64, 64)
+role_description = "Fast close-range fighter built around aggressive maneuvering."
+engine_loop = ExtResource("5_engine")
+engine_pitch_scale = 1.28
 metadata/_custom_type_script = "uid://dtjhydxdas3kp"

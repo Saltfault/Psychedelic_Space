@@ -12,14 +12,23 @@ signal close_requested
 @onready var vsync_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/VSyncToggle
 @onready var fps_limit_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/FPSLimitOption
 @onready var dev_mode_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/DevModeToggle
-@onready var pause_focus_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/PauseFocusToggle
-@onready var auto_fire_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/AutoFireToggle
+@onready var pause_focus_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/PauseFocusToggle
+@onready var auto_fire_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/AutoFireToggle
 @onready var master_mute_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Audio/MuteToggle
-@onready var minimap_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Other/MinimapToggle
+@onready var music_volume_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Audio/MusicVolumeSlider
+@onready var music_volume_value: Label = $MarginContainer/VBoxContainer/Tabs/Audio/MusicVolumeValue
+@onready var sfx_volume_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Audio/SFXVolumeSlider
+@onready var sfx_volume_value: Label = $MarginContainer/VBoxContainer/Tabs/Audio/SFXVolumeValue
+@onready var menu_volume_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Audio/MenuVolumeSlider
+@onready var menu_volume_value: Label = $MarginContainer/VBoxContainer/Tabs/Audio/MenuVolumeValue
+@onready var minimap_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/MinimapToggle
 @onready var profily_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Other/ProfilyOption
 @onready var profily_description: Label = $MarginContainer/VBoxContainer/Tabs/Other/ProfilyDescription
-@onready var shake_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Other/ScreenShakeSlider
-@onready var shake_value: Label = $MarginContainer/VBoxContainer/Tabs/Other/ScreenShakeValue
+@onready var shake_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Gameplay/ScreenShakeSlider
+@onready var shake_value: Label = $MarginContainer/VBoxContainer/Tabs/Gameplay/ScreenShakeValue
+@onready var vibration_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/VibrationToggle
+@onready var reduced_motion_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/ReducedMotionToggle
+@onready var reduce_flashing_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/ReduceFlashingToggle
 @onready var reset_button: Button = $MarginContainer/VBoxContainer/Tabs/Other/ResetDefaultsButton
 @onready var close_button: Button = $MarginContainer/VBoxContainer/CloseButton
 @onready var key_buttons: Dictionary = {
@@ -62,10 +71,17 @@ func _ready() -> void:
 		profily_option.add_item(profile_name)
 	volume_slider.set_value_no_signal(GameSettings.master_volume_db)
 	volume_value.text = _format_volume(GameSettings.master_volume_db)
+	_sync_audio_sliders()
 	_select_resolution()
 	_sync_controls()
 	volume_slider.value_changed.connect(_on_volume_changed)
+	music_volume_slider.value_changed.connect(GameSettings.set_music_volume)
+	sfx_volume_slider.value_changed.connect(GameSettings.set_sfx_volume)
+	menu_volume_slider.value_changed.connect(GameSettings.set_menu_volume)
 	shake_slider.value_changed.connect(GameSettings.set_screen_shake_strength)
+	vibration_toggle.toggled.connect(GameSettings.set_controller_vibration)
+	reduced_motion_toggle.toggled.connect(GameSettings.set_reduced_motion)
+	reduce_flashing_toggle.toggled.connect(GameSettings.set_reduce_flashing)
 	resolution_option.item_selected.connect(_on_resolution_selected)
 	fps_limit_option.item_selected.connect(_on_fps_limit_selected)
 	fullscreen_toggle.toggled.connect(GameSettings.set_fullscreen)
@@ -92,6 +108,15 @@ func _ready() -> void:
 func _on_volume_changed(value: float) -> void:
 	GameSettings.set_master_volume(value)
 	volume_value.text = _format_volume(value)
+
+
+func _sync_audio_sliders() -> void:
+	music_volume_slider.set_value_no_signal(GameSettings.music_volume_db)
+	music_volume_value.text = _format_volume(GameSettings.music_volume_db)
+	sfx_volume_slider.set_value_no_signal(GameSettings.sfx_volume_db)
+	sfx_volume_value.text = _format_volume(GameSettings.sfx_volume_db)
+	menu_volume_slider.set_value_no_signal(GameSettings.menu_volume_db)
+	menu_volume_value.text = _format_volume(GameSettings.menu_volume_db)
 
 
 func _on_resolution_selected(index: int) -> void:
@@ -127,11 +152,15 @@ func _sync_controls() -> void:
 	borderless_toggle.set_pressed_no_signal(GameSettings.borderless)
 	vsync_toggle.set_pressed_no_signal(GameSettings.vsync_enabled)
 	master_mute_toggle.set_pressed_no_signal(GameSettings.master_muted)
+	_sync_audio_sliders()
 	pause_focus_toggle.set_pressed_no_signal(GameSettings.pause_on_focus_loss)
 	auto_fire_toggle.set_pressed_no_signal(GameSettings.auto_fire)
 	minimap_toggle.set_pressed_no_signal(GameSettings.show_minimap)
 	shake_slider.set_value_no_signal(GameSettings.screen_shake_strength)
 	shake_value.text = "%d%%" % roundi(GameSettings.screen_shake_strength * 100.0)
+	vibration_toggle.set_pressed_no_signal(GameSettings.controller_vibration)
+	reduced_motion_toggle.set_pressed_no_signal(GameSettings.reduced_motion)
+	reduce_flashing_toggle.set_pressed_no_signal(GameSettings.reduce_flashing)
 	for index in range(FPS_LIMITS.size()):
 		if FPS_LIMITS[index] == GameSettings.fps_limit:
 			# Only reselect on an actual change so item_selected never loops back

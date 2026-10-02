@@ -10,8 +10,16 @@ signal hull_changed(current: float, maximum: float)
 signal shield_changed(current: float, maximum: float)
 ## Emitted whenever equipped or unequipped module inventories change.
 signal modules_changed
+## Emitted when the ship's active primary weapon changes.
+signal weapon_changed(weapon: WeaponDefinition)
 
 const SHIPS: Registry = preload("res://assets/data/registries/ships.tres")
+const UNEQUIPPED_MODULE_CAPACITY: int = 25
+## All hulls and pilots start with this independent weapon; pickups replace it during a run.
+const STARTING_WEAPON_ID: StringName = &"pulse_cannon"
+const FALLBACK_WEAPON_COOLDOWN: float = 0.18
+const FALLBACK_PROJECTILE_SPEED: float = 1000.0
+const FALLBACK_PROJECTILE_DAMAGE: float = 10.0
 
 ## Stable YARD ID of the ShipDefinition that provides this ship's baseline statistics.
 @export_custom(
@@ -26,8 +34,13 @@ const SHIPS: Registry = preload("res://assets/data/registries/ships.tres")
 
 @onready var muzzle: Marker2D = $Muzzle
 @onready var shield_visual: Sprite2D = $Visuals/ShieldVisual
+@onready var hull_visual: Sprite2D = get_node_or_null("Visuals/Hull") as Sprite2D
+@onready var engine_audio: AudioStreamPlayer2D = $EngineAudio
 
 var definition: ShipDefinition = null
+## Current data-backed primary weapon; legacy ShipDefinition stats are fallback-only.
+var weapon_definition: WeaponDefinition
+var active_weapon_id: StringName = &""
 
 var command_heading: Vector2 = Vector2.RIGHT
 var command_thrust: float = 0.0
@@ -74,10 +87,28 @@ func _ready() -> void:
 		Log.error("YARD could not load ShipDefinition ID", ship_id)
 		set_physics_process(false)
 		return
+	engine_audio.stream = definition.engine_loop
+	engine_audio.pitch_scale = definition.engine_pitch_scale
+	if engine_audio.stream is AudioStreamWAV:
+		(engine_audio.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 	if muzzle == null:
 		Log.error("BaseShip is missing its Muzzle Marker2D child", get_path())
 		set_physics_process(false)
 		return
+	if hull_visual != null and definition.hull_texture != null:
+		hull_visual.texture = definition.hull_texture
+		hull_visual.region_enabled = true
+		hull_visual.region_rect = definition.hull_region
+		if team == 0:
+			hull_visual.texture = RunState.get_ship_color_texture(GameSettings.selected_ship_color_id)
+
+	# Weapon selection belongs to run combat/pickups, never to the selected hull or pilot.
+	weapon_definition = RunState.get_weapon(STARTING_WEAPON_ID)
+	if weapon_definition == null:
+		Log.error("The universal starting weapon is missing from YARD", STARTING_WEAPON_ID)
+	else:
+		active_weapon_id = weapon_definition.weapon_id
+		projectile_scene = weapon_definition.projectile_scene
 
 	# Normalize the spawn and seed the continuous coordinate before movement begins.
 	unwrapped_world_position = global_position
@@ -96,10 +127,14 @@ func _ready() -> void:
 
 	if team == 0:
 		add_to_group("player_ship")
+		set_meta("contact_type", "player")
 	else:
 		add_to_group("enemy_ship")
+		set_meta("contact_type", "enemy")
 
 	_rebuild_stats(true)
+	if weapon_definition != null:
+		weapon_changed.emit(weapon_definition)
 	_update_shield_visual()
 	Log.info("Ship definition loaded", ship_id, definition.display_name)
 
@@ -107,6 +142,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	# Every frame follows the same order: input, timers, steering, shields, firing, motion.
 	_gather_commands(delta)
+	_update_engine_audio()
 
 	weapon_cooldown_left = max(weapon_cooldown_left - delta, 0.0)
 	shield_regen_block_time = max(shield_regen_block_time - delta, 0.0)
@@ -129,6 +165,17 @@ func _physics_process(delta: float) -> void:
 		# Avoid rendering interpolation across the large coordinate discontinuity.
 		reset_physics_interpolation()
 	_previous_wrapped_position = wrapped_position
+
+
+func _update_engine_audio() -> void:
+	# Keep the continuous loop tied to thrust; dash activation remains a separate one-shot.
+	if engine_audio.stream == null:
+		return
+	var should_play: bool = not is_dead and command_thrust > 0.03
+	if should_play and not engine_audio.playing:
+		engine_audio.play()
+	elif not should_play and engine_audio.playing:
+		engine_audio.stop()
 
 
 func _exit_tree() -> void:
@@ -184,8 +231,9 @@ func _update_shield(delta: float) -> void:
 
 ## Spawn one projectile if the weapon is ready and its configured scene is valid.
 func try_fire() -> void:
-	# Projectiles inherit the ship's current direction, damage, and team.
-	if projectile_scene == null or muzzle == null:
+	# YARD definitions own the projectile scene and volley pattern.
+	var firing_scene: PackedScene = weapon_definition.projectile_scene if weapon_definition != null else projectile_scene
+	if firing_scene == null or muzzle == null:
 		return
 
 	if weapon_cooldown_left > 0.0:
@@ -193,19 +241,41 @@ func try_fire() -> void:
 
 	weapon_cooldown_left = weapon_cooldown
 
-	var projectile: Projectile = projectile_scene.instantiate() as Projectile
-	if projectile == null:
-		Log.error("Projectile scene root must use Projectile.gd", projectile_scene.resource_path)
-		return
-	projectile.rotation = rotation
-	projectile.velocity = (Vector2.RIGHT.rotated(rotation) * projectile_speed)
-	projectile.damage = projectile_damage
-	projectile.team = team
-	projectile.source = self
-	if definition != null:
-		projectile.visual_override = definition.projectile_visual
+	var shot_count: int = weapon_definition.projectile_count if weapon_definition != null else 1
+	var spread: float = deg_to_rad(weapon_definition.spread_degrees) if weapon_definition != null else 0.0
+	for shot_index in range(shot_count):
+		var spread_offset: float = 0.0
+		if shot_count > 1:
+			spread_offset = lerpf(-spread * 0.5, spread * 0.5, float(shot_index) / float(shot_count - 1))
+		var shot_angle: float = rotation + spread_offset
+		var projectile: Projectile = firing_scene.instantiate() as Projectile
+		if projectile == null:
+			Log.error("Weapon projectile scene root must use Projectile.gd", firing_scene.resource_path)
+			continue
+		projectile.rotation = shot_angle
+		projectile.velocity = Vector2.RIGHT.rotated(shot_angle) * projectile_speed
+		projectile.damage = projectile_damage
+		projectile.team = team
+		projectile.source = self
+		SectorSpace.spawn_owned(projectile, muzzle.global_position)
+		if EventAudio.instance != null:
+			EventAudio.instance.play_2d("enemy_fire" if team != 0 else "player_fire", self, "SFX")
 
-	SectorSpace.spawn_owned(projectile, muzzle.global_position)
+
+## Equip a registered weapon by stable ID. Returns false without changing state on failure.
+func equip_weapon(weapon_id: StringName, announce: bool = true) -> bool:
+	var next_weapon: WeaponDefinition = RunState.get_weapon(weapon_id)
+	if next_weapon == null or next_weapon.projectile_scene == null:
+		Log.error("Cannot equip missing or incomplete weapon", weapon_id)
+		return false
+	weapon_definition = next_weapon
+	active_weapon_id = next_weapon.weapon_id
+	projectile_scene = next_weapon.projectile_scene
+	_rebuild_stats(false)
+	weapon_changed.emit(weapon_definition)
+	if announce:
+		Log.info("Weapon equipped", name, weapon_definition.display_name)
+	return true
 
 
 ## Apply nonnegative damage to shields first, then hull; emits change and death signals.
@@ -230,6 +300,10 @@ func take_damage(amount: float) -> void:
 		hull_changed.emit(hull, max_hull)
 
 	_update_shield_visual()
+	if hull_visual != null and is_instance_valid(hull_visual):
+		Juicee.flash(hull_visual, Color(1.0, 0.75, 0.8), 0.08)
+	if team != 0 and GameSettings.screen_shake_strength > 0.0:
+		Juicee.shake_camera(self, 0.7 * GameSettings.screen_shake_strength, 0.055, 32.0)
 	Log.debug("Ship took damage", amount, shield, hull)
 
 	if hull <= 0.0:
@@ -272,7 +346,8 @@ func install_module(module: ModuleDefinition) -> bool:
 
 ## Add an acquired module to reserve without changing the ship's current stats.
 func store_module(module: ModuleDefinition) -> bool:
-	if module == null:
+	if module == null or unequipped_modules.size() >= UNEQUIPPED_MODULE_CAPACITY:
+		Log.warn("Unequipped module inventory is full", UNEQUIPPED_MODULE_CAPACITY)
 		return false
 
 	unequipped_modules.append(module)
@@ -302,6 +377,9 @@ func equip_module(inventory_index: int) -> bool:
 func unequip_module(equipped_index: int) -> bool:
 	if equipped_index < 0 or equipped_index >= installed_modules.size():
 		return false
+	if unequipped_modules.size() >= UNEQUIPPED_MODULE_CAPACITY:
+		Log.warn("Cannot unequip module: reserve inventory is full", UNEQUIPPED_MODULE_CAPACITY)
+		return false
 
 	var module: ModuleDefinition = installed_modules[equipped_index]
 	installed_modules.remove_at(equipped_index)
@@ -328,9 +406,9 @@ func _rebuild_stats(initializing: bool) -> void:
 	shield_regen_per_second = definition.shield_regen_per_second
 	shield_regen_delay = definition.shield_regen_delay
 
-	weapon_cooldown = definition.weapon_cooldown
-	projectile_speed = definition.projectile_speed
-	projectile_damage = definition.projectile_damage
+	weapon_cooldown = weapon_definition.cooldown if weapon_definition != null else FALLBACK_WEAPON_COOLDOWN
+	projectile_speed = weapon_definition.projectile_speed if weapon_definition != null else FALLBACK_PROJECTILE_SPEED
+	projectile_damage = weapon_definition.damage if weapon_definition != null else FALLBACK_PROJECTILE_DAMAGE
 
 	sensor_range = definition.sensor_range
 	module_slots = definition.module_slots

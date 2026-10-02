@@ -25,15 +25,7 @@ class_name ShipDefinition
 ## Delay after damage before shield regeneration starts, in seconds.
 @export var shield_regen_delay: float = 2.5
 
-@export_group("Weapon")
-## Time between shots, in seconds.
-@export var weapon_cooldown: float = 0.18
-## Projectile travel speed in world units per second.
-@export var projectile_speed: float = 1000.0
-## Damage dealt by each projectile before target defenses.
-@export var projectile_damage: float = 10.0
-## Fixed projectile artwork used by every shot from this hull; empty keeps the scene default.
-@export var projectile_visual: Texture2D
+@export_group("Destruction Effects")
 ## Fixed explosion artwork used when this hull is destroyed.
 @export var explosion_visual: Texture2D
 
@@ -44,3 +36,17 @@ class_name ShipDefinition
 @export_group("Modules")
 ## Maximum number of module slots available to this hull.
 @export var module_slots: int = 4
+
+@export_group("Ship Visuals")
+## Sprite atlas used by the existing Visuals/Hull Sprite2D.
+@export var hull_texture: Texture2D
+## 64x64 atlas cell rectangle; use an empty rect for a standalone texture.
+@export var hull_region: Rect2 = Rect2(0, 0, 64, 64)
+## Optional short role description shown in ship selection.
+@export_multiline var role_description: String = ""
+
+@export_group("Audio")
+## Loop used while this hull is actively thrusting; each YARD ship entry can choose its own engine tone.
+@export var engine_loop: AudioStream
+## Per-hull pitch tuning keeps shared source loops distinctive across ship classes.
+@export_range(0.5, 2.0, 0.01) var engine_pitch_scale: float = 1.0

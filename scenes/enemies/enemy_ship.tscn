@@ -8,10 +8,12 @@
 [ext_resource type="PackedScene" path="res://scenes/effects/explosion.tscn" id="7_explosion"]
 [ext_resource type="Script" uid="uid://cpa2qb3trjq4k" path="res://addons/lit/nodes/lit_point_light_2d.gd" id="8_enemy_hull_light"]
 [ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="9_shield_shader"]
-[ext_resource type="PackedScene" path="res://scenes/world/shield_booster.tscn" id="10_shield_booster"]
-[ext_resource type="PackedScene" path="res://scenes/world/module_pickup.tscn" id="11_module_pickup"]
-[ext_resource type="Texture2D" path="res://assets/shaders/objects/shield_uv_texture.tres" id="12_shield_uv_texture"]
+[ext_resource type="PackedScene" uid="uid://bm41w0es26w0o" path="res://scenes/pickups/shield_booster.tscn" id="10_shield_booster"]
+[ext_resource type="PackedScene" uid="uid://c465ts00j646k" path="res://scenes/pickups/module_pickup.tscn" id="11_module_pickup"]
+[ext_resource type="Texture2D" uid="uid://c6uwg8w1t2dhm" path="res://assets/shaders/objects/shield_uv_texture.tres" id="12_shield_uv_texture"]
 [ext_resource type="Script" uid="uid://bg6o2q3cxdcr" path="res://scripts/ships/sensor_component.gd" id="13_sensor"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/weapon_pickup.tscn" id="14_weapon_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/large_shield_booster.tscn" id="15_large_shield"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_awypu"]
 shader = ExtResource("1_0wb5s")
@@ -43,8 +45,10 @@ script = ExtResource("4_enemy_script")
 ai_style = 1
 explosion_scene = ExtResource("7_explosion")
 shield_booster_scene = ExtResource("10_shield_booster")
+large_shield_booster_scene = ExtResource("15_large_shield")
 module_pickup_scene = ExtResource("11_module_pickup")
-ship_id = &"corsair"
+weapon_pickup_scene = ExtResource("14_weapon_pickup")
+ship_id = &"prototype_ship"
 team = 1
 projectile_scene = ExtResource("6_projectile")
 
@@ -53,7 +57,7 @@ projectile_scene = ExtResource("6_projectile")
 [node name="Hull" type="Sprite2D" parent="Visuals" unique_id=676939502]
 texture_filter = 1
 material = SubResource("ShaderMaterial_awypu")
-rotation = -1.5707963
+rotation = 1.5707963
 texture = ExtResource("5_enemy_sheet")
 region_enabled = true
 region_rect = Rect2(32, 10, 49, 55)
@@ -84,3 +88,7 @@ position = Vector2(36, 0)
 
 [node name="SensorComponent" type="Node" parent="."]
 script = ExtResource("13_sensor")
+
+[node name="EngineAudio" type="AudioStreamPlayer2D" parent="."]
+volume_db = -18.0
+bus = &"SFX"

@@ -200,6 +200,9 @@ func _sort_sections() -> void:
 # Public methods
 # #######################################
 func set_tracked_section(section: String) -> void:
+	# Godot can report an empty inspector section while docks are being rebuilt.
+	if section.is_empty():
+		return
 	if _tracked_section == section:
 		return
 	
@@ -256,7 +259,9 @@ func set_tracked_section(section: String) -> void:
 		_sort_sections()
 		
 		# Enabled new section
-		section_list.get_node(section).enabled = true
+		var new_section: Control = section_list.get_node_or_null(section) as Control
+		if new_section != null:
+			new_section.enabled = true
 		
 
 func get_tracked_section() -> String:

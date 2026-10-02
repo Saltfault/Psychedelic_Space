@@ -382,21 +382,8 @@ func _exit_tree() -> void:
 func _ready() -> void:
 	v_box_container.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST # For that retro look.
 	add_command("quit", quit, 0, 0, "Quits the game.")
-	add_command("exit", quit, 0, 0, "Quits the game.")
 	add_command("clear", clear, 0, 0, "Clears the text on the console.")
-	add_command("delete_history", delete_history, 0, 0, "Deletes the history of previously entered commands.")
 	add_command("help", help, 0, 0, "Displays instructions on how to use the console.")
-	add_command("commands_list", commands_list, 0, 0, "Lists all commands and their descriptions.")
-	add_command("commands", commands, 0, 0, "Lists commands with no descriptions.")
-	add_command("cvars", cvars, 0, 0, "Lists all console variables and their values.")
-	add_command("calc", calculate, ["mathematical expression to evaluate"], 0, "Evaluates the math passed in for quick arithmetic.")
-	add_command("echo", print_line, ["string"], 1, "Prints given string to the console.")
-	add_command("echo_warning", print_warning, ["string"], 1, "Prints given string as warning to the console.")
-	add_command("echo_info", print_info, ["string"], 1, "Prints given string as info to the console.")
-	add_command("echo_error", print_error, ["string"], 1, "Prints given string as an error to the console.")
-	add_command("pause", pause, 0, 0, "Pauses node processing.")
-	add_command("unpause", unpause, 0, 0, "Unpauses node processing.")
-	add_command("exec", exec, 1, 1, "Execute a script.")
 
 
 func _input(event : InputEvent) -> void:
@@ -652,14 +639,6 @@ func _on_text_entered(new_text : String) -> void:
 			var arguments := text_split.slice(1)
 			var console_command : ConsoleCommand = console_commands[text_command]
 
-			# calc is a especial command that needs special treatment
-			if (text_command.match("calc")):
-				var expression := ""
-				for word in arguments:
-					expression += word
-				console_command.function.callv([expression])
-				return
-
 			if (arguments.size() < console_command.required):
 				print_error("Too few arguments! Required < %d >" % console_command.required)
 				return
@@ -698,18 +677,8 @@ func delete_history() -> void:
 
 func help() -> void:
 	rich_label.append_text("	Built in commands:
-		[system_color color=CONSOLE_COLOR_LITERAL]calc[/system_color]: Calculates a given expresion
-		[system_color color=CONSOLE_COLOR_LITERAL]clear[/system_color]: Clears the registry view
-		[system_color color=CONSOLE_COLOR_LITERAL]commands[/system_color]: Shows a reduced list of all the currently registered commands
-		[system_color color=CONSOLE_COLOR_LITERAL]commands_list[/system_color]: Shows a detailed list of all the currently registered commands
-		[system_color color=CONSOLE_COLOR_LITERAL]cvars[/system_color]: Lists all console variables and their values
-		[system_color color=CONSOLE_COLOR_LITERAL]delete_history[/system_color]: Deletes the commands history
-		[system_color color=CONSOLE_COLOR_LITERAL]echo[/system_color]: Prints a given string to the console
-		[system_color color=CONSOLE_COLOR_LITERAL]echo_error[/system_color]: Prints a given string as an error to the console
-		[system_color color=CONSOLE_COLOR_LITERAL]echo_info[/system_color]: Prints a given string as info to the console
-		[system_color color=CONSOLE_COLOR_LITERAL]echo_warning[/system_color]: Prints a given string as warning to the console
-		[system_color color=CONSOLE_COLOR_LITERAL]pause[/system_color]: Pauses node processing
-		[system_color color=CONSOLE_COLOR_LITERAL]unpause[/system_color]: Unpauses node processing
+		[system_color color=CONSOLE_COLOR_LITERAL]clear[/system_color]: Clears console output
+		[system_color color=CONSOLE_COLOR_LITERAL]help[/system_color]: Lists the registered game commands
 		[system_color color=CONSOLE_COLOR_LITERAL]quit[/system_color]: Quits the game
 	Controls:
 		[system_color color=CONSOLE_COLOR_INFO]Up[/system_color] and [system_color color=CONSOLE_COLOR_INFO]Down[/system_color] arrow keys to navigate commands history
@@ -718,19 +687,6 @@ func help() -> void:
 		[[system_color color=CONSOLE_COLOR_INFO]Ctrl[/system_color] + [system_color color=CONSOLE_COLOR_INFO]Mouse Wheel[/system_color]] up/down to change console font size
 		[system_color color=CONSOLE_COLOR_INFO]~[/system_color] or [system_color color=CONSOLE_COLOR_INFO]Esc[/system_color] key to close the console
 		[system_color color=CONSOLE_COLOR_INFO]Tab[/system_color] key to autocomplete, [system_color system_color=CONSOLE_COLOR_INFO]Tab[/system_color] again to cycle between matching suggestions\n\n")
-
-
-func calculate(command : String) -> void:
-	var expression := Expression.new()
-	var error = expression.parse(command)
-	if error:
-		print_error("%s" % expression.get_error_text())
-		return
-	var result = expression.execute()
-	if not expression.has_execute_failed():
-		print_line(str(result))
-	else:
-		print_error("%s" % expression.get_error_text())
 
 
 func commands() -> void:
@@ -786,20 +742,3 @@ func set_enable_on_release_build(enable : bool):
 		if (!OS.is_debug_build()):
 			disable()
 
-
-func pause() -> void:
-	get_tree().paused = true
-
-
-func unpause() -> void:
-	get_tree().paused = false
-
-
-func exec(filename : String) -> void:
-	var path := "user://%s.txt" % [filename]
-	var script := FileAccess.open(path, FileAccess.READ)
-	if (script):
-		while (!script.eof_reached()):
-			_on_text_entered(script.get_line())
-	else:
-		print_error("File %s not found." % [path])

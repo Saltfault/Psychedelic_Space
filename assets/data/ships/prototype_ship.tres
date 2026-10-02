@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://b18tytpgt30ex"]
+[gd_resource type="Resource" script_class="ShipDefinition" load_steps=4 format=3 uid="uid://b18tytpgt30ex"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_hhr8s"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Blue.png" id="2_hull"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/engine/engine_thruster_loop.wav" id="3_engine"]
 
 [resource]
 script = ExtResource("1_hhr8s")
@@ -13,7 +15,9 @@ max_hull = 200.0
 max_shield = 100.0
 shield_regen_per_second = 12.0
 shield_regen_delay = 1.8
-weapon_cooldown = 0.15
-projectile_speed = 1150.0
-projectile_damage = 14.0
 sensor_range = 2100.0
+hull_texture = ExtResource("2_hull")
+hull_region = Rect2(0, 0, 64, 64)
+role_description = "Balanced scout with sturdy shields and reliable handling."
+engine_loop = ExtResource("3_engine")
+engine_pitch_scale = 1.12

@@ -100,8 +100,8 @@ func _spawn_individual_enemy(sector: SectorRoot) -> void:
 		Log.error("Wave enemy scene root must use EnemyShip.gd", enemy_scene.resource_path)
 		return
 	var angle: float = rng.randf_range(0.0, TAU)
-	var distance: float = rng.randf_range(180.0, 430.0)
-	# Use the live ship transform, not the sector's fixed arrival point.
+	var distance: float = _minimum_enemy_spawn_distance(sector) + rng.randf_range(20.0, 100.0)
+	# Use the live ship transform and stay outside camera view and sensor contact.
 	enemy.global_position = SectorSpace.wrap_position(
 		player.global_position + Vector2.RIGHT.rotated(angle) * distance,
 	)
@@ -121,7 +121,11 @@ func generate_sector(sector: SectorRoot) -> void:
 	_spawn_planet(sector)
 	var optional_nebula_chance: float = clampf(float(_system_attribute(sector, &"nebula_chance", 0.2)), 0.0, 1.0)
 	if sector.sector_id != "nebula" and rng.randf() < optional_nebula_chance:
-		_spawn_scene(nebula_scene, sector.get_node("Landmarks"), _random_open_position(sector, 2400.0))
+		_spawn_scene(
+			nebula_scene,
+			sector.get_node("Landmarks"),
+			_random_open_position(sector, 2400.0, _screen_world_radius(sector) + 2400.0),
+		)
 
 	# Each role guarantees its mission-critical actors; all positions remain seeded.
 	match sector.sector_id:
@@ -177,7 +181,9 @@ func _generate_asteroids(sector: SectorRoot) -> void:
 	if sector.sector_id == "start":
 		cluster_count = rng.randi_range(2, 4)
 	for cluster_index in range(cluster_count):
-		var cluster_position: Vector2 = _random_open_position(sector, 1100.0)
+		var cluster_position: Vector2 = _random_open_position(
+			sector, 1100.0, _screen_world_radius(sector) + 1200.0,
+		)
 		reserved_positions.append(cluster_position)
 		var rocks_in_cluster: int = (
 			rng.randi_range(
@@ -239,14 +245,14 @@ func _find_asteroid_position(sector: SectorRoot, cluster_center: Vector2, radius
 		var candidate: Vector2 = cluster_center + offset
 		candidate.x = clampf(candidate.x, radius + 24.0, sector.sector_size.x - radius - 24.0)
 		candidate.y = clampf(candidate.y, radius + 24.0, sector.sector_size.y - radius - 24.0)
-		if candidate.distance_to(sector.spawn_position) < 1050.0:
+		if SectorSpace.wrapped_distance(candidate, sector.spawn_position) < _screen_world_radius(sector) + radius + 80.0:
 			continue
 
 		var overlaps_existing: bool = false
 		for placement: Dictionary in asteroid_placements:
 			var other_position: Vector2 = placement["position"]
 			var other_radius: float = float(placement["radius"])
-			if candidate.distance_to(other_position) < radius + other_radius + ASTEROID_CLEARANCE:
+			if SectorSpace.wrapped_distance(candidate, other_position) < radius + other_radius + ASTEROID_CLEARANCE:
 				overlaps_existing = true
 				break
 		if not overlaps_existing:
@@ -267,7 +273,9 @@ func _make_rock_polygon(base_radius: float) -> PackedVector2Array:
 
 func _spawn_nebula_objective(sector: SectorRoot) -> void:
 	# Keep the beacon near the nebula while avoiding a direct overlap with its center.
-	var nebula_position: Vector2 = _random_open_position(sector, 2500.0, 3000.0)
+	var nebula_position: Vector2 = _random_open_position(
+		sector, 2500.0, _screen_world_radius(sector) + 2400.0,
+	)
 	_spawn_scene(nebula_scene, sector.get_node("Landmarks"), nebula_position)
 	var beacon_position: Vector2 = nebula_position + Vector2(950.0, 250.0)
 	beacon_position.x = clampf(beacon_position.x, 250.0, sector.sector_size.x - 250.0)
@@ -366,13 +374,15 @@ func _scaled_count(base_count: int) -> int:
 
 
 func _random_enemy_spawn_position(sector: SectorRoot) -> Vector2:
-	# Patrol scenes contain up to 180-unit child offsets, leaving a 320-unit center radius under the 500-unit cap.
+	# Include the patrol's widest child offset so every ship starts beyond sensor range.
 	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
 	var center: Vector2 = player.global_position if is_instance_valid(player) else sector.spawn_position
+	var minimum_distance: float = _minimum_enemy_spawn_distance(sector)
 	for attempt in range(64):
 		var candidate: Vector2 = (
 			center
-			+ Vector2.RIGHT.rotated(rng.randf_range(0.0, TAU)) * rng.randf_range(90.0, 300.0)
+			+ Vector2.RIGHT.rotated(rng.randf_range(0.0, TAU))
+			* (minimum_distance + rng.randf_range(20.0, 220.0))
 		)
 		candidate = SectorSpace.wrap_position(candidate)
 		var blocked: bool = false
@@ -384,7 +394,7 @@ func _random_enemy_spawn_position(sector: SectorRoot) -> Vector2:
 			return candidate
 	for index in range(16):
 		var fallback: Vector2 = SectorSpace.wrap_position(
-			center + Vector2.RIGHT.rotated(TAU * float(index) / 16.0) * 300.0,
+			center + Vector2.RIGHT.rotated(TAU * float(index) / 16.0) * (minimum_distance + 120.0),
 		)
 		var fallback_blocked: bool = false
 		for reserved in reserved_positions:
@@ -393,7 +403,27 @@ func _random_enemy_spawn_position(sector: SectorRoot) -> Vector2:
 				break
 		if not fallback_blocked:
 			return fallback
-	return SectorSpace.wrap_position(center + Vector2(-300.0, 0.0))
+	return SectorSpace.wrap_position(center + Vector2.LEFT * (minimum_distance + 120.0))
+
+
+func _minimum_enemy_spawn_distance(sector: SectorRoot) -> float:
+	var player: PlayerShip = get_tree().get_first_node_in_group("player_ship") as PlayerShip
+	var sensor_range: float = 0.0
+	if is_instance_valid(player):
+		var sensor: SensorComponent = player.get_node_or_null("SensorComponent") as SensorComponent
+		if sensor != null:
+			sensor_range = player.sensor_range
+	# Add the patrol's maximum child offset and a margin beyond the sensor contact edge.
+	return maxf(sensor_range + 220.0, _screen_world_radius(sector) + 100.0) + 180.0
+
+
+func _screen_world_radius(sector: SectorRoot) -> float:
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var camera: Camera2D = get_viewport().get_camera_2d()
+	if is_instance_valid(camera):
+		viewport_size /= camera.zoom.abs().max(Vector2(0.01, 0.01))
+	# Wrap-aware sectors may be smaller than the viewport; clamp to their usable half-size.
+	return minf(viewport_size.length() * 0.5, minf(sector.sector_size.x, sector.sector_size.y) * 0.5)
 
 
 func _spawn_scene(scene: PackedScene, parent: Node, at: Vector2) -> void:
@@ -419,11 +449,11 @@ func _random_open_position(
 			rng.randf_range(250.0, sector.sector_size.x - 250.0),
 			rng.randf_range(250.0, sector.sector_size.y - 250.0),
 		)
-		if candidate.distance_to(sector.spawn_position) < minimum_spawn_distance:
+		if SectorSpace.wrapped_distance(candidate, sector.spawn_position) < minimum_spawn_distance:
 			continue
 		var blocked: bool = false
 		for reserved in reserved_positions:
-			if candidate.distance_to(reserved) < clearance:
+			if SectorSpace.wrapped_distance(candidate, reserved) < clearance:
 				blocked = true
 				break
 		if not blocked:
@@ -437,7 +467,7 @@ func _random_open_position(
 		fallback.y = clampf(fallback.y, 250.0, sector.sector_size.y - 250.0)
 		var blocked: bool = false
 		for reserved in reserved_positions:
-			if fallback.distance_to(reserved) < clearance:
+			if SectorSpace.wrapped_distance(fallback, reserved) < clearance:
 				blocked = true
 				break
 		if not blocked:

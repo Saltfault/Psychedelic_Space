@@ -702,6 +702,9 @@ func _on_cell_edited(row: int, column: int, old_value: Variant, new_value: Varia
 	if column not in [UID_COLUMN, STRINGID_COLUMN]:
 		var entry := get_row_resource_uid(row)
 		var col_config: DynamicTable.ColumnConfig = dynamic_table.get_column(column)
+		if col_config == null:
+			update_view()
+			return
 		var prop_name: StringName = col_config.identifier
 		if RegistryIO.is_uid_valid(entry):
 			_edit_entry_property(entry, prop_name, old_value, new_value)
@@ -726,6 +729,8 @@ func _on_column_resized(column: int, new_width: float) -> void:
 			current_cache_data.string_id_column_width = new_width
 		_:
 			var col_config: DynamicTable.ColumnConfig = dynamic_table.get_column(column)
+			if col_config == null:
+				return
 			var prop_name: StringName = col_config.identifier
 			current_cache_data.property_columns_widths[prop_name] = new_width
 
