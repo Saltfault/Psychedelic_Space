@@ -1,28 +1,49 @@
 [gd_scene format=3 uid="uid://ui4bronbjukn"]
 
 [ext_resource type="Script" uid="uid://cm0k2y85uwley" path="res://scripts/ui/station_panel.gd" id="1_8qgwc"]
-[ext_resource type="Texture2D" path="res://assets/ui/window_theme_blue/panel_focused.png" id="2_shop_frame"]
+[ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_shop_frame"]
+[ext_resource type="Theme" uid="uid://dxm0apnpg8h80" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="3_theme"]
+[ext_resource type="Script" path="res://scripts/ui/module_sell_drop_zone.gd" id="4_sell_zone"]
+
+[sub_resource type="AtlasTexture" id="StationPanelAtlas"]
+atlas = ExtResource("2_shop_frame")
+region = Rect2(60, 245, 204, 252)
 
 [sub_resource type="StyleBoxTexture" id="StationShopFrame"]
-texture = ExtResource("2_shop_frame")
-texture_margin_left = 12.0
-texture_margin_top = 12.0
-texture_margin_right = 12.0
-texture_margin_bottom = 12.0
 content_margin_left = 18.0
 content_margin_top = 18.0
 content_margin_right = 18.0
 content_margin_bottom = 18.0
+texture = SubResource("StationPanelAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
 
 [node name="StationPanel" type="PanelContainer" unique_id=873997591]
+custom_minimum_size = Vector2(1180, 1000)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -590.0
+offset_top = -500.0
+offset_right = 590.0
+offset_bottom = 500.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StationShopFrame")
-custom_minimum_size = Vector2(860, 760)
-offset_right = 40.0
-offset_bottom = 40.0
 script = ExtResource("1_8qgwc")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=252262856]
 layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1211261395]
 layout_mode = 2
@@ -30,7 +51,8 @@ theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2036394058]
 layout_mode = 2
-text = " Station Shop "
+theme_type_variation = &"Title"
+text = "STATION SERVICES"
 horizontal_alignment = 1
 
 [node name="Credits" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1819218419]
@@ -41,60 +63,9 @@ text = " Credits = 0"
 layout_mode = 2
 text = " Hull = 100 / 100 "
 
-[node name="InventoryTitle" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="OffersTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=117549777]
 layout_mode = 2
-text = "Module Inventories"
-horizontal_alignment = 1
-
-[node name="InventoryColumns" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="EquippedColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/InventoryColumns"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="EquippedHeading" type="Label" parent="MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn"]
-layout_mode = 2
-text = "EQUIPPED"
-horizontal_alignment = 1
-
-[node name="EquippedList" type="ItemList" parent="MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn"]
-custom_minimum_size = Vector2(400, 160)
-layout_mode = 2
-max_text_lines = 3
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="UnequipButton" type="Button" parent="MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Unequip Selected"
-
-[node name="UnequippedColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/InventoryColumns"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="UnequippedHeading" type="Label" parent="MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn"]
-layout_mode = 2
-text = "UNEQUIPPED"
-horizontal_alignment = 1
-
-[node name="UnequippedList" type="ItemList" parent="MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn"]
-custom_minimum_size = Vector2(400, 160)
-layout_mode = 2
-max_text_lines = 3
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="EquipButton" type="Button" parent="MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Equip Selected"
-
-[node name="OffersTitle" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Station Offers"
+text = "AVAILABLE MODULES"
 horizontal_alignment = 1
 
 [node name="Offer1" type="Button" parent="MarginContainer/VBoxContainer" unique_id=644442901]
@@ -111,6 +82,85 @@ text = "Offer Two"
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "Offer Three"
+
+[node name="InventoryRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="UnequippedPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/InventoryRow"]
+custom_minimum_size = Vector2(530, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StationShopFrame")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Heading" type="Label" parent="MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "UNEQUIPPED MODULES"
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+columns = 5
+
+[node name="EquippedPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/InventoryRow"]
+custom_minimum_size = Vector2(530, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StationShopFrame")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/InventoryRow/EquippedPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/InventoryRow/EquippedPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Heading" type="Label" parent="MarginContainer/VBoxContainer/InventoryRow/EquippedPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "EQUIPPED MODULES"
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="MarginContainer/VBoxContainer/InventoryRow/EquippedPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+columns = 3
+
+[node name="SellZone" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+script = ExtResource("4_sell_zone")
+
+[node name="SellLabel" type="Label" parent="MarginContainer/VBoxContainer/SellZone"]
+layout_mode = 2
+mouse_filter = 2
+text = "DROP A MODULE HERE TO SELL IT FOR HALF ITS LIST PRICE"
+horizontal_alignment = 1
 
 [node name="Repair" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1387938243]
 layout_mode = 2

@@ -1,14 +1,10 @@
 extends PanelContainer
-## Paused station interface for module purchases and paid hull repairs.
+## Paused station shop with module inventories, drag sorting, sales, and hull repair.
+
+const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.tscn")
 
 @onready var credits_label: Label = $MarginContainer/VBoxContainer/Credits
 @onready var hull_label: Label = $MarginContainer/VBoxContainer/Hull
-@onready var equipped_heading: Label = $MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn/EquippedHeading
-@onready var unequipped_heading: Label = $MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn/UnequippedHeading
-@onready var equipped_list: ItemList = $MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn/EquippedList
-@onready var unequipped_list: ItemList = $MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn/UnequippedList
-@onready var equip_button: Button = $MarginContainer/VBoxContainer/InventoryColumns/UnequippedColumn/EquipButton
-@onready var unequip_button: Button = $MarginContainer/VBoxContainer/InventoryColumns/EquippedColumn/UnequipButton
 
 @onready var offer_buttons: Array[Button] = [
 	$MarginContainer/VBoxContainer/Offer1,
@@ -19,6 +15,9 @@ extends PanelContainer
 @onready var repair_button: Button = $MarginContainer/VBoxContainer/Repair
 @onready var status_label: Label = $MarginContainer/VBoxContainer/Status
 @onready var close_button: Button = $MarginContainer/VBoxContainer/Close
+@onready var unequipped_grid: GridContainer = $MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel/MarginContainer/VBoxContainer/Grid
+@onready var equipped_grid: GridContainer = $MarginContainer/VBoxContainer/InventoryRow/EquippedPanel/MarginContainer/VBoxContainer/Grid
+@onready var sell_zone: ModuleSellDropZone = $MarginContainer/VBoxContainer/SellZone
 
 var player: PlayerShip = null
 var offers: Array[ModuleDefinition] = []
@@ -32,23 +31,22 @@ func _ready() -> void:
 	for i in range(offer_buttons.size()):
 		offer_buttons[i].pressed.connect(_buy_offer.bind(i))
 
-	equip_button.pressed.connect(_equip_selected)
-	unequip_button.pressed.connect(_unequip_selected)
-	equipped_list.item_selected.connect(_refresh_inventory_controls)
-	unequipped_list.item_selected.connect(_refresh_inventory_controls)
 	repair_button.pressed.connect(_repair)
 	close_button.pressed.connect(close_panel)
+	sell_zone.module_dropped.connect(_sell_module_by_drop)
+	if not RunState.credits_changed.is_connected(_on_credits_changed):
+		RunState.credits_changed.connect(_on_credits_changed)
 
 
 ## Roll this visit's offers, bind the player, then pause the world while the panel is open.
 func open_for(target_player: PlayerShip) -> void:
 	if player != target_player and is_instance_valid(player):
-		if player.modules_changed.is_connected(_refresh):
-			player.modules_changed.disconnect(_refresh)
+		if player.modules_changed.is_connected(_on_modules_changed):
+			player.modules_changed.disconnect(_on_modules_changed)
 
 	player = target_player
-	if is_instance_valid(player) and not player.modules_changed.is_connected(_refresh):
-		player.modules_changed.connect(_refresh)
+	if is_instance_valid(player) and not player.modules_changed.is_connected(_on_modules_changed):
+		player.modules_changed.connect(_on_modules_changed)
 
 	_roll_offers()
 	_refresh()
@@ -100,12 +98,8 @@ func _refresh() -> void:
 
 	if is_instance_valid(player):
 		hull_label.text = "Hull: %d / %d" % [roundi(player.hull), roundi(player.max_hull)]
-		_refresh_module_inventories()
 	else:
 		hull_label.text = "Hull: -- / --"
-		equipped_list.clear()
-		unequipped_list.clear()
-		_refresh_inventory_controls()
 
 	for i in range(offer_buttons.size()):
 		if i < offers.size():
@@ -121,78 +115,102 @@ func _refresh() -> void:
 			offer_buttons[i].disabled = true
 
 	repair_button.text = "Repair 10 Hull - 10 cr"
+	_refresh_inventories()
 
 
-func _refresh_module_inventories() -> void:
-	equipped_list.clear()
-	unequipped_list.clear()
-
-	if not is_instance_valid(player):
-		_refresh_inventory_controls()
-		return
-
-	equipped_heading.text = "EQUIPPED  %d / %d" % [
-		player.installed_modules.size(),
-		player.module_slots,
-	]
-	unequipped_heading.text = "UNEQUIPPED  %d" % player.unequipped_modules.size()
-
-	for module in player.installed_modules:
-		equipped_list.add_item("%s [%s]\n%s" % [
-			module.display_name,
-			module.category,
-			module.description,
-		])
-
-	for module in player.unequipped_modules:
-		unequipped_list.add_item("%s [%s]\n%s" % [
-			module.display_name,
-			module.category,
-			module.description,
-		])
-
-	_refresh_inventory_controls()
-
-
-func _refresh_inventory_controls(_selected_index: int = -1) -> void:
-	var equipped_selection: PackedInt32Array = equipped_list.get_selected_items()
-	var reserve_selection: PackedInt32Array = unequipped_list.get_selected_items()
-	unequip_button.disabled = equipped_selection.is_empty()
-	equip_button.disabled = (
-		reserve_selection.is_empty()
-		or not is_instance_valid(player)
-		or player.installed_modules.size() >= player.module_slots
-	)
-
-
-func _equip_selected() -> void:
+func _refresh_inventories() -> void:
+	_clear_grid(unequipped_grid)
+	_clear_grid(equipped_grid)
 	if not is_instance_valid(player):
 		return
-	var selected: PackedInt32Array = unequipped_list.get_selected_items()
-	if selected.is_empty():
-		status_label.text = "Select an unequipped module first."
-		return
-	if not player.equip_module(selected[0]):
-		status_label.text = "No empty equipped module slots."
-		return
-
-	status_label.text = "Equipped module."
-	_refresh()
+	for index in range(BaseShip.UNEQUIPPED_MODULE_CAPACITY):
+		var module: ModuleDefinition = player.unequipped_modules[index] if index < player.unequipped_modules.size() else null
+		_add_module_slot(unequipped_grid, module, index, false)
+	for index in range(player.module_slots):
+		var module: ModuleDefinition = player.installed_modules[index] if index < player.installed_modules.size() else null
+		_add_module_slot(equipped_grid, module, index, true)
 
 
-func _unequip_selected() -> void:
+func _add_module_slot(grid: GridContainer, module: ModuleDefinition, index: int, equipped: bool) -> void:
+	var slot := SLOT_SCENE.instantiate() as ModuleInventorySlot
+	slot.custom_minimum_size = Vector2(72, 72)
+	slot.configure(module, index, equipped, self, player.module_slots)
+	grid.add_child(slot)
+
+
+func _clear_grid(grid: GridContainer) -> void:
+	for child in grid.get_children():
+		grid.remove_child(child)
+		child.queue_free()
+
+
+func _on_modules_changed() -> void:
+	call_deferred("_refresh")
+
+
+func _on_credits_changed(_credits: int) -> void:
+	call_deferred("_refresh")
+
+
+## Validate a station-inventory drop before it changes the player's module arrays.
+func can_accept_drop(source_equipped: bool, source_index: int, target_equipped: bool, target_index: int) -> bool:
 	if not is_instance_valid(player):
-		return
-	var selected: PackedInt32Array = equipped_list.get_selected_items()
-	if selected.is_empty():
-		status_label.text = "Select an equipped module first."
-		return
-	if not player.unequip_module(selected[0]):
-		status_label.text = "Could not move that module to reserve."
-		return
+		return false
+	var source: Array[ModuleDefinition] = player.installed_modules if source_equipped else player.unequipped_modules
+	var target: Array[ModuleDefinition] = player.installed_modules if target_equipped else player.unequipped_modules
+	if source_index < 0 or source_index >= source.size():
+		return false
+	if source_equipped == target_equipped:
+		var capacity: int = player.module_slots if target_equipped else BaseShip.UNEQUIPPED_MODULE_CAPACITY
+		return target_index >= 0 and target_index < capacity and target_index != source_index
+	if source_equipped:
+		return target_index >= target.size() and target_index < BaseShip.UNEQUIPPED_MODULE_CAPACITY and target.size() < BaseShip.UNEQUIPPED_MODULE_CAPACITY
+	return target_index == target.size() and target.size() < player.module_slots
 
-	status_label.text = "Moved module to unequipped inventory."
-	_refresh()
+
+## Sort, equip, or unequip modules through the same saved slot scenes used by the HUD.
+func move_module_by_drop(source_equipped: bool, source_index: int, target_equipped: bool, target_index: int) -> bool:
+	if not can_accept_drop(source_equipped, source_index, target_equipped, target_index):
+		return false
+	if source_equipped == target_equipped:
+		var inventory: Array[ModuleDefinition] = player.installed_modules if source_equipped else player.unequipped_modules
+		if target_index < inventory.size():
+			var displaced: ModuleDefinition = inventory[target_index]
+			inventory[target_index] = inventory[source_index]
+			inventory[source_index] = displaced
+		else:
+			var moved: ModuleDefinition = inventory[source_index]
+			inventory.remove_at(source_index)
+			inventory.append(moved)
+		player.modules_changed.emit()
+		return true
+	return player.unequip_module(source_index) if source_equipped else player.equip_module(source_index)
+
+
+func _sell_module_by_drop(payload: Variant) -> void:
+	if not is_instance_valid(player) or not payload is Dictionary:
+		return
+	var source_equipped: bool = bool(payload.get("source_equipped", false))
+	var source_index: int = int(payload.get("source_index", -1))
+	var module: ModuleDefinition = payload.get("module") as ModuleDefinition
+	if module == null:
+		return
+	var source: Array[ModuleDefinition] = player.installed_modules if source_equipped else player.unequipped_modules
+	if source_index < 0 or source_index >= source.size() or source[source_index] != module:
+		return
+	if source_equipped and not player.unequip_module(source_index):
+		status_label.text = "Could not move the equipped module into reserve."
+		return
+	var inventory_index: int = player.unequipped_modules.find(module)
+	if inventory_index < 0:
+		return
+	player.unequipped_modules.remove_at(inventory_index)
+	var sale_price: int = maxi(1, floori(float(module.price) * 0.5))
+	RunState.add_credits(sale_price)
+	player.modules_changed.emit()
+	status_label.text = "Sold %s for %d credits." % [module.display_name, sale_price]
+	Log.info("Module sold at station", module.display_name, sale_price)
+	call_deferred("_refresh")
 
 
 func _buy_offer(index: int) -> void:

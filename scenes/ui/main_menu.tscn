@@ -1,9 +1,59 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://bfbntpoh02cac"]
 
-[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
-[ext_resource type="PackedScene" path="res://scenes/ui/settings_panel.tscn" id="2_settings"]
+[ext_resource type="Script" uid="uid://dicicl3hxmam5" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" uid="uid://dtmyhx1b7l3r5" path="res://scenes/ui/settings_panel.tscn" id="2_settings"]
+[ext_resource type="Texture2D" uid="uid://dftoe03ac6vu6" path="res://assets/ui/scifi_ui/Buttons.png" id="3_buttons"]
+[ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="4_panels"]
+[ext_resource type="Script" uid="uid://bwbh17iq4lvxi" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="5_audio_mounter"]
+[ext_resource type="Resource" uid="uid://cv3antahgajo7" path="res://assets/audio/event_bank.tres" id="6_audio_bank"]
+[ext_resource type="Script" uid="uid://dsu6i05k2dija" path="res://scripts/audio/music_director.gd" id="7_music_director"]
+[ext_resource type="AudioStream" uid="uid://de4j620wl73ko" path="res://assets/audio/music/cosmos_cinematic_120bpm_c_minor.wav" id="8_music_stream"]
 
-[node name="MainMenu" type="Control"]
+[sub_resource type="AtlasTexture" id="MenuPanelAtlas"]
+atlas = ExtResource("4_panels")
+region = Rect2(60, 245, 204, 252)
+
+[sub_resource type="StyleBoxTexture" id="MenuPanelFrame"]
+texture = SubResource("MenuPanelAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+
+[sub_resource type="AtlasTexture" id="NewGameNormal"]
+atlas = ExtResource("3_buttons")
+region = Rect2(14, 18, 138, 43)
+
+[sub_resource type="AtlasTexture" id="NewGameHover"]
+atlas = ExtResource("3_buttons")
+region = Rect2(162, 18, 138, 43)
+
+[sub_resource type="AtlasTexture" id="ContinueNormal"]
+atlas = ExtResource("3_buttons")
+region = Rect2(14, 117, 138, 42)
+
+[sub_resource type="AtlasTexture" id="ContinueHover"]
+atlas = ExtResource("3_buttons")
+region = Rect2(162, 117, 138, 42)
+
+[sub_resource type="AtlasTexture" id="OptionsNormal"]
+atlas = ExtResource("3_buttons")
+region = Rect2(14, 68, 138, 42)
+
+[sub_resource type="AtlasTexture" id="OptionsHover"]
+atlas = ExtResource("3_buttons")
+region = Rect2(162, 68, 138, 42)
+
+[sub_resource type="AtlasTexture" id="QuitNormal"]
+atlas = ExtResource("3_buttons")
+region = Rect2(14, 164, 138, 43)
+
+[sub_resource type="AtlasTexture" id="QuitHover"]
+atlas = ExtResource("3_buttons")
+region = Rect2(162, 164, 138, 43)
+
+[node name="MainMenu" type="Control" unique_id=1700166718]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,7 +61,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="SpaceBackground" type="ColorRect" parent="."]
+[node name="SpaceBackground" type="ColorRect" parent="." unique_id=586688855]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +71,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.012, 0.025, 0.065, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1157569184]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,44 +79,90 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MenuPanel" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(620, 520)
+[node name="MenuPanel" type="PanelContainer" parent="CenterContainer" unique_id=644632940]
+custom_minimum_size = Vector2(620, 680)
 layout_mode = 2
-theme_type_variation = &"WindowPanel"
+theme_override_styles/panel = SubResource("MenuPanelFrame")
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MenuPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/MenuPanel" unique_id=1608899892]
 layout_mode = 2
 theme_override_constants/margin_left = 48
-theme_override_constants/margin_top = 48
+theme_override_constants/margin_top = 36
 theme_override_constants/margin_right = 48
-theme_override_constants/margin_bottom = 48
+theme_override_constants/margin_bottom = 36
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MenuPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MenuPanel/MarginContainer" unique_id=542534168]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=645229633]
 layout_mode = 2
-text = "PSYCHEDELIC SPACE"
 theme_type_variation = &"Title"
+theme_override_font_sizes/font_size = 50
+text = "PSYCHEDELIC SPACE"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer"]
+[node name="Subtitle" type="Label" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=534707685]
 layout_mode = 2
+theme_override_font_sizes/font_size = 25
 text = "A SECTOR-BY-SECTOR SURVIVAL RUN"
 horizontal_alignment = 1
 
-[node name="PlayButton" type="Button" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer"]
+[node name="PlayButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=1640894299]
+custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
-text = "START GAME"
+size_flags_horizontal = 4
+texture_normal = SubResource("NewGameNormal")
+texture_hover = SubResource("NewGameHover")
+ignore_texture_size = true
+stretch_mode = 4
 
-[node name="SettingsButton" type="Button" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer"]
+[node name="ContinueButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=944503416]
+custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
-text = "SETTINGS"
+size_flags_horizontal = 4
+texture_normal = SubResource("ContinueNormal")
+texture_hover = SubResource("ContinueHover")
+ignore_texture_size = true
+stretch_mode = 4
 
-[node name="QuitButton" type="Button" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer"]
+[node name="OptionsButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=2074498205]
+custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
-text = "QUIT"
+size_flags_horizontal = 4
+texture_normal = SubResource("OptionsNormal")
+texture_hover = SubResource("OptionsHover")
+ignore_texture_size = true
+stretch_mode = 4
 
-[node name="SettingsPanel" parent="." instance=ExtResource("2_settings")]
+[node name="QuitButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=283718106]
+custom_minimum_size = Vector2(276, 86)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = SubResource("QuitNormal")
+texture_hover = SubResource("QuitHover")
+ignore_texture_size = true
+stretch_mode = 4
+
+[node name="SettingsPanel" parent="." unique_id=1856454373 instance=ExtResource("2_settings")]
 visible = false
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 581.0
+offset_top = 214.0
+offset_right = 1341.0
+offset_bottom = 854.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="EventAudioBankMounter" type="Node" parent="." unique_id=72441587]
+script = ExtResource("5_audio_mounter")
+_audio_bank_resource = ExtResource("6_audio_bank")
+
+[node name="MusicDirector" type="Node" parent="." unique_id=513372771]
+script = ExtResource("7_music_director")
+music_stream = ExtResource("8_music_stream")

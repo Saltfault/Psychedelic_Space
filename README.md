@@ -74,12 +74,12 @@ impossible accretion disks, and violently colourful hulls.
 
 ## Current status
 
-**Prototype foundation, in active development.** Sections 1–24 of the external build guide have
-been statically reconciled against the project; Section 25 is the current development step.
-Gameplay has not been rerun as part of this documentation audit. Content and balance are still
-prototype quality. The procedural map and sector generator exist, but the
-campaign coordinator and complete warp/run flow described by later guide sections are not yet
-connected.
+**The campaign systems are implemented in the project source; gameplay verification is still pending.**
+The implementation guide describes the campaign, solar-system themes, matching shader-rendered
+planet landmarks, selectable ships and pilots, data-driven weapons, enemy roles, a phased outpost,
+Event Audio, Juicee, and Conductor. These systems have not yet had a full gameplay acceptance run
+after integration, so treat balance and end-to-end behavior as unverified until the acceptance
+checks in the guide are completed.
 
 ### Implemented
 
@@ -92,45 +92,56 @@ connected.
   `command_heading` / `command_thrust` / `command_fire`, and the ship does not care whether a
   human or an AI issued them.
 - **Two damage layers** — shields absorb first and regenerate after a delay; hull overflow
-  persists.
+  persists. Ram's forward shield is a separate finite-health component that blocks projectiles,
+  damages enemies on contact, and recharges after use.
 - **Forward-fire projectiles** with team filtering, wrapped travel, and a lifetime cap.
-- **Enemy AI with two styles** — `STRAFE` keeps its nose on the player while adding tangential
-  drift and kites around a preferred range; `CHARGE` closes hard and eases off at point-blank.
-  Shared aggro across a `PatrolGroup`.
+- **Enemy AI roles** — `STRAFE`, `CHARGE`, `INTERCEPTOR`, and `SNIPER` tactics share ship physics
+  and patrol alerts. Each enemy needs its own current sensor contact to fire; lost contacts enter
+  a no-fire search before disengaging.
 - **World encounters** — patrol groups, a drifting caravan with a route, and a stationary
   outpost that defends territory and reinforces when alerted.
 - **Sensors** — range-limited contact list on a refresh timer, with contact metadata driving
   colour-coded minimap markers. Nebula fields degrade sensor range while you are inside them.
 - **Module buildcraft** — hull, shields, fire rate, damage, thrust, and sensor range effects,
   installed into a per-ship slot budget.
-- **Pilot abilities** — data-driven, currently `DASH` (a forward impulse on cooldown).
-- **Station** — paid hull repair plus a randomised store that rolls offers from YARD module
-  categories.
-- **HUD** — hull/shield/credits/sensor/mission/pilot readouts, minimap, settings panel, and a
-  completion panel.
+- **Pilot abilities** — data-backed Dash and Ram. Ram raises a forward-facing shield that blocks
+  projectiles and damages enemies on contact; its separate shield meter recharges after use.
+- **Station** — paid hull repair, a randomized YARD module store, side-by-side equipped and
+  reserve inventories, drag sorting, and module resale.
+- **HUD and menus** — hull/shield/credits/sensor/mission/pilot/weapon readouts, local map,
+  combined equipment screen, ship statistics panel, pause/options menus, death and completion
+  panels, and a seeded system route map.
 - **World simulation** — `advance_world()` ticks on sector transition: the caravan advances its
   route, an alerted outpost gains reinforcements, and the optional objective expires on a
   deadline. Known caravan position goes stale deliberately — your map shows what you last saw,
   not what is true.
 - **Dev-mode console** with run-status, credit-granting, module-testing, and reset commands.
-- **Visual effects** — procedural starfield and shield shader; nebula visuals use a shader while
-  a separate `Area2D` supplies sensor interference.
+- **Visual and audio effects** — procedural sector starfield, main-menu star shader, authored
+  shield and ship sheets, imported shader planets, Event Audio event bank, system-specific
+  Conductor tracks, and Juicee feedback.
 
-### Implemented foundations not yet connected to the campaign loop
+### Campaign and content systems
 
-- `SystemMap` generates a seeded, one-way FTL route graph with unique node IDs and a fixed lower-
-  right Warp node. `SectorGenerator` composes each destination from seeded actors and landmarks;
-  the six authored sector scenes are layout fixtures, not campaign destinations.
-- The map and generated-sector scene are not yet driven by the campaign coordinator. The project
-  main scene remains `scenes/sectors/sector.tscn`, so the generated route is not reachable in the
-  normal game flow yet. Do not treat static scene/resource inspection as proof of runtime play.
+- A new run enters ship selection and then builds a deterministic route through three authored
+  solar-system resource themes. Each route node has its own stable ID, position, content role,
+  solar-system metadata, and generation seed.
+- `SystemMap` owns only adjacent-node travel and rejects transitions until the current sector is
+  clear. The coordinator commits accepted transitions and advances the discrete world once.
+- `SectorGenerator` composes destinations from their seed and role. Matching map body IDs select
+  the same PlanetDefinition used by the in-sector planet scene and local sensor icon. Dedicated
+  asteroid-ring nodes are labeled on the route map and generate dense, spaced rock clusters.
+- Weapons can be swapped by pickup; enemies have authored role/weapon/pickup settings; the Outpost
+  is a three-phase objective with a boss status display.
 
-### Not yet implemented or still in progress
+### Verification still required
 
-Section 25 discrete-world proof is in progress. Campaign integration and warp completion are
-later guide steps. Meta-progression, factions as data, a mission framework, bosses, audio, and
-additional ship and pilot rosters remain future work. See [design docs](#design-documents) for
-the full intended scope.
+The source has not been run as a game during this implementation pass. Complete the project's
+deterministic map, save/continue migration, combat/drop, sensor, boss, audio, planet identity, and
+accessibility acceptance checks in Godot before treating them as verified.
+The YARD registries for the new resource types also need an editor scan so their stable-ID
+indexes and Inspector dropdowns match the authored `.tres` files. Plugin/API availability and
+asset terms are documented in [ASSET_CREDITS.md](ASSET_CREDITS.md) and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
@@ -258,9 +269,11 @@ git config lfs."https://forgejo.hearthhome.lol/Saltfault/TBN-Psychedlic_Space_Ga
 ```
 
 Open the project in Godot 4.7.2. `project.godot` enables the bundled plugins; gameplay depends
-on Lit, the developer console, Log.gd, and YARD. The other enabled addons provide editor tools.
-F5 runs the current main scene (`scenes/sectors/sector.tscn`), which is still a prototype fixture
-and not the completed campaign flow.
+on Lit, the developer console, Log.gd, YARD, Event Audio, Juicee, Conductor, and Input Helper.
+The other enabled addons provide editor tools. F5 opens the main menu in
+`scenes/ui/main_menu.tscn`; New Game leads through ship selection into the campaign. Run the
+implementation guide's acceptance checklist after importing the project; source inspection alone does
+not prove that the whole flow works in-engine.
 
 **Autoloads** (registered in `project.godot`): `SectorSpace`, `RunState`, `Console`,
 `LitManager`.
@@ -275,15 +288,22 @@ This is the project's central content rule:
 > Runtime code asks a registry for a resource by stable ID, or queries the registry by indexed
 > property. It does not hold paths to individual resources.
 
-The registry ID survives file moves and is what gameplay code stores. Three registries exist:
+The registry ID survives file moves and is what gameplay code stores. The project includes
+registries for ships, pilots, modules, weapons, planets, and solar systems. Ships and modules have
+existing indexed entries; newer resource folders are configured as scan sources and must be
+scanned/synced in YARD after the first editor import so the Inspector dropdowns and stable-ID maps
+include all authored resources.
 
 | Registry | Class restriction | Indexed property |
 |---|---|---|
 | `ships.tres` | `ShipDefinition` | — |
 | `pilots.tres` | `PilotDefinition` | — |
 | `modules.tres` | `ModuleDefinition` | `category` |
+| `weapons.tres` | `WeaponDefinition` | — |
+| `planets.tres` | `PlanetDefinition` | — |
+| `solar_systems.tres` | `SolarSystemDefinition` | — |
 
-Current entries: 3 ships (`prototype_ship`, `corsair`, `cutter`), 1 pilot (`dash`), 6 modules
+Current entries: 3 ships (`prototype_ship`, `corsair`, `cutter`), 2 pilots (`dash`, `ram`), 6 modules
 across `offense` / `defense` / `mobility` / `sensor` / `utility`.
 
 **Adding a module** means adding a YARD entry and reindexing `modules.tres` — no code edit. The
@@ -357,9 +377,8 @@ git lfs unlock assets/sprites/ships/player.png
 
 ### Design documents
 
-The design foundation, development roadmap, and full prototype build guide live outside this
-repository, in the Downloads folder as HTML. They are the source of intent; this README
-describes what the code actually does.
+Design references and implementation instructions are maintained separately from this source
+tree. This README describes the current code and project setup.
 
 ---
 

@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3 uid="uid://bm41w0es26w0o"]
+
+[ext_resource type="Script" uid="uid://bnfabvyy318kc" path="res://scripts/world/shield_booster.gd" id="1_c55xq"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/shield_small_green.png" id="2_icon"]
+[ext_resource type="Shader" path="res://assets/shaders/objects/shield_pickup_blue.gdshader" id="3_blue_shader"]
+
+[sub_resource type="ShaderMaterial" id="BlueShieldPickupMaterial"]
+shader = ExtResource("3_blue_shader")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g4v7s"]
+radius = 31.016125
+
+[node name="ShieldBooster" type="Area2D" unique_id=1508861258]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_c55xq")
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=483475365]
+texture_filter = 1
+texture = ExtResource("2_icon")
+material = SubResource("BlueShieldPickupMaterial")
+scale = Vector2(5, 5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2057539136]
+position = Vector2(0, 3)
+shape = SubResource("CircleShape2D_g4v7s")

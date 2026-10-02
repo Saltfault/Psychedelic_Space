@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [asset_manager]
 
 export_roots={
-"effects": "res://assets/sprites/effects",
+"effects": "res://assets/effects",
 "images": "res://assets/sprites",
 "music": "res://assets/audio/music",
 "other": "res://assets",
@@ -26,6 +26,11 @@ export_roots={
 "shaders": "res://assets/shaders",
 "sounds": "res://assets/audio/sfx"
 }
+
+[audio]
+
+buses/default_bus_layout="res://assets/audio/default_bus_layout.tres"
+window/vsync/vsync_mode=0
 
 [autoload]
 
@@ -35,8 +40,12 @@ RunState="*uid://cukvf0upyjtl7"
 GameSettings="*res://scripts/autoload/game_settings.gd"
 SectorSpace="*uid://b8vh0l0qrnjlk"
 DevConsoleCommands="*res://scripts/autoload/dev_console_commands.gd"
-_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Profily="*uid://qmnu1ehm866e"
+Conductor="*uid://c5rvmkaorxynb"
+EventAudio="*uid://be741v81fj3xc"
+InputHelper="*uid://cholww48njaeh"
+Juicee="*uid://b36fwfvmmv0xc"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
 
@@ -44,15 +53,14 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/vsync/vsync_mode=0
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/GDQuest_GDScript_formatter/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/godit/plugin.cfg", "res://addons/godoban/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/inspector_tabs/plugin.cfg", "res://addons/lit/plugin.cfg", "res://addons/log/plugin.cfg", "res://addons/profily/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg", "res://addons/quill-ide/plugin.cfg", "res://addons/terminal/plugin.cfg", "res://addons/yard/plugin.cfg")
+enabled=PackedStringArray("res://addons/GDQuest_GDScript_formatter/plugin.cfg", "res://addons/conductor/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/event_audio/plugin.cfg", "res://addons/global_asset_manager/plugin.cfg", "res://addons/godit/plugin.cfg", "res://addons/godoban/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/godot_doctor/plugin.cfg", "res://addons/input_helper/plugin.cfg", "res://addons/inspector_tabs/plugin.cfg", "res://addons/juicee/plugin.cfg", "res://addons/licenses/plugin.cfg", "res://addons/lit/plugin.cfg", "res://addons/log/plugin.cfg", "res://addons/profily/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg", "res://addons/quill-ide/plugin.cfg", "res://addons/terminal/plugin.cfg", "res://addons/yard/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 
 [gui]
 
-theme/custom="res://addons/pixel_ui_scifi/themes/cyan.tres"
+theme/custom="res://assets/ui/scifi_ui/scifi_ui_theme.tres"
 
 [input]
 
