@@ -108,3 +108,7 @@ texture = SubResource("RamShieldTexture")
 polygon = PackedVector2Array(-8, -16, 22, -30, 58, -24, 78, 0, 58, 24, 22, 30, -8, 16)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=690971959]
+
+[node name="EngineAudio" type="AudioStreamPlayer2D" parent="."]
+volume_db = -18.0
+bus = &"SFX"

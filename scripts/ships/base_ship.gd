@@ -35,7 +35,7 @@ const FALLBACK_PROJECTILE_DAMAGE: float = 10.0
 @onready var muzzle: Marker2D = $Muzzle
 @onready var shield_visual: Sprite2D = $Visuals/ShieldVisual
 @onready var hull_visual: Sprite2D = get_node_or_null("Visuals/Hull") as Sprite2D
-@onready var engine_audio: AudioStreamPlayer2D = $EngineAudio
+@onready var engine_audio: AudioStreamPlayer2D = get_node_or_null("EngineAudio") as AudioStreamPlayer2D
 
 var definition: ShipDefinition = null
 ## Current data-backed primary weapon; legacy ShipDefinition stats are fallback-only.
@@ -87,10 +87,11 @@ func _ready() -> void:
 		Log.error("YARD could not load ShipDefinition ID", ship_id)
 		set_physics_process(false)
 		return
-	engine_audio.stream = definition.engine_loop
-	engine_audio.pitch_scale = definition.engine_pitch_scale
-	if engine_audio.stream is AudioStreamWAV:
-		(engine_audio.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	if engine_audio != null:
+		engine_audio.stream = definition.engine_loop
+		engine_audio.pitch_scale = definition.engine_pitch_scale
+		if engine_audio.stream is AudioStreamWAV:
+			(engine_audio.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 	if muzzle == null:
 		Log.error("BaseShip is missing its Muzzle Marker2D child", get_path())
 		set_physics_process(false)
@@ -169,7 +170,7 @@ func _physics_process(delta: float) -> void:
 
 func _update_engine_audio() -> void:
 	# Keep the continuous loop tied to thrust; dash activation remains a separate one-shot.
-	if engine_audio.stream == null:
+	if engine_audio == null or engine_audio.stream == null:
 		return
 	var should_play: bool = not is_dead and command_thrust > 0.03
 	if should_play and not engine_audio.playing:
