@@ -24,7 +24,22 @@ shader_parameter/directional_horizontal_scale = 32.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_q8uc0"]
 radius = 174.1838
 
+[sub_resource type="Gradient" id="OutpostGlowGradient"]
+colors = PackedColorArray(1, 0.42, 0.2, 0.62, 1, 0.42, 0.2, 0)
+offsets = PackedFloat32Array(0, 1)
+
+[sub_resource type="GradientTexture2D" id="OutpostGlowTexture"]
+gradient = SubResource("OutpostGlowGradient")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+width = 128
+height = 128
+
 [node name="Outpost" type="StaticBody2D" unique_id=711302207]
+scale = Vector2(2, 2)
+collision_layer = 1
+collision_mask = 7
 script = ExtResource("1_hc0iv")
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1653630075]
@@ -36,10 +51,69 @@ texture = ExtResource("3_boss_sheet")
 region_enabled = true
 region_rect = Rect2(128, 32, 128, 112)
 
+[node name="BeaconLight" type="PointLight2D" parent="."]
+position = Vector2(0, -24)
+texture = SubResource("OutpostGlowTexture")
+texture_scale = 7.0
+color = Color(1, 0.42, 0.22, 1)
+energy = 1.6
+shadow_enabled = false
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=197859064]
 shape = SubResource("CircleShape2D_q8uc0")
 
-[node name="Muzzle" type="Marker2D" parent="." unique_id=14783624]
+[node name="MuzzleTop" type="Marker2D" parent="." unique_id=14783624]
+position = Vector2(0, -190)
+
+[node name="MuzzleRight" type="Marker2D" parent="." unique_id=14783625]
 position = Vector2(190, 0)
 
+[node name="MuzzleBottom" type="Marker2D" parent="." unique_id=14783626]
+position = Vector2(0, 190)
+
+[node name="MuzzleLeft" type="Marker2D" parent="." unique_id=14783627]
+position = Vector2(-190, 0)
+
 [node name="FireTimer" type="Timer" parent="." unique_id=222654057]
+
+[node name="BossHUD" type="CanvasLayer" parent="." unique_id=188390441]
+visible = false
+layer = 5
+
+[node name="Panel" type="PanelContainer" parent="BossHUD" unique_id=188390442]
+offset_left = 570.0
+offset_top = 30.0
+offset_right = 1350.0
+offset_bottom = 146.0
+
+[node name="Content" type="VBoxContainer" parent="BossHUD/Panel" unique_id=188390443]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BossName" type="Label" parent="BossHUD/Panel/Content" unique_id=188390444]
+layout_mode = 2
+theme_type_variation = &"Title"
+text = "ENEMY OUTPOST"
+horizontal_alignment = 1
+
+[node name="PhaseLabel" type="Label" parent="BossHUD/Panel/Content" unique_id=188390445]
+layout_mode = 2
+text = "PHASE 1 / 3"
+horizontal_alignment = 1
+
+[node name="ShieldLabel" type="Label" parent="BossHUD/Panel/Content"]
+layout_mode = 2
+text = "PHASE SHIELD"
+horizontal_alignment = 1
+
+[node name="ShieldBar" type="ProgressBar" parent="BossHUD/Panel/Content"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="HealthBar" type="ProgressBar" parent="BossHUD/Panel/Content" unique_id=188390446]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+value = 100.0
+show_percentage = false

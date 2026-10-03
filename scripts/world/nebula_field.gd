@@ -5,12 +5,22 @@ class_name NebulaField
 
 ## Sensor-range and signature multiplier applied to ships while inside the Area2D.
 @export_range(0.1, 1.0, 0.05) var sensor_multiplier: float = 0.35
+@onready var nebula_visual: Sprite2D = $NebulaVisual
 
 
 func _ready() -> void:
+	add_to_group("sensor_contact")
+	set_meta("contact_type", "nebula")
+	set_meta("sensor_signature", 0.7)
 	# Area membership is gameplay; the visual child never determines field coverage.
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	# Mirror only the cloud sprite across sector seams, not its collision field.
+	SectorSpace.register_wrap_visual(self, nebula_visual)
+
+
+func _exit_tree() -> void:
+	SectorSpace.unregister_wrap_visual(self)
 
 
 func _on_body_entered(body: Node2D) -> void:

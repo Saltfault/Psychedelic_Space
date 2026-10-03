@@ -5,6 +5,8 @@ class_name SectorGenerator
 const ASTEROID_SCRIPT: Script = preload("res://scripts/world/asteroid.gd")
 const ASTEROID_CLEARANCE: float = 48.0
 const MINIMAP_SPAWN_CLEARANCE: float = 1600.0
+const PATROL_FORMATION_RADIUS: float = 170.0
+const OFFSCREEN_SPAWN_MARGIN: float = 150.0
 const ASTEROID_RING_CLUSTER_MINIMUM: int = 18
 const ASTEROID_RING_CLUSTER_MAXIMUM: int = 24
 const ASTEROID_RING_ROCKS_PER_CLUSTER_MINIMUM: int = 5
@@ -393,10 +395,14 @@ func enemy_spawn_distance(sector: SectorRoot) -> float:
 		var sensor: SensorComponent = player.get_node_or_null("SensorComponent") as SensorComponent
 		if sensor != null:
 			sensor_range = player.sensor_range
-	# The marker range is a second hard floor so a newly arrived enemy is absent from the map.
+	# Spawn the patrol center far enough out that its closest member also clears
+	# the viewport and minimap after the formation offset is applied.
 	return maxf(
 		sensor_range + 400.0,
-		maxf(_screen_world_radius(sector) + 100.0, MINIMAP_SPAWN_CLEARANCE + 100.0),
+		maxf(
+			_screen_world_radius(sector) + PATROL_FORMATION_RADIUS + OFFSCREEN_SPAWN_MARGIN,
+			MINIMAP_SPAWN_CLEARANCE + PATROL_FORMATION_RADIUS + OFFSCREEN_SPAWN_MARGIN,
+		),
 	)
 
 

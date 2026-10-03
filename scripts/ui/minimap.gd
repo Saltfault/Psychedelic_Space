@@ -1,80 +1,144 @@
 extends Control
-## Draws nearby sensor contacts using wrapped positions and contact metadata.
+## Positions saved marker scenes from the player's current sensor contacts.
 class_name Minimap
+
+const MARKER_SCENE: PackedScene = preload("res://scenes/ui/minimap_marker.tscn")
 
 @export_range(1.0, 10000.0, 100.0) var map_range: float = 3200.0
 
+@onready var marker_layer: Control = $Markers
+@onready var player_marker: TextureRect = $PlayerMarker
+
 var player: PlayerShip
 var sensor: SensorComponent
+var _markers_by_id: Dictionary = {}
 
 
 ## Bind the player whose sensor contacts and position this minimap should display.
 func configure(target_player: PlayerShip) -> void:
 	player = target_player
 	sensor = player.get_node_or_null("SensorComponent") as SensorComponent
-	queue_redraw()
+	player_marker.visible = is_instance_valid(player)
+	_refresh_markers()
 
 
 func _process(_delta: float) -> void:
-	queue_redraw()
+	_refresh_markers()
 
 
-func _draw() -> void:
-	var center: Vector2 = size * 0.5
-	var radius: float = minf(size.x, size.y) * 0.46
-
-	draw_circle(center, radius, Color(0.03, 0.05, 0.09, 0.85))
-	draw_arc(center, radius, 0.0, TAU, 64, Color(0.35, 0.8, 1.0, 0.8), 2.0)
-
+func _refresh_markers() -> void:
 	if not is_instance_valid(player):
+		_clear_markers()
+		player_marker.hide()
 		return
-
-	draw_circle(center, 4.0, Color.WHITE)
-
+	player_marker.show()
+	var center: Vector2 = size * 0.5
+	var radius: float = minf(size.x, size.y) * 0.31
+	var seen: Dictionary = {}
 	if sensor != null:
 		for contact: Node2D in sensor.contacts:
 			if not is_instance_valid(contact) or contact.is_in_group("main_objective"):
 				continue
-			_draw_contact(contact, center, radius)
+			var marker_data: Dictionary = _contact_style(contact)
+			if marker_data.is_empty():
+				continue
+			var marker_id: int = contact.get_instance_id()
+			seen[marker_id] = true
+			_sync_marker(marker_id, contact, center, radius, marker_data)
 
-	# The mission objective is mission knowledge, not a sensor contact; always show its real position.
+	# Mission knowledge is shown independently from sensor contact/range.
 	var objective: Node2D = get_tree().get_first_node_in_group("main_objective") as Node2D
 	if is_instance_valid(objective):
-		_draw_marker(objective, center, radius, Color(1.0, 0.2, 0.8), 6.0)
+		var objective_id: int = objective.get_instance_id()
+		seen[objective_id] = true
+		var objective_marker_data: Dictionary = _contact_style(objective)
+		objective_marker_data["icon"] = preload("res://assets/ui/map_icons/outpost.svg")
+		objective_marker_data["color"] = Color(1.0, 0.2, 0.8)
+		objective_marker_data["diameter"] = 12.0
+		_sync_marker(
+			objective_id,
+			objective,
+			center,
+			radius,
+			objective_marker_data,
+		)
+	for old_id: Variant in _markers_by_id.keys():
+		if seen.has(old_id):
+			continue
+		var old_marker: MinimapMarker = _markers_by_id[old_id] as MinimapMarker
+		old_marker.queue_free()
+		_markers_by_id.erase(old_id)
 
 
-func _draw_contact(contact: Node2D, center: Vector2, radius: float) -> void:
+func _contact_style(contact: Node2D) -> Dictionary:
 	var contact_type: String = str(contact.get_meta("contact_type", "unknown"))
-	var color: Color = Color(1.0, 0.75, 0.25)
-
+	var tint: Color = Color(1.0, 0.75, 0.25)
+	var icon: Texture2D = null
+	var diameter: float = 8.0
 	match contact_type:
 		"station":
-			color = Color(0.3, 1.0, 0.55)
+			tint = Color(0.3, 1.0, 0.55)
+			icon = preload("res://assets/ui/map_icons/station.svg")
 		"outpost":
-			color = Color(1.0, 0.25, 0.35)
+			tint = Color(1.0, 0.25, 0.35)
+			icon = preload("res://assets/ui/map_icons/outpost.svg")
 		"caravan":
-			color = Color(1.0, 0.8, 0.2)
+			tint = Color(1.0, 0.8, 0.2)
+			icon = preload("res://assets/ui/map_icons/enemy.svg")
 		"intel":
-			color = Color(0.2, 0.9, 1.0)
+			tint = Color(0.2, 0.9, 1.0)
+			icon = preload("res://assets/sprites/pickups/intel_nut_red.png")
 		"warp":
-			color = Color(1.0, 0.25, 0.95)
+			tint = Color(1.0, 0.25, 0.95)
+			icon = preload("res://assets/ui/map_icons/warp_gate.svg")
+		"enemy":
+			icon = preload("res://assets/ui/map_icons/enemy.svg")
+		"weapon":
+			icon = preload("res://assets/sprites/pickups/weapon_common_green.png")
+		"module":
+			icon = preload("res://assets/sprites/pickups/module_common_green.png")
+		"asteroid":
+			icon = preload("res://assets/ui/map_icons/asteroid.svg")
+		"nebula":
+			icon = preload("res://assets/ui/map_icons/nebula.svg")
+		"planet":
+			icon = preload("res://assets/ui/map_icons/planet_terran.svg")
+	if contact.has_meta("planet_id"):
+		var planet: PlanetDefinition = RunState.get_planet(
+			StringName(str(contact.get_meta("planet_id")))
+		)
+		if planet != null:
+			icon = planet.map_icon
+	if contact_type == "unknown":
+		return {}
+	return {"icon": icon, "color": tint, "diameter": diameter}
 
-	_draw_marker(contact, center, radius, color, 4.0)
 
-
-func _draw_marker(
+func _sync_marker(
+	marker_id: int,
 	target: Node2D,
 	center: Vector2,
 	radius: float,
-	color: Color,
-	marker_radius: float,
+	marker_data: Dictionary,
 ) -> void:
+	var marker: MinimapMarker = _markers_by_id.get(marker_id) as MinimapMarker
+	if marker == null:
+		marker = MARKER_SCENE.instantiate() as MinimapMarker
+		marker_layer.add_child(marker)
+		_markers_by_id[marker_id] = marker
+	var diameter: float = float(marker_data["diameter"])
+	var tint: Color = marker_data["color"]
+	marker.configure(marker_data["icon"] as Texture2D, tint, diameter)
 	var delta: Vector2 = SectorSpace.shortest_delta(player.global_position, target.global_position)
-	var range_for_display: float = maxf(map_range, 1.0)
-	var normalized_distance: float = minf(delta.length() / range_for_display, 1.0)
+	var normalized_distance: float = minf(delta.length() / maxf(map_range, 1.0), 1.0)
 	var direction: Vector2 = Vector2.RIGHT
 	if delta.length_squared() > 0.001:
 		direction = delta.normalized()
+	marker.position = center + direction * radius * normalized_distance - marker.size * 0.5
 
-	var point: Vector2 = center + direction * radius * normalized_distance
-	draw_circle(point, marker_radius, color)
+
+func _clear_markers() -> void:
+	for marker_value: Variant in _markers_by_id.values():
+		var marker: MinimapMarker = marker_value as MinimapMarker
+		marker.queue_free()
+	_markers_by_id.clear()

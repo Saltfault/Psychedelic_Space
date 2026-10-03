@@ -126,6 +126,22 @@ func generate_new_map(seed_value: int) -> void:
 	if not has_asteroid_ring and node_order.size() > 6:
 		var ring_index: int = rng.randi_range(5, node_order.size() - 2)
 		nodes_by_id[node_order[ring_index]]["role"] = "asteroid_ring"
+	# A solar system has one physical star. Multiple star-role nodes were reusing
+	# the same star definition and made Sol appear to contain several suns.
+	var star_node_ids: Array[String] = []
+	for index in range(5, node_order.size() - 1):
+		var candidate_id: String = node_order[index]
+		if String(nodes_by_id[candidate_id]["role"]) == "star":
+			star_node_ids.append(candidate_id)
+	if star_node_ids.is_empty():
+		var star_index: int = rng.randi_range(5, node_order.size() - 2)
+		var generated_star_id: String = node_order[star_index]
+		nodes_by_id[generated_star_id]["role"] = "star"
+		star_node_ids.append(generated_star_id)
+	var retained_star_id: String = star_node_ids[rng.randi_range(0, star_node_ids.size() - 1)]
+	for candidate_id in star_node_ids:
+		if candidate_id != retained_star_id:
+			nodes_by_id[candidate_id]["role"] = "generic"
 
 	var system: SolarSystemDefinition = RunState.get_current_system()
 	if system == null:

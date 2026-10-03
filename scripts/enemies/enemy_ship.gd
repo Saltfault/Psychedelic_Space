@@ -21,8 +21,16 @@ enum AIStyle {
 	SNIPER,
 }
 
+## Aggressive enemies keep engaging instead of retreating when their shields are low.
+enum EnemySubtype {
+	STANDARD,
+	AGGRESSIVE,
+}
+
 ## Tactic used while pursuing a currently detected player.
 @export var ai_style: AIStyle = AIStyle.STRAFE
+## STANDARD enemies flee at low shields; AGGRESSIVE enemies do not.
+@export var enemy_subtype: EnemySubtype = EnemySubtype.STANDARD
 ## Legacy pursuit radius, applied in addition to a live sensor contact.
 @export_range(0.0, 4000.0, 25.0) var aggro_range: float = 1250.0
 
@@ -148,7 +156,7 @@ func _gather_commands(delta: float) -> void:
 		command_fire = false
 		return
 
-	if max_shield > 0.0 and shield <= max_shield * flee_shield_ratio:
+	if _should_flee():
 		# Fleeing is intentionally slower so a player can close the gap and finish the chase.
 		command_heading = -to_player.normalized()
 		command_thrust = 0.45
@@ -186,9 +194,17 @@ func _gather_commands(delta: float) -> void:
 
 ## Cap retreat velocity separately so accumulated momentum cannot keep a fleeing enemy fast.
 func _movement_speed_limit() -> float:
-	if max_shield > 0.0 and shield <= max_shield * flee_shield_ratio:
+	if _should_flee():
 		return max_speed * 0.55
 	return super._movement_speed_limit()
+
+
+func _should_flee() -> bool:
+	return (
+		enemy_subtype != EnemySubtype.AGGRESSIVE
+		and max_shield > 0.0
+		and shield <= max_shield * flee_shield_ratio
+	)
 
 ## Enter active pursuit after this ship's sensor confirms the player.
 func become_aggro() -> void:
