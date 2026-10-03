@@ -3,6 +3,7 @@ extends BaseShip
 class_name EnemyShip
 
 const MODULE_DROP_CHANCE: float = 0.35
+const WEAPON_DROP_CHANCE: float = 0.24
 
 ## Awareness state; SEARCH follows the last confirmed location without firing.
 enum State {
@@ -16,6 +17,8 @@ enum State {
 enum AIStyle {
 	STRAFE,
 	CHARGE,
+	INTERCEPTOR,
+	SNIPER,
 }
 
 ## Tactic used while pursuing a currently detected player.
@@ -31,8 +34,12 @@ var search_time_left: float = 0.0
 
 ## Range at which this ship is allowed to fire at a live contact.
 @export_range(0.0, 4000.0, 25.0) var attack_range: float = 900.0
+## Break contact and retreat below this fraction of the ship's shield capacity.
+@export_range(0.05, 0.75, 0.05) var flee_shield_ratio: float = 0.25
 ## Preferred separation used by the STRAFE tactic.
 @export_range(0.0, 2500.0, 25.0) var desired_distance: float = 650.0
+## Range band favored by Interceptors and Snipers.
+@export_range(100.0, 2500.0, 25.0) var preferred_range: float = 1100.0
 ## Lateral acceleration used by the STRAFE tactic.
 @export_range(0.0, 1000.0, 25.0) var strafe_acceleration: float = 220.0
 ## Thrust command while unaware; patrol groups may override this value.
@@ -44,8 +51,12 @@ var search_time_left: float = 0.0
 @export var explosion_scene: PackedScene
 ## Optional shield pickup spawned on death.
 @export var shield_booster_scene: PackedScene
+## Rare high-value shield pickup dropped independently from the common canister.
+@export var large_shield_booster_scene: PackedScene
 ## Optional module pickup spawned on death.
 @export var module_pickup_scene: PackedScene
+## Weapon pickup instantiated when this enemy's weapon-drop roll succeeds.
+@export var weapon_pickup_scene: PackedScene
 
 # Cache the player after it joins BaseShip's player_ship group.
 var state: State = State.UNAWARE
@@ -56,6 +67,26 @@ func _ready() -> void:
 	# Set the hostile team before BaseShip registers this ship in groups.
 	team = 1
 	super._ready()
+	if definition != null:
+		_apply_sector_difficulty()
+
+
+func _apply_sector_difficulty() -> void:
+	# Keep the long-term ramp, then apply the requested global 10% enemy nerf.
+	var multiplier: float = RunState.enemy_difficulty_multiplier() * 0.9
+	max_hull *= multiplier
+	hull *= multiplier
+	max_shield *= multiplier
+	shield *= multiplier
+	shield_regen_per_second *= multiplier
+	projectile_damage *= multiplier
+	projectile_speed *= multiplier
+	max_speed *= multiplier
+	thrust_acceleration *= multiplier
+	turn_speed *= multiplier
+	weapon_cooldown /= multiplier
+	hull_changed.emit(hull, max_hull)
+	shield_changed.emit(shield, max_shield)
 
 
 func _gather_commands(delta: float) -> void:
@@ -117,6 +148,13 @@ func _gather_commands(delta: float) -> void:
 		command_fire = false
 		return
 
+	if max_shield > 0.0 and shield <= max_shield * flee_shield_ratio:
+		# Fleeing is intentionally slower so a player can close the gap and finish the chase.
+		command_heading = -to_player.normalized()
+		command_thrust = 0.45
+		command_fire = false
+		return
+
 	# AGGRO keeps the Step 8 aim, strafe/charge, and firing behavior.
 	var target_direction: Vector2 = to_player.normalized()
 	command_heading = target_direction
@@ -138,7 +176,19 @@ func _gather_commands(delta: float) -> void:
 
 	var aim_error: float = absf(angle_difference(rotation, target_direction.angle()))
 	command_fire = distance <= attack_range and aim_error <= deg_to_rad(14.0)
-	
+	if ai_style == AIStyle.INTERCEPTOR:
+		command_thrust = 1.0 if distance > preferred_range else 0.35
+	elif ai_style == AIStyle.SNIPER:
+		command_thrust = 0.8 if distance > preferred_range else 0.0
+		if distance < preferred_range * 0.65:
+			command_thrust = 1.0
+
+
+## Cap retreat velocity separately so accumulated momentum cannot keep a fleeing enemy fast.
+func _movement_speed_limit() -> float:
+	if max_shield > 0.0 and shield <= max_shield * flee_shield_ratio:
+		return max_speed * 0.55
+	return super._movement_speed_limit()
 
 ## Enter active pursuit after this ship's sensor confirms the player.
 func become_aggro() -> void:
@@ -149,7 +199,8 @@ func become_aggro() -> void:
 	state = State.AGGRO
 	Log.info("Enemy entered aggro", name, RunState.current_sector_id)
 
-	if RunState.current_sector_id == "outpost":
+	var active_sector: SectorRoot = get_tree().get_first_node_in_group("active_sector") as SectorRoot
+	if active_sector != null and active_sector.has_outpost_objective:
 		RunState.outpost_alerted = true
 
 	var parent_node: Node = get_parent()
@@ -162,6 +213,7 @@ func force_aggro(known_player_position: Vector2 = Vector2.ZERO) -> void:
 	# Patrol alerts share the source ships confirmed location without granting contact.
 	last_known_player_position = known_player_position
 	state = State.AGGRO
+	search_time_left = search_duration
 
 
 func _die() -> void:
@@ -178,9 +230,13 @@ func _die() -> void:
 				if explosion_sprite != null:
 					explosion_sprite.texture = definition.explosion_visual
 			SectorSpace.spawn_owned(effect, global_position)
+	if GameSettings.screen_shake_strength > 0.0:
+		Juicee.shake_camera(self, 3.0 * GameSettings.screen_shake_strength, 0.22, 20.0)
 
-	if shield_booster_scene != null and randf() < 0.18:
+	if shield_booster_scene != null and randf() < 0.12:
 		SectorSpace.spawn_owned(shield_booster_scene.instantiate(), global_position)
+	if large_shield_booster_scene != null and randf() < 0.025:
+		SectorSpace.spawn_owned(large_shield_booster_scene.instantiate(), global_position)
 
 	if module_pickup_scene != null and randf() < MODULE_DROP_CHANCE:
 		var dropped_module: ModuleDefinition = RunState.get_random_module()
@@ -191,7 +247,17 @@ func _die() -> void:
 			Log.info("Enemy dropped a module", name, dropped_module.display_name)
 	elif module_pickup_scene == null:
 		Log.error("Enemy has no module pickup scene assigned", name)
+	if weapon_pickup_scene != null and randf() < WEAPON_DROP_CHANCE:
+		var dropped_weapon: WeaponDefinition = RunState.get_random_weapon()
+		if dropped_weapon != null:
+			var pickup: WeaponPickup = weapon_pickup_scene.instantiate() as WeaponPickup
+			if pickup != null:
+				pickup.weapon = dropped_weapon
+				SectorSpace.spawn_owned(pickup, global_position)
+				Log.info("Enemy dropped a weapon", name, dropped_weapon.display_name)
 
 	RunState.add_credits(randi_range(4, 9))
+	if EventAudio.instance != null:
+		EventAudio.instance.play_2d("enemy_death", self, "SFX")
 	Log.info("Enemy defeated", name, global_position)
 	super._die()

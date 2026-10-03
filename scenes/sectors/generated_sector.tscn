@@ -4,15 +4,15 @@
 [ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="2_qutw5"]
 [ext_resource type="Script" uid="uid://dtbtq2iowg33y" path="res://addons/lit/nodes/lit_canvas_modulate.gd" id="3_dopbe"]
 [ext_resource type="Script" uid="uid://cakbs23pu53yt" path="res://scripts/world/sector_generator.gd" id="4_utapr"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/caravan.tscn" id="5_caravan"]
+[ext_resource type="PackedScene" uid="uid://bleelony7g2ko" path="res://scenes/enemies/caravan.tscn" id="5_caravan"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="6_reinforcement"]
-[ext_resource type="PackedScene" path="res://scenes/ships/projectile.tscn" id="7_projectile"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/patrol_group.tscn" id="8_patrol"]
-[ext_resource type="PackedScene" path="res://scenes/world/station.tscn" id="9_station"]
-[ext_resource type="PackedScene" path="res://scenes/world/nebula_field.tscn" id="10_nebula"]
-[ext_resource type="PackedScene" path="res://scenes/world/intel_beacon.tscn" id="11_beacon"]
-[ext_resource type="PackedScene" path="res://scenes/world/outpost.tscn" id="12_outpost"]
-[ext_resource type="PackedScene" path="res://scenes/world/warp_gate.tscn" id="13_warp_gate"]
+[ext_resource type="PackedScene" uid="uid://bugq3l42agjob" path="res://scenes/ships/projectile.tscn" id="7_projectile"]
+[ext_resource type="PackedScene" uid="uid://cxqkehtk0mfbm" path="res://scenes/world/station.tscn" id="9_station"]
+[ext_resource type="PackedScene" uid="uid://bwnq1gmpu2wy" path="res://scenes/world/nebula_field.tscn" id="10_nebula"]
+[ext_resource type="PackedScene" uid="uid://ntkjrfuidfp" path="res://scenes/pickups/intel_beacon.tscn" id="11_beacon"]
+[ext_resource type="PackedScene" uid="uid://bux8k5c07p8xq" path="res://scenes/world/outpost.tscn" id="12_outpost"]
+[ext_resource type="PackedScene" uid="uid://cjrf1sjm060pa" path="res://scenes/world/warp_gate.tscn" id="13_warp_gate"]
+[ext_resource type="PackedScene" path="res://scenes/world/planet_body.tscn" id="14_planet_body"]
 
 [node name="GeneratedSector" type="Node2D" unique_id=845970153]
 script = ExtResource("1_0sov8")
@@ -30,13 +30,17 @@ metadata/_custom_type_script = "uid://dtbtq2iowg33y"
 
 [node name="SectorGenerator" type="Node" parent="." unique_id=1434022841]
 script = ExtResource("4_utapr")
-patrol_group_scene = ExtResource("8_patrol")
 station_scene = ExtResource("9_station")
 nebula_scene = ExtResource("10_nebula")
 intel_beacon_scene = ExtResource("11_beacon")
 outpost_scene = ExtResource("12_outpost")
 projectile_scene = ExtResource("7_projectile")
 warp_gate_scene = ExtResource("13_warp_gate")
+planet_scene = ExtResource("14_planet_body")
+
+[node name="EnemyWaveTimer" type="Timer" parent="SectorGenerator"]
+wait_time = 25.0
+one_shot = true
 
 [node name="Encounters" type="Node2D" parent="." unique_id=1709771713]
 

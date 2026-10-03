@@ -5,6 +5,7 @@ class_name EquipmentScreen
 signal closed
 
 const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.tscn")
+const WEAPON_SLOT_SCENE: PackedScene = preload("res://scenes/ui/weapon_loadout_slot.tscn")
 
 @onready var _unequipped_grid: GridContainer = $Panel/MarginContainer/VBoxContainer/ContentRow/UnequippedPanel/MarginContainer/VBoxContainer/Grid
 @onready var _equipped_grid: GridContainer = $Panel/MarginContainer/VBoxContainer/ContentRow/EquippedPanel/MarginContainer/VBoxContainer/Grid
@@ -12,6 +13,7 @@ const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.t
 @onready var _status: Label = $Panel/MarginContainer/VBoxContainer/Status
 @onready var _credits: Label = $Panel/MarginContainer/VBoxContainer/Header/Credits
 @onready var _back_button: Button = $Panel/MarginContainer/VBoxContainer/Header/BackButton
+@onready var _weapon_row: HBoxContainer = $Panel/MarginContainer/VBoxContainer/WeaponRow
 
 var player: PlayerShip
 
@@ -26,9 +28,13 @@ func _ready() -> void:
 func configure(target_player: PlayerShip) -> void:
 	if is_instance_valid(player) and player.modules_changed.is_connected(_on_modules_changed):
 		player.modules_changed.disconnect(_on_modules_changed)
+	if is_instance_valid(player) and player.weapon_changed.is_connected(_on_weapon_changed):
+		player.weapon_changed.disconnect(_on_weapon_changed)
 	player = target_player
 	if is_instance_valid(player) and not player.modules_changed.is_connected(_on_modules_changed):
 		player.modules_changed.connect(_on_modules_changed)
+	if is_instance_valid(player) and not player.weapon_changed.is_connected(_on_weapon_changed):
+		player.weapon_changed.connect(_on_weapon_changed)
 	_refresh()
 
 
@@ -111,6 +117,20 @@ func move_module_by_drop(
 	return succeeded
 
 
+## Replace the mandatory primary weapon while refusing unknown/unregistered weapon resources.
+func equip_weapon_definition(weapon: WeaponDefinition) -> bool:
+	if not is_instance_valid(player) or weapon == null:
+		return false
+	var registered: WeaponDefinition = RunState.get_weapon(weapon.weapon_id)
+	if registered == null or registered.weapon_id != weapon.weapon_id:
+		return false
+	var equipped: bool = player.equip_weapon(weapon.weapon_id)
+	if equipped:
+		_status.text = "%s equipped." % weapon.display_name
+		_refresh_weapon_slot()
+	return equipped
+
+
 func _refresh() -> void:
 	_clear_grid(_unequipped_grid)
 	_clear_grid(_equipped_grid)
@@ -120,6 +140,7 @@ func _refresh() -> void:
 		return
 
 	_credits.text = "CREDITS  %d" % RunState.credits
+	_refresh_weapon_slot()
 	for index in range(25):
 		var module: ModuleDefinition = (
 			player.unequipped_modules[index]
@@ -158,6 +179,21 @@ func _clear_grid(grid: GridContainer) -> void:
 	for child in grid.get_children():
 		grid.remove_child(child)
 		child.queue_free()
+
+
+func _refresh_weapon_slot() -> void:
+	for child in _weapon_row.get_children():
+		_weapon_row.remove_child(child)
+		child.queue_free()
+	if not is_instance_valid(player):
+		return
+	var weapon_slot: WeaponLoadoutSlot = WEAPON_SLOT_SCENE.instantiate() as WeaponLoadoutSlot
+	_weapon_row.add_child(weapon_slot)
+	weapon_slot.configure(player.weapon_definition, self)
+
+
+func _on_weapon_changed(_weapon: WeaponDefinition) -> void:
+	call_deferred("_refresh_weapon_slot")
 
 
 func _on_modules_changed() -> void:

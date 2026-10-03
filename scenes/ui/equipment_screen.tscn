@@ -109,6 +109,10 @@ theme_override_styles/hover = SubResource("EquipmentButtonFrame")
 text = "BACK"
 icon = SubResource("BackIcon")
 
+[node name="WeaponRow" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
 [node name="ContentRow" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=1486971129]
 layout_mode = 2
 size_flags_vertical = 3

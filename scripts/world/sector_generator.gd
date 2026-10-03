@@ -4,6 +4,7 @@ class_name SectorGenerator
 
 const ASTEROID_SCRIPT: Script = preload("res://scripts/world/asteroid.gd")
 const ASTEROID_CLEARANCE: float = 48.0
+const MINIMAP_SPAWN_CLEARANCE: float = 1600.0
 const ASTEROID_RING_CLUSTER_MINIMUM: int = 18
 const ASTEROID_RING_CLUSTER_MAXIMUM: int = 24
 const ASTEROID_RING_ROCKS_PER_CLUSTER_MINIMUM: int = 5
@@ -13,8 +14,6 @@ const FALLBACK_ENEMY_SCENES: Array[PackedScene] = [
 	preload("res://scenes/enemies/enemy_cutter.tscn"),
 ]
 
-## Patrol encounter scene used by roles that guarantee combat activity.
-@export var patrol_group_scene: PackedScene
 ## Optional station landmark used in station-role sectors.
 @export var station_scene: PackedScene
 ## Interactive sensor-interference field used in nebula-role sectors.
@@ -38,19 +37,30 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var reserved_positions: Array[Vector2] = []
 var asteroid_placements: Array[Dictionary] = []
 var waves_remaining: int = 0
+var enemy_budget_remaining: int = 0
 
 
 func _ready() -> void:
 	enemy_wave_timer.timeout.connect(_spawn_next_enemy_wave)
 	var sector: SectorRoot = get_parent() as SectorRoot
 	if sector != null and not sector.skip_hostile_spawns and sector.sector_id != "station":
-		# Set this before SectorRoot computes its first clear state.
-		waves_remaining = _scaled_wave_total()
+		# Split a fixed sector budget into delayed arrivals; role-specific content cannot add extras.
+		var total_enemy_budget: int = _scaled_enemy_total()
+		var reinforcement_count: int = 0
+		if (
+			sector.has_outpost_objective
+			and not RunState.outpost_destroyed
+			and sector.reinforcement_enemy_scene != null
+		):
+			reinforcement_count = clampi(RunState.outpost_reinforcement_level, 0, 3)
+		enemy_budget_remaining = maxi(0, total_enemy_budget - reinforcement_count)
+		waves_remaining = mini(waves_per_sector, enemy_budget_remaining)
 	call_deferred("_start_enemy_waves")
 
 
-func _scaled_wave_total() -> int:
-	return maxi(1, roundi(float(waves_per_sector) * (1.0 + float(maxi(RunState.world_tick, 0)) * 0.01)))
+func _scaled_enemy_total() -> int:
+	# Integer populations approximate a compounded +1% per committed sector.
+	return maxi(3, roundi(3.0 * pow(1.01, float(maxi(RunState.world_tick, 0)))))
 
 
 func _start_enemy_waves() -> void:
@@ -66,19 +76,14 @@ func _spawn_next_enemy_wave() -> void:
 		waves_remaining = 0
 		return
 
-	# Wave composition is deliberately not announced to the player.
-	match rng.randi_range(0, 2):
-		0:
-			for index in range(_scaled_count(rng.randi_range(2, 3))):
-				_spawn_individual_enemy(sector)
-		1:
-			for index in range(_scaled_count(rng.randi_range(1, 2))):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
-		_:
-			_spawn_patrol(sector, _random_enemy_spawn_position(sector))
-			for index in range(_scaled_count(rng.randi_range(1, 2))):
-				_spawn_individual_enemy(sector)
-
+	# Wave composition stays hidden, but every arrival consumes this sector's exact budget.
+	var enemies_in_wave: int = ceili(float(enemy_budget_remaining) / float(waves_remaining))
+	var spawn_position: Vector2 = _random_enemy_spawn_position(sector)
+	if enemies_in_wave == 1:
+		_spawn_individual_enemy(sector, spawn_position)
+	else:
+		_spawn_patrol_wave(sector, spawn_position, enemies_in_wave)
+	enemy_budget_remaining -= enemies_in_wave
 	waves_remaining -= 1
 	if waves_remaining > 0:
 		enemy_wave_timer.start()
@@ -86,26 +91,44 @@ func _spawn_next_enemy_wave() -> void:
 	sector.call_deferred("_refresh_clear_state")
 
 
-func _spawn_individual_enemy(sector: SectorRoot) -> void:
-	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
-	if not is_instance_valid(player):
-		return
+func _enemy_scene_choices() -> Array[PackedScene]:
 	var system: SolarSystemDefinition = RunState.get_current_system()
-	var choices: Array[PackedScene] = FALLBACK_ENEMY_SCENES
-	if system != null and not system.enemy_scenes.is_empty():
-		choices = system.enemy_scenes
+	return system.enemy_scenes if system != null and not system.enemy_scenes.is_empty() else FALLBACK_ENEMY_SCENES
+
+
+func _instantiate_wave_enemy() -> EnemyShip:
+	var choices: Array[PackedScene] = _enemy_scene_choices()
 	var enemy_scene: PackedScene = choices[rng.randi_range(0, choices.size() - 1)]
 	var enemy: EnemyShip = enemy_scene.instantiate() as EnemyShip
 	if enemy == null:
 		Log.error("Wave enemy scene root must use EnemyShip.gd", enemy_scene.resource_path)
+	return enemy
+
+
+func _spawn_individual_enemy(sector: SectorRoot, at: Vector2) -> void:
+	var enemy: EnemyShip = _instantiate_wave_enemy()
+	if enemy == null:
 		return
-	var angle: float = rng.randf_range(0.0, TAU)
-	var distance: float = _minimum_enemy_spawn_distance(sector) + rng.randf_range(20.0, 100.0)
-	# Use the live ship transform and stay outside camera view and sensor contact.
-	enemy.global_position = SectorSpace.wrap_position(
-		player.global_position + Vector2.RIGHT.rotated(angle) * distance,
-	)
+	# Use the live ship transform and stay outside camera view, minimap, and sensor contact.
+	enemy.global_position = at
 	sector.get_node("Encounters").add_child(enemy)
+
+
+func _spawn_patrol_wave(sector: SectorRoot, at: Vector2, ship_count: int) -> void:
+	# A wave can use a shared-alert patrol while the per-sector budget remains exact.
+	var group := PatrolGroup.new()
+	group.name = "GeneratedPatrolWave"
+	group.position = at
+	group.drifting = true
+	group.drift_thrust = 0.2
+	for index in range(ship_count):
+		var enemy: EnemyShip = _instantiate_wave_enemy()
+		if enemy == null:
+			continue
+		var angle: float = TAU * float(index) / float(ship_count)
+		enemy.position = Vector2.RIGHT.rotated(angle) * rng.randf_range(90.0, 170.0)
+		group.add_child(enemy)
+	sector.get_node("Encounters").add_child(group)
 
 
 ## Populate the supplied generated sector deterministically from its role, seed, and system attributes.
@@ -129,16 +152,8 @@ func generate_sector(sector: SectorRoot) -> void:
 
 	# Each role guarantees its mission-critical actors; all positions remain seeded.
 	match sector.sector_id:
-		"asteroid_ring":
-			var ring_patrol_count: int = _scaled_count(rng.randi_range(1, 2))
-			for index in range(ring_patrol_count):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
-		"start":
-			_spawn_patrol(sector, _random_enemy_spawn_position(sector))
-		"patrol":
-			var patrol_count: int = _scaled_count(rng.randi_range(1, 2))
-			for index in range(patrol_count):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
+		"asteroid_ring", "start", "patrol":
+			pass # Hostiles for every role come only from the capped wave budget.
 		"station":
 			_spawn_sensor_area(
 				station_scene,
@@ -147,11 +162,7 @@ func generate_sector(sector: SectorRoot) -> void:
 			)
 		"nebula":
 			_spawn_nebula_objective(sector)
-			for index in range(_scaled_count(1)):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
 		"warp":
-			for index in range(_scaled_count(2)):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
 			if warp_gate_scene != null:
 				_spawn_scene(
 					warp_gate_scene,
@@ -159,10 +170,7 @@ func generate_sector(sector: SectorRoot) -> void:
 					_random_open_position(sector, 600.0, 3000.0),
 				)
 		_:
-			# Generic nodes vary between quiet travel and a small patrol encounter.
-			var generic_patrol_count: int = _scaled_count(rng.randi_range(0, 2))
-			for index in range(generic_patrol_count):
-				_spawn_patrol(sector, _random_enemy_spawn_position(sector))
+			pass
 
 	if sector.has_outpost_objective and not RunState.outpost_destroyed:
 		_spawn_outpost(sector, _random_open_position(sector, 900.0, 1050.0))
@@ -245,7 +253,9 @@ func _find_asteroid_position(sector: SectorRoot, cluster_center: Vector2, radius
 		var candidate: Vector2 = cluster_center + offset
 		candidate.x = clampf(candidate.x, radius + 24.0, sector.sector_size.x - radius - 24.0)
 		candidate.y = clampf(candidate.y, radius + 24.0, sector.sector_size.y - radius - 24.0)
-		if SectorSpace.wrapped_distance(candidate, sector.spawn_position) < _screen_world_radius(sector) + radius + 80.0:
+		var player_position: Vector2 = _player_position(sector)
+		var spawn_clearance: float = maxf(_screen_world_radius(sector), MINIMAP_SPAWN_CLEARANCE)
+		if SectorSpace.wrapped_distance(candidate, player_position) < spawn_clearance + radius + 80.0:
 			continue
 
 		var overlaps_existing: bool = false
@@ -342,42 +352,11 @@ func _spawn_sensor_area(scene: PackedScene, parent: Node, at: Vector2) -> void:
 	Log.info("Generated sector landmark", scene.resource_path, at)
 
 
-func _spawn_patrol(sector: SectorRoot, at: Vector2) -> void:
-	# Solar-system YARD data chooses among authored roles; the group shares alert state.
-	if sector.skip_hostile_spawns:
-		return
-	var system: SolarSystemDefinition = RunState.get_current_system()
-	if system == null or system.enemy_scenes.is_empty():
-		_spawn_scene(patrol_group_scene, sector.get_node("Encounters"), at)
-		return
-	var group := PatrolGroup.new()
-	group.name = "GeneratedPatrol"
-	group.position = at
-	var ship_count: int = rng.randi_range(2, 3)
-	for index in range(ship_count):
-		var enemy_scene: PackedScene = system.enemy_scenes[rng.randi_range(0, system.enemy_scenes.size() - 1)]
-		var enemy: EnemyShip = enemy_scene.instantiate() as EnemyShip
-		if enemy == null:
-			Log.error("Solar system enemy scene root must use EnemyShip.gd", enemy_scene.resource_path)
-			continue
-		enemy.position = Vector2.RIGHT.rotated(TAU * float(index) / float(ship_count)) * rng.randf_range(85.0, 180.0)
-		group.add_child(enemy)
-	sector.get_node("Encounters").add_child(group)
-	reserved_positions.append(at)
-
-
-func _scaled_count(base_count: int) -> int:
-	# Fractional rolls keep the expected population at +1% per committed sector.
-	var scaled: float = float(base_count) * (1.0 + float(maxi(RunState.world_tick, 0)) * 0.01)
-	var whole: int = floori(scaled)
-	return whole + (1 if rng.randf() < scaled - float(whole) else 0)
-
-
 func _random_enemy_spawn_position(sector: SectorRoot) -> Vector2:
 	# Include the patrol's widest child offset so every ship starts beyond sensor range.
 	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
 	var center: Vector2 = player.global_position if is_instance_valid(player) else sector.spawn_position
-	var minimum_distance: float = _minimum_enemy_spawn_distance(sector)
+	var minimum_distance: float = enemy_spawn_distance(sector)
 	for attempt in range(64):
 		var candidate: Vector2 = (
 			center
@@ -406,15 +385,24 @@ func _random_enemy_spawn_position(sector: SectorRoot) -> Vector2:
 	return SectorSpace.wrap_position(center + Vector2.LEFT * (minimum_distance + 120.0))
 
 
-func _minimum_enemy_spawn_distance(sector: SectorRoot) -> float:
+## Return the spawn radius that keeps every hostile beyond view, radar, and minimap range.
+func enemy_spawn_distance(sector: SectorRoot) -> float:
 	var player: PlayerShip = get_tree().get_first_node_in_group("player_ship") as PlayerShip
 	var sensor_range: float = 0.0
 	if is_instance_valid(player):
 		var sensor: SensorComponent = player.get_node_or_null("SensorComponent") as SensorComponent
 		if sensor != null:
 			sensor_range = player.sensor_range
-	# Add the patrol's maximum child offset and a margin beyond the sensor contact edge.
-	return maxf(sensor_range + 220.0, _screen_world_radius(sector) + 100.0) + 180.0
+	# The marker range is a second hard floor so a newly arrived enemy is absent from the map.
+	return maxf(
+		sensor_range + 400.0,
+		maxf(_screen_world_radius(sector) + 100.0, MINIMAP_SPAWN_CLEARANCE + 100.0),
+	)
+
+
+func _player_position(sector: SectorRoot) -> Vector2:
+	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
+	return player.global_position if is_instance_valid(player) else sector.spawn_position
 
 
 func _screen_world_radius(sector: SectorRoot) -> float:
@@ -449,7 +437,12 @@ func _random_open_position(
 			rng.randf_range(250.0, sector.sector_size.x - 250.0),
 			rng.randf_range(250.0, sector.sector_size.y - 250.0),
 		)
-		if SectorSpace.wrapped_distance(candidate, sector.spawn_position) < minimum_spawn_distance:
+		var player_position: Vector2 = _player_position(sector)
+		var required_distance: float = maxf(
+			minimum_spawn_distance,
+			maxf(MINIMAP_SPAWN_CLEARANCE, _screen_world_radius(sector)),
+		)
+		if SectorSpace.wrapped_distance(candidate, player_position) < required_distance:
 			continue
 		var blocked: bool = false
 		for reserved in reserved_positions:
@@ -459,12 +452,19 @@ func _random_open_position(
 		if not blocked:
 			return candidate
 	# Failed random placement must not hide required content on the far edge of the sector.
-	var fallback_radius: float = maxf(minimum_spawn_distance + 150.0, clearance + 250.0)
+	var fallback_required_distance: float = maxf(
+		minimum_spawn_distance,
+		maxf(MINIMAP_SPAWN_CLEARANCE, _screen_world_radius(sector)),
+	)
+	var fallback_radius: float = fallback_required_distance + 150.0
+	var fallback_player_position: Vector2 = _player_position(sector)
 	for index in range(16):
 		var angle: float = TAU * float(index) / 16.0
-		var fallback: Vector2 = sector.spawn_position + Vector2.RIGHT.rotated(angle) * fallback_radius
-		fallback.x = clampf(fallback.x, 250.0, sector.sector_size.x - 250.0)
-		fallback.y = clampf(fallback.y, 250.0, sector.sector_size.y - 250.0)
+		var fallback: Vector2 = SectorSpace.wrap_position(
+			fallback_player_position + Vector2.RIGHT.rotated(angle) * fallback_radius,
+		)
+		if SectorSpace.wrapped_distance(fallback, fallback_player_position) < fallback_required_distance:
+			continue
 		var blocked: bool = false
 		for reserved in reserved_positions:
 			if SectorSpace.wrapped_distance(fallback, reserved) < clearance:
@@ -472,4 +472,5 @@ func _random_open_position(
 				break
 		if not blocked:
 			return fallback
-	return sector.spawn_position + Vector2(fallback_radius, 0.0)
+	Log.error("Could not find a clear off-map spawn position", sector.map_node_id)
+	return SectorSpace.wrap_position(fallback_player_position + Vector2(fallback_radius, 0.0))

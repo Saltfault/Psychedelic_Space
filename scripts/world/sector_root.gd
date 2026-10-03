@@ -14,25 +14,35 @@ signal clear_state_changed(is_clear: bool)
 
 ## Optional persistent caravan scene spawned only in its current route sector.
 @export var caravan_scene: PackedScene
-## Local spawn point used by the persistent caravan instance.
-@export var caravan_spawn_position: Vector2 = Vector2(2500.0, 2500.0)
+## Arrival-relative offset reserved for the persistent caravan's three-ship formation.
+@export var caravan_spawn_offset: Vector2 = Vector2(250.0, 0.0)
 
 ## Enemy scene used for persistent outpost reinforcements.
 @export var reinforcement_enemy_scene: PackedScene
-## Deterministic positions generated for the outpost's current reinforcement level.
-@export var reinforcement_positions: Array[Vector2] = []
-
 ## The map node identity and seed configure campaign-generated sector content.
 @onready var sector_generator: Node = get_node_or_null("SectorGenerator")
 
 var map_node_id: String = ""
 var sector_seed: int = 0
+## Restoring an already-cleared visit skips regenerated hostiles so its clear state remains true.
+var skip_hostile_spawns: bool = false
 var solar_system_id: String = "generic_system"
+var solar_system_name: String = "Uncharted System"
 var solar_system_attributes: Dictionary = {}
-## Current route-clear result, derived from this sector's required objective and live enemies.
+## Stable YARD key selected for this route node's body; empty means no body.
+var planet_id: StringName = &""
+## BodyKind ordinal serialized into procedural route data.
+var planet_kind: int = PlanetDefinition.BodyKind.PLANET
+## Whether this route node contains the campaign outpost objective, independent of sector role.
+var has_outpost_objective: bool = false
+## Clear requires resolved objectives, no live enemies, and no future hostile waves.
 var is_clear: bool:
 	get:
-		return _mandatory_objectives_resolved() and _living_enemy_count() == 0
+		return (
+			_mandatory_objectives_resolved()
+			and _living_enemy_count() == 0
+			and (sector_generator == null or int(sector_generator.get("waves_remaining")) == 0)
+		)
 
 var _last_published_clear_state: bool = false
 
@@ -43,6 +53,10 @@ func configure_for_map_node(node_data: Dictionary) -> void:
 	sector_id = String(node_data.get("role", "generic"))
 	sector_seed = int(node_data.get("generation_seed", 0))
 	solar_system_id = String(node_data.get("solar_system_id", "generic_system"))
+	solar_system_name = String(node_data.get("solar_system_name", "Uncharted System"))
+	planet_id = StringName(str(node_data.get("planet_id", "")))
+	planet_kind = int(node_data.get("planet_kind", PlanetDefinition.BodyKind.PLANET))
+	has_outpost_objective = bool(node_data.get("has_outpost", false))
 	var raw_attributes: Variant = node_data.get("solar_system_attributes", {})
 	if raw_attributes is Dictionary:
 		solar_system_attributes = raw_attributes.duplicate(true)
@@ -68,12 +82,8 @@ func _ready() -> void:
 
 ## Return whether this sector's role objective is resolved and no hostile ships remain.
 func _mandatory_objectives_resolved() -> bool:
-	match sector_id:
-		"outpost":
-			return RunState.main_objective_complete
-		# Intel is optional; blocking departure would prevent its world-tick deadline from advancing.
-		_:
-			return true
+	# Intel is optional; only the separately-marked outpost blocks sector travel.
+	return not has_outpost_objective or RunState.main_objective_complete
 
 
 func _living_enemy_count() -> int:
@@ -128,7 +138,7 @@ func get_spawn_position() -> Vector2:
 
 
 func _handle_persistent_objectives() -> void:
-	if sector_id == "outpost" and RunState.outpost_destroyed:
+	if has_outpost_objective and RunState.outpost_destroyed:
 		var objective: Node = get_tree().get_first_node_in_group("main_objective")
 		if objective != null and is_ancestor_of(objective):
 			objective.queue_free()
@@ -144,22 +154,41 @@ func _spawn_caravan_if_present() -> void:
 	var caravan: Node2D = caravan_scene.instantiate() as Node2D
 	if caravan == null:
 		return
-	caravan.global_position = caravan_spawn_position
+	# Keep the convoy near the arrival pocket without overlapping the player's ship.
+	caravan.global_position = SectorSpace.wrap_position(spawn_position + caravan_spawn_offset)
 	add_child(caravan)
 
 
 func _spawn_outpost_reinforcements() -> void:
-	if sector_id != "outpost":
+	if (
+		not has_outpost_objective
+		or skip_hostile_spawns
+		or sector_id == "station"
+		or RunState.outpost_destroyed
+	):
 		return
 
 	if reinforcement_enemy_scene == null:
 		return
 
-	var count: int = mini(RunState.outpost_reinforcement_level, reinforcement_positions.size())
+	var count: int = clampi(RunState.outpost_reinforcement_level, 0, 3)
 
+	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
+	var angle_offset: float = randf() * TAU
+	var spawn_distance: float = 1700.0
+	var player_ship: PlayerShip = player as PlayerShip
+	if is_instance_valid(player_ship):
+		spawn_distance = maxf(spawn_distance, player_ship.sensor_range + 400.0)
+	if sector_generator != null and sector_generator.has_method("enemy_spawn_distance"):
+		spawn_distance = float(sector_generator.call("enemy_spawn_distance", self))
 	for i in range(count):
 		var enemy: Node2D = reinforcement_enemy_scene.instantiate() as Node2D
 		if enemy == null:
 			continue
-		enemy.global_position = reinforcement_positions[i]
+		var center: Vector2 = spawn_position
+		if is_instance_valid(player):
+			center = player.global_position
+		var direction: Vector2 = Vector2.RIGHT.rotated(angle_offset + TAU * float(i) / float(maxi(count, 1)))
+		# Reinforcements obey the same off-screen, beyond-sensor spawn floor as wave enemies.
+		enemy.global_position = SectorSpace.wrap_position(center + direction * (spawn_distance + 120.0))
 		add_child(enemy)

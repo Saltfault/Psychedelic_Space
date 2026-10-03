@@ -12,16 +12,14 @@ const MAP_CONTENT_INSET: Vector2 = Vector2(72.0, 80.0)
 const MAP_CONTENT_BOTTOM_RESERVED: float = 220.0
 const ROUTE_VISUAL_SCENE: PackedScene = preload("res://scenes/ui/system_map_route.tscn")
 const NODE_VISUAL_SCENE: PackedScene = preload("res://scenes/ui/system_map_node.tscn")
-const ICON_START: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Sun.png")
-const ICON_GENERIC: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Barren.png")
+const ICON_START: Texture2D = preload("res://assets/ui/map_icons/sector_node.svg")
+const ICON_GENERIC: Texture2D = preload("res://assets/ui/map_icons/sector_node.svg")
 const ICON_ASTEROID: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Asteroid.png")
 const ICON_STATION: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Tech.png")
 const ICON_OUTPOST: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Tech2.png")
 const ICON_GATE: Texture2D = preload("res://assets/ui/map_icons/planet_pack/BlackHole.png")
 const ICON_NEBULA: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Clouds.png")
-const ICON_ENEMY: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Comet.png")
-const ICON_MOON: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Barren.png")
-const ICON_STAR: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Sun.png")
+const ICON_ENEMY: Texture2D = preload("res://assets/ui/map_icons/enemy.svg")
 
 @onready var info: Label = $Info
 @onready var legend: Label = $Legend
@@ -46,7 +44,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	hide()
-	legend.text = "START | PATROL | STATION | NEBULA | ASTEROID RING\nOUTPOST | WARP | PLANETS"
+	legend.text = "START / SECTOR | ENEMY | STATION | NEBULA | ASTEROID RING\nOUTPOST | WARP GATE | PLANET / MOON / STAR ONLY WHEN PRESENT"
 	close_button.pressed.connect(close_map)
 
 
@@ -384,14 +382,16 @@ func _body_kind_for_role(role: String) -> int:
 
 
 func _node_icon(node_data: Dictionary) -> Texture2D:
-	var icon: Texture2D = null
+	var role: StringName = StringName(str(node_data.get("role", "generic")))
 	var planet_id: StringName = StringName(str(node_data.get("planet_id", "")))
 	if planet_id != &"":
 		var planet: PlanetDefinition = RunState.get_planet(planet_id)
 		if planet != null:
-			icon = planet.map_icon
-	if icon == null:
-		icon = _role_icon(StringName(str(node_data.get("role", "generic"))))
+			return planet.map_icon if planet.map_icon != null else ICON_GENERIC
+	# A missing or invalid definition must never draw a pretend planet, moon, or star.
+	if role in [&"planet", &"moon", &"star"]:
+		return ICON_GENERIC
+	var icon: Texture2D = _role_icon(role)
 	if icon == null:
 		icon = ICON_GENERIC
 	return icon
@@ -402,9 +402,6 @@ func _role_icon(role: StringName) -> Texture2D:
 		&"start": return ICON_START
 		&"generic": return ICON_GENERIC
 		&"asteroid_ring": return ICON_ASTEROID
-		&"planet": return ICON_GENERIC
-		&"moon": return ICON_MOON
-		&"star": return ICON_STAR
 		&"patrol": return ICON_ENEMY
 		&"nebula": return ICON_NEBULA
 		&"station": return ICON_STATION

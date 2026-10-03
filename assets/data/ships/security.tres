@@ -1,11 +1,9 @@
-[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://kq14ssgpq11g"]
+[gd_resource type="Resource" script_class="ShipDefinition" load_steps=5 format=3 uid="uid://kq14ssgpq11g"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_hpaqf"]
 [ext_resource type="Texture2D" uid="uid://b2vqpfqqyjgc4" path="res://assets/effects/scifi_fx/scifx1_explosion_A_large_red/spritesheet.png" id="3_explosion"]
 [ext_resource type="Texture2D" uid="uid://c06n30cv1sysn" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Gold.png" id="4_hull"]
-
-[sub_resource type="Resource" id="Resource_2mpy5"]
-metadata/__load_path__ = "res://assets/audio/sfx/engine/engine_heavy_loop.wav"
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
 
 [resource]
 script = ExtResource("1_hpaqf")
@@ -21,6 +19,6 @@ module_slots = 6
 hull_texture = ExtResource("4_hull")
 hull_region = Rect2(128, 0, 64, 64)
 role_description = "Heavier interceptor with reinforced hull and deliberate handling."
-engine_loop = SubResource("Resource_2mpy5")
+engine_loop = ExtResource("5_engine")
 engine_pitch_scale = 0.78
 metadata/_custom_type_script = "uid://dtjhydxdas3kp"
