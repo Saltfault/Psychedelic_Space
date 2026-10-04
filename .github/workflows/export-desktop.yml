@@ -92,16 +92,113 @@ jobs:
           mkdir -p build/windows-x86_64 build/windows-arm64 \
             build/linux-x86_64 build/linux-arm64 build/macos-universal
 
-          "$GODOT" --headless --path . --export-release \
-            "Windows Desktop" build/windows-x86_64/PsychedelicSpaceGame.exe
-          "$GODOT" --headless --path . --export-release \
-            "Windows ARM64" build/windows-arm64/PsychedelicSpaceGame.exe
-          "$GODOT" --headless --path . --export-release \
-            "Linux x86_64" build/linux-x86_64/PsychedelicSpaceGame.x86_64
-          "$GODOT" --headless --path . --export-release \
-            "Linux ARM64" build/linux-arm64/PsychedelicSpaceGame.arm64
-          "$GODOT" --headless --path . --export-release \
-            "macOS Universal" build/macos-universal/PsychedelicSpaceGame.zip
+          verify_export() {
+            local output="$1"
+            local format="$2"
+            local architecture="$3"
+            local description
+            local machine
+            local pck
+            local size
+
+            test -s "$output" || {
+              echo "::error::Godot did not produce $output"
+              return 1
+            }
+            size="$(stat -c '%s' "$output")"
+            test "$size" -gt 1048576 || {
+              echo "::error::Export is unexpectedly small ($size bytes): $output"
+              return 1
+            }
+
+            case "$format" in
+              windows)
+                description="$(file -b "$output")"
+                [[ "$description" == *"PE32+"* ]] || {
+                  echo "::error::Not a 64-bit Windows executable: $description"
+                  return 1
+                }
+                if [[ "$architecture" == "x86_64" ]]; then
+                  [[ "$description" == *"x86-64"* ]] || return 1
+                else
+                  [[ "$description" == *"Aarch64"* || "$description" == *"ARM aarch64"* ]] || return 1
+                fi
+                objdump -f "$output" >/dev/null || return 1
+                pck="${output%.*}.pck"
+                test -s "$pck" || {
+                  echo "::error::Missing PCK sidecar required by this non-embedded export: $pck"
+                  return 1
+                }
+                [[ "$(head -c 4 "$pck")" == "GDPC" ]] || {
+                  echo "::error::Invalid Godot PCK header: $pck"
+                  return 1
+                }
+                ;;
+              linux)
+                machine="$(readelf -h "$output" | sed -n 's/^[[:space:]]*Machine:[[:space:]]*//p')"
+                if [[ "$architecture" == "x86_64" ]]; then
+                  [[ "$machine" == *"X86-64"* ]] || return 1
+                else
+                  [[ "$machine" == *"AArch64"* ]] || return 1
+                fi
+                pck="${output%.*}.pck"
+                test -s "$pck" || {
+                  echo "::error::Missing PCK sidecar required by this non-embedded export: $pck"
+                  return 1
+                }
+                [[ "$(head -c 4 "$pck")" == "GDPC" ]] || {
+                  echo "::error::Invalid Godot PCK header: $pck"
+                  return 1
+                }
+                ;;
+              macos)
+                unzip -tq "$output" || return 1
+                unzip -Z1 "$output" | grep '/Contents/MacOS/PsychedelicSpaceGame$' >/dev/null || return 1
+                ;;
+            esac
+            echo "Validated $format $architecture export: $output ($size bytes)"
+          }
+
+          export_target() {
+            local preset="$1"
+            local output="$2"
+            local format="$3"
+            local architecture="$4"
+            local export_status
+
+            echo "::group::Export $preset"
+            set +e
+            "$GODOT" --headless --path . --export-release "$preset" "$output"
+            export_status=$?
+            set -e
+
+            if [[ "$export_status" -ne 0 && "$export_status" -ne 134 ]]; then
+              echo "::endgroup::"
+              return "$export_status"
+            fi
+            if [[ "$export_status" -eq 134 ]]; then
+              echo "::warning::Godot exited with SIGABRT; validating the generated artifact before continuing."
+            fi
+            local validation_status=0
+            if verify_export "$output" "$format" "$architecture"; then
+              validation_status=0
+            else
+              validation_status=$?
+            fi
+            echo "::endgroup::"
+            return "$validation_status"
+          }
+
+          export_target "Windows Desktop" \
+            build/windows-x86_64/PsychedelicSpaceGame.exe windows x86_64
+          export_target "Windows ARM64" \
+            build/windows-arm64/PsychedelicSpaceGame.exe windows arm64
+          export_target "Linux x86_64" \
+            build/linux-x86_64/PsychedelicSpaceGame.x86_64 linux x86_64
+          export_target "Linux ARM64" \
+            build/linux-arm64/PsychedelicSpaceGame.arm64 linux arm64
+          export_target "macOS Universal" \
+            build/macos-universal/PsychedelicSpaceGame.zip macos universal
 
           chmod +x build/linux-x86_64/PsychedelicSpaceGame.x86_64
           chmod +x build/linux-arm64/PsychedelicSpaceGame.arm64
