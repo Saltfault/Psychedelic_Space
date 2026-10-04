@@ -2,3 +2,16 @@
 .godot/
 /android/
 /build/
+
+# Local editor/review tool caches and generated exports
+/.assetmanager/
+/.opencodereview/
+/exports/
+/project_time_tracker.json
+
+# Temporary editor and operating-system files
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
