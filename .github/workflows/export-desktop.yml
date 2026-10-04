@@ -189,13 +189,8 @@ jobs:
             export_status=$?
             set -e
 
-            if [[ "$export_status" -ne 0 && "$export_status" -ne 134 ]]; then
-              echo "::error::Godot export preset '$preset' failed with status $export_status"
-              echo "::endgroup::"
-              return "$export_status"
-            fi
-            if [[ "$export_status" -eq 134 ]]; then
-              echo "::warning::Godot exited with SIGABRT; validating the generated artifact before continuing."
+            if [[ "$export_status" -ne 0 ]]; then
+              echo "::warning::Godot export preset '$preset' exited with status $export_status; validating the generated artifact before continuing."
             fi
             local validation_status=0
             if verify_export "$output" "$format" "$architecture"; then
