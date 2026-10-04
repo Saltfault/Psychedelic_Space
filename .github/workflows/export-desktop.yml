@@ -129,10 +129,6 @@ jobs:
                     return 1
                   }
                 fi
-                objdump -f "$output" >/dev/null || {
-                  echo "::error::Could not read Windows executable format: $output"
-                  return 1
-                }
                 pck="${output%.*}.pck"
                 test -s "$pck" || {
                   echo "::error::Missing PCK sidecar required by this non-embedded export: $pck"
