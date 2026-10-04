@@ -182,15 +182,19 @@ jobs:
             local format="$3"
             local architecture="$4"
             local export_status
+            local log_file="$RUNNER_TEMP/godot-export-${format}-${architecture}.log"
+            local export_details
 
             echo "::group::Export $preset"
             set +e
-            "$GODOT" --headless --path . --export-release "$preset" "$output"
-            export_status=$?
+            "$GODOT" --headless --path . --export-release "$preset" "$output" 2>&1 | tee "$log_file"
+            export_status=${PIPESTATUS[0]}
             set -e
 
             if [[ "$export_status" -ne 0 ]]; then
               echo "::warning::Godot export preset '$preset' exited with status $export_status; validating the generated artifact before continuing."
+              export_details="$(tail -n 12 "$log_file" | tr '\n' ' ' | sed 's/::/%3A%3A/g')"
+              echo "::error title=Godot export output::$export_details"
             fi
             local validation_status=0
             if verify_export "$output" "$format" "$architecture"; then
