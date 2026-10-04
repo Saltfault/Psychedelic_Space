@@ -1,0 +1,141 @@
+name: Mirror GitHub releases
+
+on:
+  push:
+    tags:
+      - "v*"
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mirror-releases:
+    name: Copy published GitHub releases to Forgejo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror release metadata and assets
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import pathlib
+          import subprocess
+          import tempfile
+          from urllib.error import HTTPError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+
+          repo = "Saltfault/Psychedelic_Space"
+          github_releases_url = f"https://api.github.com/repos/{repo}/releases"
+          forgejo_api = f"https://forgejo.hearthhome.lol/api/v1/repos/{repo}"
+          token = os.environ["FORGEJO_TOKEN"]
+
+          def get_json(url, headers=None):
+              request = Request(url, headers=headers or {"Accept": "application/vnd.github+json"})
+              with urlopen(request, timeout=60) as response:
+                  return json.load(response)
+
+          def forgejo_request(method, path, payload=None, missing_ok=False):
+              data = json.dumps(payload).encode() if payload is not None else None
+              headers = {
+                  "Accept": "application/json",
+                  "Authorization": f"token {token}",
+                  "User-Agent": "Psychedelic-Space-release-mirror",
+              }
+              if payload is not None:
+                  headers["Content-Type"] = "application/json"
+              request = Request(forgejo_api + path, data=data, headers=headers, method=method)
+              try:
+                  with urlopen(request, timeout=60) as response:
+                      body = response.read()
+                      return json.loads(body) if body else None
+              except HTTPError as error:
+                  if missing_ok and error.code == 404:
+                      return None
+                  detail = error.read(1000).decode("utf-8", errors="replace")
+                  raise RuntimeError(f"Forgejo API {method} {path} returned {error.code}: {detail}") from error
+
+          headers = {"Accept": "application/vnd.github+json", "User-Agent": "Psychedelic-Space-release-mirror"}
+          releases = []
+          page = 1
+          while True:
+              batch = get_json(f"{github_releases_url}?per_page=100&page={page}", headers)
+              if not batch:
+                  break
+              releases.extend(release for release in batch if not release.get("draft", False))
+              page += 1
+
+          with tempfile.TemporaryDirectory(prefix="psy-space-release-mirror-") as temp_dir:
+              temp_path = pathlib.Path(temp_dir)
+              curl_auth = temp_path / "forgejo-curl.conf"
+              curl_auth.write_text(f'header = "Authorization: token {token}"\n', encoding="utf-8")
+              curl_auth.chmod(0o600)
+
+              for source in reversed(releases):
+                  tag = source["tag_name"]
+                  tag_path = quote(tag, safe="")
+                  existing = forgejo_request("GET", f"/releases/tags/{tag_path}", missing_ok=True)
+                  payload = {
+                      "tag_name": tag,
+                      "name": source.get("name") or tag,
+                      "body": source.get("body") or "",
+                      "draft": False,
+                      "prerelease": bool(source.get("prerelease", False)),
+                  }
+
+                  if existing is None:
+                      mirror = forgejo_request("POST", "/releases", payload)
+                      print(f"Created Forgejo release {tag}")
+                  else:
+                      mirror = existing
+                      changes = {
+                          key: value for key, value in payload.items()
+                          if key != "tag_name" and mirror.get(key) != value
+                      }
+                      if changes:
+                          mirror = forgejo_request("PATCH", f"/releases/{mirror['id']}", changes)
+                          print(f"Updated Forgejo release {tag}")
+
+                  release_id = mirror["id"]
+                  assets_url = f"/releases/{release_id}/assets"
+                  existing_assets = forgejo_request("GET", assets_url) or []
+                  assets_by_name = {asset["name"]: asset for asset in existing_assets}
+
+                  for asset in source.get("assets", []):
+                      name = asset["name"]
+                      current = assets_by_name.get(name)
+                      if current and current.get("size") == asset.get("size"):
+                          continue
+                      if current:
+                          forgejo_request("DELETE", f"{assets_url}/{current['id']}")
+
+                      local_asset = temp_path / "release-asset.bin"
+                      subprocess.run(
+                          ["curl", "--fail", "--location", "--retry", "3", "--silent", "--show-error",
+                           "--output", str(local_asset), asset["browser_download_url"]],
+                          check=True,
+                      )
+                      if local_asset.stat().st_size != asset["size"]:
+                          raise RuntimeError(f"Downloaded size mismatch for {tag} / {name}")
+
+                      upload_url = (
+                          f"https://forgejo.hearthhome.lol/api/v1/repos/{repo}"
+                          f"/releases/{release_id}/assets?name={quote(name, safe='')}"
+                      )
+                      subprocess.run(
+                          ["curl", "--fail", "--location", "--retry", "3", "--silent", "--show-error",
+                           "--config", str(curl_auth), "--header", "Content-Type: application/octet-stream",
+                           "--data-binary", f"@{local_asset}", upload_url],
+                          check=True,
+                          stdout=subprocess.DEVNULL,
+                      )
+                      print(f"Uploaded {tag} / {name} ({asset['size']} bytes)")
+
+          print(f"Mirrored {len(releases)} published GitHub releases")
+          PY
