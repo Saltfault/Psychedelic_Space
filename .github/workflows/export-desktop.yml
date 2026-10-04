@@ -24,10 +24,21 @@ jobs:
     if: github.server_url == 'https://github.com'
     runs-on: ubuntu-24.04
     steps:
-      - name: Check out project and Git LFS assets
+      - name: Check out project source
         uses: actions/checkout@v4
         with:
-          lfs: true
+          # GitHub's LFS store is not the source of the project's binary assets.
+          lfs: false
+
+      - name: Fetch Git LFS assets from Forgejo
+        shell: bash
+        run: |
+          set -euo pipefail
+          git lfs install --local
+          git remote add forgejo-lfs \
+            https://forgejo.hearthhome.lol/Saltfault/Psychedelic_Space.git
+          git lfs fetch forgejo-lfs "$GITHUB_SHA"
+          git lfs checkout
 
       - name: Download Godot and official export templates
         shell: bash
