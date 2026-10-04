@@ -1,0 +1,93 @@
+name: Export desktop builds
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.7.2"
+  GODOT_RELEASE_TAG: "4.7.2-stable"
+  GODOT_EDITOR_ZIP: "Godot_v4.7.2-stable_linux.x86_64.zip"
+  GODOT_TEMPLATES_TPZ: "Godot_v4.7.2-stable_export_templates.tpz"
+
+jobs:
+  export-desktop:
+    name: Export Windows, Linux, and macOS
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out project and Git LFS assets
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Download Godot and official export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" "$RUNNER_TEMP/templates"
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE_TAG}/${GODOT_EDITOR_ZIP}" \
+            --output "$RUNNER_TEMP/godot-editor.zip"
+          unzip -q "$RUNNER_TEMP/godot-editor.zip" -d "$RUNNER_TEMP/godot"
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE_TAG}/${GODOT_TEMPLATES_TPZ}" \
+            --output "$RUNNER_TEMP/export-templates.tpz"
+          unzip -q "$RUNNER_TEMP/export-templates.tpz" -d "$RUNNER_TEMP/templates"
+          install -d "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          cp -a "$RUNNER_TEMP/templates/templates/." \
+            "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
+          chmod +x "$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+
+      - name: Import project resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" \
+            --headless --editor --path . --import --quit
+
+      - name: Export desktop targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT="$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          mkdir -p build/windows-x86_64 build/windows-arm64 \
+            build/linux-x86_64 build/linux-arm64 build/macos-universal
+
+          "$GODOT" --headless --path . --export-release \
+            "Windows Desktop" build/windows-x86_64/PsychedelicSpaceGame.exe
+          "$GODOT" --headless --path . --export-release \
+            "Windows ARM64" build/windows-arm64/PsychedelicSpaceGame.exe
+          "$GODOT" --headless --path . --export-release \
+            "Linux x86_64" build/linux-x86_64/PsychedelicSpaceGame.x86_64
+          "$GODOT" --headless --path . --export-release \
+            "Linux ARM64" build/linux-arm64/PsychedelicSpaceGame.arm64
+          "$GODOT" --headless --path . --export-release \
+            "macOS Universal" build/macos-universal/PsychedelicSpaceGame.zip
+
+          chmod +x build/linux-x86_64/PsychedelicSpaceGame.x86_64
+          chmod +x build/linux-arm64/PsychedelicSpaceGame.arm64
+          tar -czf build/PsychedelicSpace-Linux-x86_64.tar.gz -C build/linux-x86_64 .
+          tar -czf build/PsychedelicSpace-Linux-ARM64.tar.gz -C build/linux-arm64 .
+
+      - name: Report legacy Windows limitation
+        shell: bash
+        run: |
+          echo "::warning::Godot 4.7.2's documented exported-game minimum is Windows 10. Windows 7/8 are not supported targets; the x64 build is for Windows 10/11."
+
+      - name: Upload desktop builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: PsychedelicSpace-desktop-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            build/windows-x86_64/
+            build/windows-arm64/
+            build/PsychedelicSpace-Linux-x86_64.tar.gz
+            build/PsychedelicSpace-Linux-ARM64.tar.gz
+            build/macos-universal/PsychedelicSpaceGame.zip
