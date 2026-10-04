@@ -190,6 +190,7 @@ jobs:
             set -e
 
             if [[ "$export_status" -ne 0 && "$export_status" -ne 134 ]]; then
+              echo "::error::Godot export preset '$preset' failed with status $export_status"
               echo "::endgroup::"
               return "$export_status"
             fi
@@ -219,8 +220,14 @@ jobs:
 
           chmod +x build/linux-x86_64/PsychedelicSpaceGame.x86_64
           chmod +x build/linux-arm64/PsychedelicSpaceGame.arm64
-          tar -czf build/PsychedelicSpace-Linux-x86_64.tar.gz -C build/linux-x86_64 .
-          tar -czf build/PsychedelicSpace-Linux-ARM64.tar.gz -C build/linux-arm64 .
+          tar -czf build/PsychedelicSpace-Linux-x86_64.tar.gz -C build/linux-x86_64 . || {
+            echo "::error::Could not package the Linux x86-64 export"
+            exit 1
+          }
+          tar -czf build/PsychedelicSpace-Linux-ARM64.tar.gz -C build/linux-arm64 . || {
+            echo "::error::Could not package the Linux ARM64 export"
+            exit 1
+          }
 
       - name: Upload desktop builds
         uses: actions/upload-artifact@v4
