@@ -205,11 +205,6 @@ jobs:
           tar -czf build/PsychedelicSpace-Linux-x86_64.tar.gz -C build/linux-x86_64 .
           tar -czf build/PsychedelicSpace-Linux-ARM64.tar.gz -C build/linux-arm64 .
 
-      - name: Report legacy Windows limitation
-        shell: bash
-        run: |
-          echo "::warning::Godot 4.7.2's documented exported-game minimum is Windows 10. Windows 7/8 are not supported targets; the x64 build is for Windows 10/11."
-
       - name: Upload desktop builds
         uses: actions/upload-artifact@v4
         with:
