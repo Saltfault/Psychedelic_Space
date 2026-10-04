@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/objects/pixel_dither_screen.gdshader" id="1_dither"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_dither")
+shader_parameter/sample_local_texture = true
+shader_parameter/pixel_size = 1
+shader_parameter/palette_mode = 0
+shader_parameter/levels = 8
+shader_parameter/dither_mode = 1
+shader_parameter/dither_strength = 0.18
+shader_parameter/brightness = 0.0
+shader_parameter/contrast = 1.0

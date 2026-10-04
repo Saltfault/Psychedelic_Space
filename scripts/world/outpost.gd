@@ -45,6 +45,7 @@ func _ready() -> void:
 	add_to_group("main_objective")
 	set_meta("contact_type", "outpost")
 	set_meta("sensor_signature", 1.0)
+	SectorSpace.register_wrap_visual(self, visual)
 	boss_name.text = "ENEMY OUTPOST"
 	shield_bar.max_value = max_shield
 	shield_bar.value = shield
@@ -56,6 +57,10 @@ func _ready() -> void:
 	fire_timer.start()
 	hull_changed.emit(hull, max_hull, phase)
 	shield_changed.emit(shield, max_shield, phase)
+
+
+func _exit_tree() -> void:
+	SectorSpace.unregister_wrap_visual(self)
 
 
 func _process(delta: float) -> void:

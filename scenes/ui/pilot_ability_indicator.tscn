@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dorox5ju6obsh" path="res://assets/ui/scifi_ui/Portrait.png" id="1_portrait"]
 [ext_resource type="Texture2D" uid="uid://dtok5jcc4h4au" path="res://assets/ui/scifi_ui/All.png" id="2_icons"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="AbilityIcon"]
 atlas = ExtResource("2_icons")
@@ -14,6 +15,8 @@ anchors_preset = 0
 mouse_filter = 2
 
 [node name="PortraitFrame" type="TextureRect" parent="." unique_id=703970494]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,6 +29,8 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CooldownBase" type="TextureRect" parent="." unique_id=1730653044]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 modulate = Color(0.4, 0.55, 0.68, 0.42)
 layout_mode = 1
 anchors_preset = 8
@@ -45,6 +50,8 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="AbilityCharge" type="TextureProgressBar" parent="." unique_id=692312087]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

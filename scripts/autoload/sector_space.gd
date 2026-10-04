@@ -159,9 +159,15 @@ func _update_wrap_visuals() -> void:
 	):
 		return
 
-	var half_view := get_viewport().get_visible_rect().size * 0.5 / camera.zoom
-	half_view += Vector2.ONE * WRAP_VISUAL_PADDING
+	var viewport_half := get_viewport().get_visible_rect().size * 0.5 / camera.zoom
+	var camera_cos: float = absf(cos(camera.global_rotation))
+	var camera_sin: float = absf(sin(camera.global_rotation))
+	var half_view := Vector2(
+		camera_cos * viewport_half.x + camera_sin * viewport_half.y,
+		camera_sin * viewport_half.x + camera_cos * viewport_half.y,
+	) + Vector2.ONE * WRAP_VISUAL_PADDING
 	var view_center := camera.get_screen_center_position()
+	var view_bounds := Rect2(view_center - half_view, half_view * 2.0)
 
 	for entry in _wrap_visual_entries:
 		var source: Node2D = entry["source"]
@@ -185,11 +191,41 @@ func _update_wrap_visuals() -> void:
 			ghost.global_transform = source.global_transform
 			ghost.global_position = source_position + offset
 
-			var ghost_position := source_position + offset
-			var inside_x: bool = absf(ghost_position.x - view_center.x) <= half_view.x
-			var inside_y: bool = absf(ghost_position.y - view_center.y) <= half_view.y
-			var inside_view: bool = inside_x and inside_y
+			var visual_bounds := _visual_world_bounds(ghost)
+			var inside_view: bool = view_bounds.intersects(visual_bounds, true)
 			ghost.visible = source.is_visible_in_tree() and inside_view
+
+
+func _visual_world_bounds(visual: Node2D) -> Rect2:
+	# Culling by the pivot alone clips large sprites and polygons while their edges remain onscreen.
+	var local_bounds: Rect2
+	if visual is Sprite2D:
+		local_bounds = (visual as Sprite2D).get_rect()
+	elif visual is Polygon2D:
+		var vertices: PackedVector2Array = (visual as Polygon2D).polygon
+		if vertices.is_empty():
+			return Rect2(visual.global_position, Vector2.ZERO)
+		var minimum_vertex: Vector2 = vertices[0]
+		var maximum_vertex: Vector2 = vertices[0]
+		for vertex in vertices:
+			minimum_vertex = minimum_vertex.min(vertex)
+			maximum_vertex = maximum_vertex.max(vertex)
+		local_bounds = Rect2(minimum_vertex, maximum_vertex - minimum_vertex)
+	else:
+		return Rect2(visual.global_position, Vector2.ZERO)
+	var transform: Transform2D = visual.global_transform
+	var corners: Array[Vector2] = [
+		transform * local_bounds.position,
+		transform * Vector2(local_bounds.end.x, local_bounds.position.y),
+		transform * local_bounds.end,
+		transform * Vector2(local_bounds.position.x, local_bounds.end.y),
+	]
+	var minimum: Vector2 = corners[0]
+	var maximum: Vector2 = corners[0]
+	for corner in corners:
+		minimum = minimum.min(corner)
+		maximum = maximum.max(corner)
+	return Rect2(minimum, maximum - minimum)
 
 
 func _collect_wrap_visual_pairs(source: Node, ghost: Node, pairs: Array[Dictionary]) -> void:

@@ -5,6 +5,9 @@ shader_type canvas_item;
 // Note: the node's modulate is not applied (the shader outputs the final color).
 // Adapted to sample the already-rendered viewport so one saved overlay can affect every screen.
 uniform sampler2D screen_source : hint_screen_texture, filter_nearest;
+// UI art uses the same effect through scene materials; glyphs are kept on the crisp screen pass.
+uniform bool sample_local_texture = false;
+uniform bool effect_enabled = true;
 
 // Size of each big pixel, measured in pixels of the source texture.
 uniform int pixel_size : hint_range(1, 32, 1) = 4;
@@ -103,15 +106,21 @@ vec3 nearest(vec3 c, int start, int count) {
 }
 
 void fragment() {
-	vec2 size = vec2(textureSize(screen_source, 0));
+	vec2 size = sample_local_texture ? vec2(textureSize(TEXTURE, 0)) : vec2(textureSize(screen_source, 0));
+	if (!effect_enabled) {
+		COLOR = sample_local_texture ? texture(TEXTURE, UV) * COLOR : texture(screen_source, SCREEN_UV);
+		return;
+	}
 	float ps = float(pixel_size);
 
 	// Sample the middle of each big pixel.
-	vec2 cell = floor(SCREEN_UV * size / ps);
+	vec2 source_uv = sample_local_texture ? UV : SCREEN_UV;
+	vec2 cell = floor(source_uv * size / ps);
 	vec2 uv = clamp((cell + 0.5) * ps / size, vec2(0.0), vec2(1.0) - 0.5 / size);
-	vec4 tex = texture(screen_source, uv);
+	vec4 tex = sample_local_texture ? texture(TEXTURE, uv) : texture(screen_source, uv);
 
-	vec3 c = (tex.rgb - 0.5) * contrast + 0.5 + brightness;
+	vec3 source_rgb = sample_local_texture ? tex.rgb * COLOR.rgb : tex.rgb;
+	vec3 c = (source_rgb - 0.5) * contrast + 0.5 + brightness;
 
 	// Dither: push the color up or down a little before snapping, by an amount
 	// that depends on how far apart the palette colors are.
@@ -158,5 +167,5 @@ void fragment() {
 		result = nearest(c, 152, 2);
 	}
 
-	COLOR = vec4(result, tex.a);
+	COLOR = sample_local_texture ? vec4(result, tex.a * COLOR.a) : vec4(result, tex.a);
 }

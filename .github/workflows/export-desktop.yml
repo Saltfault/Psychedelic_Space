@@ -58,6 +58,25 @@ jobs:
             "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
           chmod +x "$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
 
+      - name: Disable editor docks for headless export
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          project = Path("project.godot")
+          config = project.read_text()
+          section = "[editor_plugins]"
+          start = config.find(section)
+          if start >= 0:
+              end = config.find("\n[", start + len(section))
+              if end < 0:
+                  end = len(config)
+              config = config[:start] + section + "\nenabled=PackedStringArray()\n" + config[end:]
+              project.write_text(config)
+          PY
+
       - name: Import project resources
         shell: bash
         run: |

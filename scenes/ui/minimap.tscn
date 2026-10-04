@@ -1,6 +1,7 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="1_script"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Minimap.png" id="2_frame"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/minimap_disc.svg" id="3_disc"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/minimap_player.svg" id="4_player"]
@@ -33,6 +34,8 @@ nebula_icon = ExtResource("14_nebula")
 planet_icon = ExtResource("15_planet")
 
 [node name="RadarDisc" type="TextureRect" parent="."]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 1
 anchor_left = 0.19
 anchor_top = 0.19
@@ -53,6 +56,8 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="PlayerMarker" type="TextureRect" parent="."]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
@@ -68,6 +73,8 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="MinimapFrame" type="TextureRect" parent="."]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

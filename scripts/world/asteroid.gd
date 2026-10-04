@@ -18,6 +18,11 @@ func _ready() -> void:
 	contact_monitor = true
 	max_contacts_reported = 4
 	body_entered.connect(_on_body_entered)
+	SectorSpace.register_wrap_visual(self, $Visual as Node2D)
+
+
+func _exit_tree() -> void:
+	SectorSpace.unregister_wrap_visual(self)
 
 
 func _physics_process(delta: float) -> void:

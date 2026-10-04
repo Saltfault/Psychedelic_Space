@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="9_starfield"]
 [ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="10_music_director"]
 [ext_resource type="Script" uid="uid://bh5ud6dl4dfl4" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="MenuPanelAtlas"]
 atlas = ExtResource("4_panels")
@@ -105,6 +106,8 @@ text = "A SECTOR-BY-SECTOR SURVIVAL RUN"
 horizontal_alignment = 1
 
 [node name="PlayButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=1640894299]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -114,6 +117,8 @@ ignore_texture_size = true
 stretch_mode = 4
 
 [node name="ContinueButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=944503416]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -123,6 +128,8 @@ ignore_texture_size = true
 stretch_mode = 4
 
 [node name="OptionsButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=2074498205]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -132,6 +139,8 @@ ignore_texture_size = true
 stretch_mode = 4
 
 [node name="QuitButton" type="TextureButton" parent="CenterContainer/MenuPanel/MarginContainer/VBoxContainer" unique_id=283718106]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(276, 86)
 layout_mode = 2
 size_flags_horizontal = 4

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bdu2k3rton1vi"]
+[gd_scene load_steps=19 format=3 uid="uid://bdu2k3rton1vi"]
 
 [ext_resource type="Script" uid="uid://d6j6l4un6pl4" path="res://scripts/ui/system_map.gd" id="1_y73bs"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/planet_pack/Sun.png" id="12_star"]
 [ext_resource type="PackedScene" path="res://scenes/ui/system_map_route.tscn" id="13_route_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/system_map_node.tscn" id="14_node_scene"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="MapPanelAtlas"]
 atlas = ExtResource("2_map_panel")
@@ -86,6 +87,8 @@ offset_bottom = 214.0
 theme_override_constants/separation = 14
 
 [node name="SystemIcon" type="TextureRect" parent="SystemHeader" unique_id=175512341]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 expand_mode = 1
@@ -151,6 +154,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/SectorItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("3_sector")
@@ -169,6 +174,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/EnemyItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("4_enemy")
@@ -187,6 +194,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/StationItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("5_station")
@@ -205,6 +214,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/NebulaItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("6_nebula")
@@ -223,6 +234,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/AsteroidItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("7_asteroid")
@@ -241,6 +254,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/OutpostItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("8_outpost")
@@ -259,6 +274,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/WarpItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("9_warp")
@@ -277,6 +294,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/PlanetItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("10_planet")
@@ -295,6 +314,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/MoonItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("11_moon")
@@ -313,6 +334,8 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Legend/MarginContainer/Content/Items/StarItem"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("12_star")

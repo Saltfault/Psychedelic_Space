@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Icons.png" id="1_icons"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="CreditsAtlas"]
 atlas = ExtResource("1_icons")
@@ -12,6 +13,8 @@ layout_mode = 3
 anchors_preset = 0
 
 [node name="CreditsIcon" type="TextureRect" parent="."]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_right = 25.0
 offset_bottom = 25.0

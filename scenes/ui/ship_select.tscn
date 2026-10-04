@@ -1,7 +1,8 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/ship_select.gd" id="1_ship_select"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 [ext_resource type="Script" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="2_audio_mounter"]
 [ext_resource type="Resource" path="res://assets/audio/event_bank.tres" id="3_audio_bank"]
 [ext_resource type="Theme" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
@@ -130,6 +131,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AbilityIcon" type="TextureRect" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 2
 expand_mode = 1
