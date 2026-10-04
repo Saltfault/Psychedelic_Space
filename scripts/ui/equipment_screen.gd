@@ -4,8 +4,8 @@ class_name EquipmentScreen
 
 signal closed
 
-const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.tscn")
-const WEAPON_SLOT_SCENE: PackedScene = preload("res://scenes/ui/weapon_loadout_slot.tscn")
+@export var slot_scene: PackedScene
+@export var weapon_slot_scene: PackedScene
 
 @onready var _unequipped_grid: GridContainer = $Panel/MarginContainer/VBoxContainer/ContentRow/UnequippedPanel/MarginContainer/VBoxContainer/Grid
 @onready var _equipped_grid: GridContainer = $Panel/MarginContainer/VBoxContainer/ContentRow/EquippedPanel/MarginContainer/VBoxContainer/Grid
@@ -14,12 +14,14 @@ const WEAPON_SLOT_SCENE: PackedScene = preload("res://scenes/ui/weapon_loadout_s
 @onready var _credits: Label = $Panel/MarginContainer/VBoxContainer/Header/Credits
 @onready var _back_button: Button = $Panel/MarginContainer/VBoxContainer/Header/BackButton
 @onready var _weapon_row: HBoxContainer = $Panel/MarginContainer/VBoxContainer/WeaponRow
+@onready var _drag_preview: ModuleDragPreview = $DragPreview
 
 var player: PlayerShip
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	_drag_preview.hide()
 	_back_button.pressed.connect(_close)
 	hide()
 
@@ -42,6 +44,23 @@ func configure(target_player: PlayerShip) -> void:
 func open_inventory() -> void:
 	_refresh()
 	show()
+
+
+## Show the saved preview scene above the inventory while a module is being dragged.
+func begin_module_drag(module: ModuleDefinition) -> void:
+	_drag_preview.configure(module)
+	_drag_preview.global_position = get_global_mouse_position() - _drag_preview.size * 0.5
+	_drag_preview.show()
+
+
+## Hide the preview when Godot ends the current GUI drag operation.
+func end_module_drag() -> void:
+	_drag_preview.hide()
+
+
+func _process(_delta: float) -> void:
+	if _drag_preview.visible:
+		_drag_preview.global_position = get_global_mouse_position() - _drag_preview.size * 0.5
 
 
 ## Decide whether a module can be reordered, equipped, or returned to reserve.
@@ -67,17 +86,17 @@ func can_accept_drop(
 			target_index >= 0
 			and target_index < capacity
 			and target_index != source_index
-			and (target_index < target_inventory.size() or target_index == target_inventory.size())
 		)
 	if source_equipped:
 		return (
-			target_index >= player.unequipped_modules.size()
+			target_index >= 0
 			and target_index < BaseShip.UNEQUIPPED_MODULE_CAPACITY
-			and player.unequipped_modules.size() < BaseShip.UNEQUIPPED_MODULE_CAPACITY
+			and (target_index < target_inventory.size() or target_inventory.size() < BaseShip.UNEQUIPPED_MODULE_CAPACITY)
 		)
 	return (
-		target_index == player.installed_modules.size()
-		and player.installed_modules.size() < player.module_slots
+		target_index >= 0
+		and target_index < player.module_slots
+		and (target_index < target_inventory.size() or target_inventory.size() < player.module_slots)
 	)
 
 
@@ -101,19 +120,45 @@ func move_module_by_drop(
 		else:
 			var moved: ModuleDefinition = inventory[source_index]
 			inventory.remove_at(source_index)
-			inventory.append(moved)
+			inventory.insert(mini(target_index, inventory.size()), moved)
 		player.modules_changed.emit()
 		_status.text = "Module order updated."
-		call_deferred("_refresh")
 		return true
-	var succeeded: bool = (
-		player.unequip_module(source_index)
-		if source_equipped
-		else player.equip_module(source_index)
+	var target_inventory: Array[ModuleDefinition] = (
+		player.installed_modules if target_equipped else player.unequipped_modules
 	)
+	var target_is_occupied: bool = target_index < target_inventory.size()
+	var succeeded: bool
+	if target_is_occupied:
+		succeeded = (
+			player.swap_equipped_with_reserve(source_index, target_index)
+			if source_equipped
+			else player.swap_equipped_with_reserve(target_index, source_index)
+		)
+	else:
+		succeeded = (
+			player.unequip_module(source_index)
+			if source_equipped
+			else player.equip_module(source_index, target_index)
+		)
 	if succeeded:
 		_status.text = "Module moved between inventories."
-		call_deferred("_refresh")
+	return succeeded
+
+
+## Provide a double-click alternative to dragging for equipping and unequipping.
+func quick_move_module(source_equipped: bool, source_index: int) -> bool:
+	if not is_instance_valid(player):
+		return false
+	var succeeded: bool
+	if source_equipped:
+		succeeded = player.unequip_module(source_index)
+	else:
+		succeeded = player.equip_module(source_index)
+	if succeeded:
+		_status.text = "Module moved to reserve." if source_equipped else "Module equipped."
+	else:
+		_status.text = "Could not move module; check available inventory slots."
 	return succeeded
 
 
@@ -159,7 +204,7 @@ func _refresh() -> void:
 			else null
 		)
 		_add_slot(_equipped_grid, module, index, true, Vector2(72, 72))
-	_status.text = "Drag to sort, equip, or return modules to reserve. Hover for details."
+	_status.text = "Double-click or drag to equip / unequip. Drag to sort; hover for details."
 
 
 func _add_slot(
@@ -169,7 +214,10 @@ func _add_slot(
 	equipped: bool,
 	slot_size: Vector2,
 ) -> void:
-	var slot := SLOT_SCENE.instantiate() as ModuleInventorySlot
+	if slot_scene == null:
+		Log.error("EquipmentScreen scene is missing its saved module slot scene", get_path())
+		return
+	var slot := slot_scene.instantiate() as ModuleInventorySlot
 	slot.custom_minimum_size = slot_size
 	slot.configure(module, index, equipped, self, player.module_slots)
 	grid.add_child(slot)
@@ -187,7 +235,10 @@ func _refresh_weapon_slot() -> void:
 		child.queue_free()
 	if not is_instance_valid(player):
 		return
-	var weapon_slot: WeaponLoadoutSlot = WEAPON_SLOT_SCENE.instantiate() as WeaponLoadoutSlot
+	if weapon_slot_scene == null:
+		Log.error("EquipmentScreen scene is missing its saved weapon slot scene", get_path())
+		return
+	var weapon_slot: WeaponLoadoutSlot = weapon_slot_scene.instantiate() as WeaponLoadoutSlot
 	_weapon_row.add_child(weapon_slot)
 	weapon_slot.configure(player.weapon_definition, self)
 

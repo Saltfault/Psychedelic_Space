@@ -8,12 +8,8 @@
 [ext_resource type="Shader" uid="uid://pjscuydvx7se" path="res://assets/shaders/objects/shield.gdshader" id="6_shield_shader"]
 [ext_resource type="Texture2D" uid="uid://c6uwg8w1t2dhm" path="res://assets/shaders/objects/shield_uv_texture.tres" id="7_shield_uv_texture"]
 [ext_resource type="Script" uid="uid://bg6o2q3cxdcr" path="res://scripts/ships/sensor_component.gd" id="8_sensor"]
-[ext_resource type="Script" path="res://scripts/ships/ram_shield.gd" id="9_ram_shield"]
-[ext_resource type="Texture2D" path="res://assets/effects/ram_shield/pipo-btleffect208h_192.png" id="10_ram_visual"]
-
-[sub_resource type="AtlasTexture" id="RamShieldTexture"]
-atlas = ExtResource("10_ram_visual")
-region = Rect2(0, 0, 192, 192)
+[ext_resource type="Script" uid="uid://dr3ydxqhr3kx" path="res://scripts/ships/ram_shield.gd" id="9_ram_shield"]
+[ext_resource type="Texture2D" uid="uid://mj7wuhsfvagf" path="res://assets/effects/ram_shield/pipo-btleffect208h_192.png" id="10_ram_visual"]
 
 [sub_resource type="ShaderMaterial" id="HullLitMaterial"]
 shader = ExtResource("2_lit_receiver")
@@ -37,6 +33,10 @@ resource_local_to_scene = true
 shader = ExtResource("6_shield_shader")
 shader_parameter/strength = 1.0
 shader_parameter/shield_color = Color(0.15, 0.8, 1, 1)
+
+[sub_resource type="AtlasTexture" id="RamShieldTexture"]
+atlas = ExtResource("10_ram_visual")
+region = Rect2(0, 0, 192, 192)
 
 [node name="PlayerShip" type="CharacterBody2D" unique_id=1367263942]
 collision_layer = 2
@@ -101,15 +101,15 @@ script = ExtResource("9_ram_shield")
 visible = false
 position = Vector2(34, 0)
 scale = Vector2(0.5, 0.5)
-flip_h = true
 texture = SubResource("RamShieldTexture")
+flip_h = true
 
 [node name="ShieldArea" type="CollisionPolygon2D" parent="RamShield" unique_id=1326100743]
 polygon = PackedVector2Array(-8, -16, 22, -30, 58, -24, 78, 0, 58, 24, 22, 30, -8, 16)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=690971959]
 
-[node name="EngineAudio" type="AudioStreamPlayer2D" parent="."]
+[node name="EngineAudio" type="AudioStreamPlayer2D" parent="." unique_id=1123429069]
 volume_db = -12.0
 max_distance = 5000.0
 attenuation = 0.8

@@ -1,4 +1,0 @@
-Asset: Engine Flames, by Dolkyns.
-Source/license: https://dolkyns.itch.io/engine-flames (source link for reference; the archive's own LICENSE.txt is authoritative for this copy).
-Terms: custom license permits personal and commercial project use, modification, and use within projects/promotional materials. Standalone redistribution/resale is prohibited. Credit is optional; suggested: Engine flame assets by Dolkyns.
-The original LICENSE.txt and README.txt are preserved in this folder.

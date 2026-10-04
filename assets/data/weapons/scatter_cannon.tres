@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3 uid="uid://byhev1wj87228"]
+
+[ext_resource type="Script" uid="uid://biip5bi1d6ued" path="res://scripts/data/weapon_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ships/scatter_projectile.tscn" id="2_projectile"]
+[ext_resource type="Texture2D" uid="uid://b70fykr2kud2r" path="res://assets/sprites/projectiles/projectile_orange.tres" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_id = &"scatter_cannon"
+rarity = 1
+display_name = "Scatter Cannon"
+icon = ExtResource("3_icon")
+projectile_scene = ExtResource("2_projectile")
+damage = 8.0
+projectile_speed = 900.0
+cooldown = 0.52
+projectile_count = 3
+spread_degrees = 28.0
+drop_weight = 0.85

@@ -1,0 +1,25 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/weapon_pickup.gd" id="1_pickup"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_common_green.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_uncommon_blue.png" id="3_uncommon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_rare_violet.png" id="4_rare"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_epic_yellow.png" id="5_epic"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_legendary_red.png" id="6_legendary"]
+
+[sub_resource type="CircleShape2D" id="PickupShape"]
+radius = 36.0
+
+[node name="WeaponPickup" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_pickup")
+rarity_textures = Array[Texture2D]([ExtResource("2_icon"), ExtResource("3_uncommon"), ExtResource("4_rare"), ExtResource("5_epic"), ExtResource("6_legendary")])
+
+[node name="Icon" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_icon")
+scale = Vector2(1.5, 1.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("PickupShape")

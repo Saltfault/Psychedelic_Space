@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SolarSystemDefinition" format=3 uid="uid://ct7np2ls1c3ob"]
+
+[ext_resource type="Script" uid="uid://dalqxwuakpupc" path="res://scripts/data/solar_system_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d3h3m87dpm8t" path="res://assets/ui/map_icons/system_ember.svg" id="2_icon"]
+[ext_resource type="Resource" uid="uid://w4su6ry8ntae" path="res://assets/data/planets/terran.tres" id="3_terran"]
+[ext_resource type="Resource" uid="uid://cw4thjkhy7mhh" path="res://assets/data/planets/ice.tres" id="4_ice"]
+[ext_resource type="Resource" uid="uid://c3xaojocc2gtb" path="res://assets/data/planets/moon.tres" id="5_moon"]
+[ext_resource type="Resource" uid="uid://dlcniwvas0lkd" path="res://assets/data/planets/star.tres" id="6_star"]
+[ext_resource type="Script" uid="uid://463xvwg3tiet" path="res://scripts/data/planet_definition.gd" id="7_planet_script"]
+[ext_resource type="PackedScene" uid="uid://bev0mbgiaw2oh" path="res://scenes/enemies/enemy_ship.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_corsair.tscn" id="9_corsair"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="10_cutter"]
+[ext_resource type="Resource" uid="uid://ek5dd6lf6ek" path="res://assets/data/planets/lava.tres" id="11_lava"]
+[ext_resource type="Resource" uid="uid://bjj4vio2pjl56" path="res://assets/data/planets/gas_giant.tres" id="12_gas"]
+[ext_resource type="Resource" path="res://assets/data/planets/desert.tres" id="13_desert"]
+[ext_resource type="Resource" path="res://assets/data/planets/water_world.tres" id="14_water"]
+
+[resource]
+script = ExtResource("1_script")
+system_id = &"frontier"
+display_name = "Vesper Reach"
+map_icon = ExtResource("2_icon")
+planets = Array[ExtResource("7_planet_script")]([ExtResource("3_terran"), ExtResource("4_ice"), ExtResource("11_lava"), ExtResource("12_gas"), ExtResource("13_desert"), ExtResource("14_water"), ExtResource("5_moon"), ExtResource("6_star")])
+enemy_scenes = Array[PackedScene]([ExtResource("8_enemy"), ExtResource("9_corsair"), ExtResource("10_cutter")])
+nebula_chance = 0.16
+map_subtitle = "Uncharted frontier"

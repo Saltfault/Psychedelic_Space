@@ -2,9 +2,18 @@ extends Control
 ## Positions saved marker scenes from the player's current sensor contacts.
 class_name Minimap
 
-const MARKER_SCENE: PackedScene = preload("res://scenes/ui/minimap_marker.tscn")
-
 @export_range(1.0, 10000.0, 100.0) var map_range: float = 3200.0
+@export var marker_scene: PackedScene
+@export var station_icon: Texture2D
+@export var outpost_icon: Texture2D
+@export var enemy_icon: Texture2D
+@export var intel_icon: Texture2D
+@export var warp_icon: Texture2D
+@export var weapon_icon: Texture2D
+@export var module_icon: Texture2D
+@export var asteroid_icon: Texture2D
+@export var nebula_icon: Texture2D
+@export var planet_icon: Texture2D
 
 @onready var marker_layer: Control = $Markers
 @onready var player_marker: TextureRect = $PlayerMarker
@@ -52,7 +61,7 @@ func _refresh_markers() -> void:
 		var objective_id: int = objective.get_instance_id()
 		seen[objective_id] = true
 		var objective_marker_data: Dictionary = _contact_style(objective)
-		objective_marker_data["icon"] = preload("res://assets/ui/map_icons/outpost.svg")
+		objective_marker_data["icon"] = outpost_icon
 		objective_marker_data["color"] = Color(1.0, 0.2, 0.8)
 		objective_marker_data["diameter"] = 12.0
 		_sync_marker(
@@ -78,31 +87,31 @@ func _contact_style(contact: Node2D) -> Dictionary:
 	match contact_type:
 		"station":
 			tint = Color(0.3, 1.0, 0.55)
-			icon = preload("res://assets/ui/map_icons/station.svg")
+			icon = station_icon
 		"outpost":
 			tint = Color(1.0, 0.25, 0.35)
-			icon = preload("res://assets/ui/map_icons/outpost.svg")
+			icon = outpost_icon
 		"caravan":
 			tint = Color(1.0, 0.8, 0.2)
-			icon = preload("res://assets/ui/map_icons/enemy.svg")
+			icon = enemy_icon
 		"intel":
 			tint = Color(0.2, 0.9, 1.0)
-			icon = preload("res://assets/sprites/pickups/intel_nut_red.png")
+			icon = intel_icon
 		"warp":
 			tint = Color(1.0, 0.25, 0.95)
-			icon = preload("res://assets/ui/map_icons/warp_gate.svg")
+			icon = warp_icon
 		"enemy":
-			icon = preload("res://assets/ui/map_icons/enemy.svg")
+			icon = enemy_icon
 		"weapon":
-			icon = preload("res://assets/sprites/pickups/weapon_common_green.png")
+			icon = weapon_icon
 		"module":
-			icon = preload("res://assets/sprites/pickups/module_common_green.png")
+			icon = module_icon
 		"asteroid":
-			icon = preload("res://assets/ui/map_icons/asteroid.svg")
+			icon = asteroid_icon
 		"nebula":
-			icon = preload("res://assets/ui/map_icons/nebula.svg")
+			icon = nebula_icon
 		"planet":
-			icon = preload("res://assets/ui/map_icons/planet_terran.svg")
+			icon = planet_icon
 	if contact.has_meta("planet_id"):
 		var planet: PlanetDefinition = RunState.get_planet(
 			StringName(str(contact.get_meta("planet_id")))
@@ -123,7 +132,10 @@ func _sync_marker(
 ) -> void:
 	var marker: MinimapMarker = _markers_by_id.get(marker_id) as MinimapMarker
 	if marker == null:
-		marker = MARKER_SCENE.instantiate() as MinimapMarker
+		if marker_scene == null:
+			Log.error("Minimap scene is missing its saved marker scene", get_path())
+			return
+		marker = marker_scene.instantiate() as MinimapMarker
 		marker_layer.add_child(marker)
 		_markers_by_id[marker_id] = marker
 	var diameter: float = float(marker_data["diameter"])

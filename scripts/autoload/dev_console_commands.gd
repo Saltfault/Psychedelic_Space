@@ -1,15 +1,14 @@
 extends Node
 ## Registers developer-only gameplay commands with the shipped Developer Console.
 
-const ENEMY_SCENES: Dictionary[String, PackedScene] = {
-	"corsair": preload("res://scenes/enemies/enemy_corsair.tscn"),
-	"cutter": preload("res://scenes/enemies/enemy_cutter.tscn"),
-}
-const OUTPOST_SCENE: PackedScene = preload("res://scenes/world/outpost.tscn")
-const PROJECTILE_SCENE: PackedScene = preload("res://scenes/ships/projectile.tscn")
-const MODULE_PICKUP_SCENE: PackedScene = preload("res://scenes/world/module_pickup.tscn")
-const SHIELD_PICKUP_SCENE: PackedScene = preload("res://scenes/world/shield_booster.tscn")
-const INTEL_PICKUP_SCENE: PackedScene = preload("res://scenes/world/intel_beacon.tscn")
+@export var enemy_ids: Array[StringName] = []
+@export var enemy_scenes: Array[PackedScene] = []
+@export var outpost_scene: PackedScene
+@export var projectile_scene: PackedScene
+@export var module_pickup_scene: PackedScene
+@export var shield_pickup_scene: PackedScene
+@export var large_shield_pickup_scene: PackedScene
+@export var intel_pickup_scene: PackedScene
 
 
 func _ready() -> void:
@@ -18,10 +17,13 @@ func _ready() -> void:
 
 
 func _register_commands() -> void:
+	# The plugin's built-in help is static; route help to its live command registry instead.
+	Console.add_command("help", _show_all_commands, 0, 0, "Lists every registered command and its description.")
 	Console.add_command("godmode", _godmode, ["state"], 0, "Toggle player invulnerability, or use godmode on/off.")
 	Console.add_command("add_shield", _add_shield, ["amount"], 0, "Restore the given shield amount (default: full shield).")
 	Console.add_command("add_hull", _add_hull, ["amount"], 0, "Repair the given hull amount (default: full hull).")
 	Console.add_command("complete_main_obj", _complete_main_obj, 0, 0, "Complete and remove the main objective.")
+	Console.add_command("complete_sector", _complete_sector, 0, 0, "Resolve the active sector objective, stop its waves, and remove all hostiles.")
 	Console.add_command("complete_side_obj", _complete_side_obj, 0, 0, "Complete the optional intel objective.")
 	Console.add_command("shuffle_main_obj", _shuffle_main_obj, 0, 0, "Move or respawn the main objective at a random sector position.")
 	Console.add_command("shuffle_side_obj", _shuffle_side_obj, 0, 0, "Move or respawn the intel objective at a random sector position.")
@@ -30,9 +32,13 @@ func _register_commands() -> void:
 	Console.add_command("respawn", _respawn, 0, 0, "Restore the player at the current sector arrival point.")
 	Console.add_command("kill", _kill, ["target"], 1, "Kill player, all enemies, or one enemy by runtime instance ID, node name, or YARD ship ID.")
 	Console.add_command_autocomplete_list("godmode", PackedStringArray(["on", "off", "toggle"]))
-	Console.add_command_autocomplete_list("spawn", PackedStringArray(["enemy", "module", "shield", "intel", "corsair", "cutter"]))
+	Console.add_command_autocomplete_list("spawn", PackedStringArray(["enemy", "module", "shield", "large_shield", "intel", "corsair", "cutter"]))
 	Console.add_command_autocomplete_list("teleport", PackedStringArray(["sector", "system", "solar_system", "start", "patrol", "station", "nebula", "outpost", "warp", "generic_system"]))
 	Console.add_command_autocomplete_list("kill", PackedStringArray(["player", "all", "corsair", "cutter"]))
+
+
+func _show_all_commands() -> void:
+	Console.commands_list()
 
 
 func _player() -> PlayerShip:
@@ -41,6 +47,11 @@ func _player() -> PlayerShip:
 
 func _active_sector() -> SectorRoot:
 	return get_tree().get_first_node_in_group("active_sector") as SectorRoot
+
+
+func _enemy_scene(enemy_id: String) -> PackedScene:
+	var index: int = enemy_ids.find(StringName(enemy_id))
+	return enemy_scenes[index] if index >= 0 and index < enemy_scenes.size() else null
 
 
 func _say(message: String) -> void:
@@ -122,6 +133,20 @@ func _complete_main_obj() -> void:
 	Log.info("Developer command completed main objective")
 
 
+func _complete_sector() -> void:
+	var sector: SectorRoot = _active_sector()
+	if sector == null:
+		_fail("No active sector is loaded.")
+		return
+
+	var removed_enemies: int = sector.debug_complete_sector()
+	if not sector.is_clear:
+		_fail("Sector completion was requested, but the sector still has unresolved requirements.")
+		return
+	_say("Sector cleared. Removed %d hostile ship(s)." % removed_enemies)
+	Log.info("Developer command completed sector", sector.map_node_id, removed_enemies)
+
+
 func _complete_side_obj() -> void:
 	# Developer completion intentionally clears expiry so this remains useful after the deadline.
 	RunState.side_objective_expired = false
@@ -151,11 +176,14 @@ func _shuffle_main_obj() -> void:
 		if landmarks == null:
 			_fail("The active sector has no Landmarks node.")
 			return
-		outpost = OUTPOST_SCENE.instantiate() as Outpost
+		if outpost_scene == null:
+			_fail("Developer Console scene has no outpost scene assigned.")
+			return
+		outpost = outpost_scene.instantiate() as Outpost
 		if outpost == null:
 			_fail("Could not instantiate the outpost scene.")
 			return
-		outpost.projectile_scene = PROJECTILE_SCENE
+		outpost.projectile_scene = projectile_scene
 		landmarks.add_child(outpost)
 
 	outpost.global_position = _random_sector_position(sector)
@@ -183,7 +211,10 @@ func _shuffle_side_obj() -> void:
 			intel = candidate as Node2D
 			break
 	if intel == null:
-		intel = INTEL_PICKUP_SCENE.instantiate() as Node2D
+		if intel_pickup_scene == null:
+			_fail("Developer Console scene has no intel-pickup scene assigned.")
+			return
+		intel = intel_pickup_scene.instantiate() as Node2D
 		if intel == null:
 			_fail("Could not instantiate the intel pickup scene.")
 			return
@@ -210,7 +241,7 @@ func _spawn(kind_text: String, id_text: String) -> void:
 	match kind:
 		"enemy":
 			var enemy_id: String = requested_id if not requested_id.is_empty() else "corsair"
-			var enemy_scene: PackedScene = ENEMY_SCENES.get(enemy_id) as PackedScene
+			var enemy_scene: PackedScene = _enemy_scene(enemy_id)
 			if enemy_scene == null:
 				_fail("Unknown enemy. Available: corsair, cutter.")
 				return
@@ -224,21 +255,26 @@ func _spawn(kind_text: String, id_text: String) -> void:
 			if module == null:
 				_fail("Unknown module ID or empty module registry.")
 				return
-			var module_pickup: Node = MODULE_PICKUP_SCENE.instantiate()
+			if module_pickup_scene == null:
+				_fail("Developer Console scene has no module-pickup scene assigned.")
+				return
+			var module_pickup: Node = module_pickup_scene.instantiate()
 			module_pickup.set("module", module)
 			node = module_pickup as Node2D
 		"shield", "shield_pickup":
-			node = SHIELD_PICKUP_SCENE.instantiate() as Node2D
+			node = shield_pickup_scene.instantiate() as Node2D if shield_pickup_scene != null else null
+		"large_shield", "large_shield_pickup":
+			node = large_shield_pickup_scene.instantiate() as Node2D if large_shield_pickup_scene != null else null
 		"intel", "intel_pickup":
 			RunState.side_objective_complete = false
 			RunState.side_objective_expired = false
 			RunState.run_state_changed.emit()
-			node = INTEL_PICKUP_SCENE.instantiate() as Node2D
+			node = intel_pickup_scene.instantiate() as Node2D if intel_pickup_scene != null else null
 			if node is Area2D:
 				(node as Area2D).collision_layer = 0
 				(node as Area2D).collision_mask = 2
 		_:
-			_fail("Usage: spawn enemy [corsair|cutter] | module [YARD_ID] | shield | intel")
+			_fail("Usage: spawn enemy [corsair|cutter] | module [YARD_ID] | shield | large_shield | intel")
 			return
 
 	if node == null:

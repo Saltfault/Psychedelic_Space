@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3 uid="uid://mosxk10ukg46"]
+
+[ext_resource type="Script" uid="uid://biip5bi1d6ued" path="res://scripts/data/weapon_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ships/pulse_projectile.tscn" id="2_projectile"]
+[ext_resource type="Texture2D" uid="uid://t2r6toli1btv" path="res://assets/sprites/projectiles/projectile_blue.tres" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_id = &"pulse_cannon"
+rarity = 0
+icon = ExtResource("3_icon")
+projectile_scene = ExtResource("2_projectile")
+damage = 14.0
+projectile_speed = 1150.0

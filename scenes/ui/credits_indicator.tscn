@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Icons.png" id="1_icons"]
+
+[sub_resource type="AtlasTexture" id="CreditsAtlas"]
+atlas = ExtResource("1_icons")
+region = Rect2(154, 82, 28, 27)
+
+[node name="CreditsIndicator" type="Control"]
+custom_minimum_size = Vector2(150, 28)
+layout_mode = 3
+anchors_preset = 0
+
+[node name="CreditsIcon" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 25.0
+offset_bottom = 25.0
+texture = SubResource("CreditsAtlas")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="CreditsLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 1.0
+offset_right = 150.0
+offset_bottom = 25.0
+text = "CR --"

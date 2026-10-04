@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/projectile.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/projectiles/projectile_violet.tres" id="2_texture"]
+[ext_resource type="PackedScene" path="res://scenes/effects/explosion.tscn" id="3_impact"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lance"]
+radius = 14.0
+height = 70.0
+
+[node name="LanceProjectile" type="Area2D"]
+collision_layer = 8
+collision_mask = 7
+script = ExtResource("1_script")
+hit_effect_scene = ExtResource("3_impact")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 3.1415927
+texture = ExtResource("2_texture")
+scale = Vector2(0.8, 1.4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_lance")

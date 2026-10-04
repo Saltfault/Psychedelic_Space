@@ -10,19 +10,17 @@ const MAX_INTERMEDIATE_NODES: int = 14
 const LINK_RADIUS: float = 18.0
 const MAP_CONTENT_INSET: Vector2 = Vector2(72.0, 80.0)
 const MAP_CONTENT_BOTTOM_RESERVED: float = 220.0
-const ROUTE_VISUAL_SCENE: PackedScene = preload("res://scenes/ui/system_map_route.tscn")
-const NODE_VISUAL_SCENE: PackedScene = preload("res://scenes/ui/system_map_node.tscn")
-const ICON_START: Texture2D = preload("res://assets/ui/map_icons/sector_node.svg")
-const ICON_GENERIC: Texture2D = preload("res://assets/ui/map_icons/sector_node.svg")
-const ICON_ASTEROID: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Asteroid.png")
-const ICON_STATION: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Tech.png")
-const ICON_OUTPOST: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Tech2.png")
-const ICON_GATE: Texture2D = preload("res://assets/ui/map_icons/planet_pack/BlackHole.png")
-const ICON_NEBULA: Texture2D = preload("res://assets/ui/map_icons/planet_pack/Clouds.png")
-const ICON_ENEMY: Texture2D = preload("res://assets/ui/map_icons/enemy.svg")
+@export var route_visual_scene: PackedScene
+@export var node_visual_scene: PackedScene
+@export var generic_icon: Texture2D
+@export var asteroid_icon: Texture2D
+@export var station_icon: Texture2D
+@export var outpost_icon: Texture2D
+@export var gate_icon: Texture2D
+@export var nebula_icon: Texture2D
+@export var enemy_icon: Texture2D
 
 @onready var info: Label = $Info
-@onready var legend: Label = $Legend
 @onready var close_button: Button = $CloseButton
 @onready var background: Control = $Background
 @onready var system_icon: TextureRect = $SystemHeader/SystemIcon
@@ -42,9 +40,10 @@ var map_seed: int = 0
 func _ready() -> void:
 	add_to_group("system_map")
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	# Keep the route map above the HUD and other saved overlays when it is opened.
+	z_index = 100
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	hide()
-	legend.text = "START / SECTOR | ENEMY | STATION | NEBULA | ASTEROID RING\nOUTPOST | WARP GATE | PLANET / MOON / STAR ONLY WHEN PRESENT"
 	close_button.pressed.connect(close_map)
 
 
@@ -126,8 +125,7 @@ func generate_new_map(seed_value: int) -> void:
 	if not has_asteroid_ring and node_order.size() > 6:
 		var ring_index: int = rng.randi_range(5, node_order.size() - 2)
 		nodes_by_id[node_order[ring_index]]["role"] = "asteroid_ring"
-	# A solar system has one physical star. Multiple star-role nodes were reusing
-	# the same star definition and made Sol appear to contain several suns.
+	# A solar system has one physical star; other generated star-role nodes become ordinary sectors.
 	var star_node_ids: Array[String] = []
 	for index in range(5, node_order.size() - 1):
 		var candidate_id: String = node_order[index]
@@ -317,6 +315,9 @@ func commit_travel(node_id: String) -> bool:
 func open_map() -> void:
 	_refresh_info()
 	show()
+	# It is a full-screen overlay; make it the top visible Control before pausing.
+	z_index = 100
+	show()
 	get_tree().paused = true
 
 
@@ -366,14 +367,14 @@ func _refresh_graph_visuals() -> void:
 	for from_id in node_order:
 		for to_value: Variant in outgoing_links.get(from_id, []):
 			var to_id: String = String(to_value)
-			var route: SystemMapRouteVisual = ROUTE_VISUAL_SCENE.instantiate() as SystemMapRouteVisual
+			var route: SystemMapRouteVisual = route_visual_scene.instantiate() as SystemMapRouteVisual
 			map_visuals.add_child(route)
 			var tint: Color = Color(0.45, 0.9, 1.0, 1.0) if from_id == current_node_id else Color(0.25, 0.55, 0.72, 0.85)
 			route.configure(_screen_position(from_id), _screen_position(to_id), tint)
 	for node_id in node_order:
 		var node_data: Dictionary = nodes_by_id[node_id]
 		var node_role: String = String(nodes_by_id[node_id]["role"])
-		var marker: SystemMapNodeVisual = NODE_VISUAL_SCENE.instantiate() as SystemMapNodeVisual
+		var marker: SystemMapNodeVisual = node_visual_scene.instantiate() as SystemMapNodeVisual
 		map_visuals.add_child(marker)
 		marker.position = _screen_position(node_id)
 		var selected: bool = node_id == current_node_id
@@ -403,26 +404,26 @@ func _node_icon(node_data: Dictionary) -> Texture2D:
 	if planet_id != &"":
 		var planet: PlanetDefinition = RunState.get_planet(planet_id)
 		if planet != null:
-			return planet.map_icon if planet.map_icon != null else ICON_GENERIC
+			return planet.map_icon if planet.map_icon != null else generic_icon
 	# A missing or invalid definition must never draw a pretend planet, moon, or star.
 	if role in [&"planet", &"moon", &"star"]:
-		return ICON_GENERIC
+		return generic_icon
 	var icon: Texture2D = _role_icon(role)
 	if icon == null:
-		icon = ICON_GENERIC
+		icon = generic_icon
 	return icon
 
 
 func _role_icon(role: StringName) -> Texture2D:
 	match role:
-		&"start": return ICON_START
-		&"generic": return ICON_GENERIC
-		&"asteroid_ring": return ICON_ASTEROID
-		&"patrol": return ICON_ENEMY
-		&"nebula": return ICON_NEBULA
-		&"station": return ICON_STATION
-		&"outpost": return ICON_OUTPOST
-		&"warp": return ICON_GATE
+		&"start": return generic_icon
+		&"generic": return generic_icon
+		&"asteroid_ring": return asteroid_icon
+		&"patrol": return enemy_icon
+		&"nebula": return nebula_icon
+		&"station": return station_icon
+		&"outpost": return outpost_icon
+		&"warp": return gate_icon
 		_: return null
 
 

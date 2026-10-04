@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/planet_body.gd" id="1_planet_body"]
+[ext_resource type="PackedScene" path="res://scenes/world/planet_views/pixel_planet.tscn" id="2_pixel_planet"]
+[ext_resource type="PackedScene" path="res://scenes/world/planet_views/star.tscn" id="3_star"]
+
+[node name="PlanetBody" type="Node2D"]
+script = ExtResource("1_planet_body")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="PixelPlanetView" parent="Visual" instance=ExtResource("2_pixel_planet")]
+
+[node name="StarView" parent="Visual" instance=ExtResource("3_star")]

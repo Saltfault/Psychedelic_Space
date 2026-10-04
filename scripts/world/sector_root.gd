@@ -137,6 +137,40 @@ func get_spawn_position() -> Vector2:
 	return spawn_position
 
 
+## Resolve the required objective, stop future enemy waves, and remove all living hostiles.
+## Returns the number of ships removed; normal clear-state signals remain authoritative.
+func debug_complete_sector() -> int:
+	skip_hostile_spawns = true
+	if sector_generator != null and sector_generator.has_method("stop_enemy_waves"):
+		sector_generator.call("stop_enemy_waves")
+
+	if has_outpost_objective:
+		var outposts: Array[Node] = find_children("*", "Outpost", true, false)
+		for candidate in outposts:
+			var outpost: Outpost = candidate as Outpost
+			if outpost != null and outpost.hull > 0.0:
+				outpost.take_damage(outpost.hull + outpost.shield + 1.0)
+		if not RunState.main_objective_complete:
+			# A missing objective must not leave a force-cleared sector locked.
+			RunState.complete_main_objective()
+
+	var hostiles: Array[BaseShip] = []
+	_collect_living_hostiles(self, hostiles)
+	for hostile: BaseShip in hostiles:
+		hostile.take_damage(hostile.hull + hostile.shield + 1.0)
+
+	_refresh_clear_state()
+	return hostiles.size()
+
+
+func _collect_living_hostiles(parent: Node, hostiles: Array[BaseShip]) -> void:
+	for child in parent.get_children():
+		var ship: BaseShip = child as BaseShip
+		if ship != null and (ship.team != 0 or ship.is_in_group("enemy_ship")) and not ship.is_dead:
+			hostiles.append(ship)
+		_collect_living_hostiles(child, hostiles)
+
+
 func _handle_persistent_objectives() -> void:
 	if has_outpost_objective and RunState.outpost_destroyed:
 		var objective: Node = get_tree().get_first_node_in_group("main_objective")

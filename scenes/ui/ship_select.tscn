@@ -1,0 +1,154 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ship_select.gd" id="1_ship_select"]
+[ext_resource type="Script" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="2_audio_mounter"]
+[ext_resource type="Resource" path="res://assets/audio/event_bank.tres" id="3_audio_bank"]
+[ext_resource type="Theme" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Panels.png" id="5_panels"]
+[ext_resource type="PackedScene" path="res://scenes/world/space_background.tscn" id="8_starfield"]
+[ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="9_music_director"]
+
+[sub_resource type="AtlasTexture" id="SelectionPanelAtlas"]
+atlas = ExtResource("5_panels")
+region = Rect2(60, 245, 204, 252)
+
+[sub_resource type="StyleBoxTexture" id="SelectionPanelFrame"]
+texture = SubResource("SelectionPanelAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+
+[node name="ShipSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ship_select")
+theme = ExtResource("4_theme")
+
+[node name="MusicDirector" parent="." instance=ExtResource("9_music_director")]
+
+[node name="SpaceBackground" parent="." instance=ExtResource("8_starfield")]
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SelectionPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(900, 760)
+layout_mode = 2
+theme_type_variation = &"WindowPanel"
+theme_override_styles/panel = SubResource("SelectionPanelFrame")
+
+[node name="Content" type="VBoxContainer" parent="CenterContainer/SelectionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="CenterContainer/SelectionPanel/Content"]
+layout_mode = 2
+theme_type_variation = &"Title"
+theme_override_font_sizes/font_size = 38
+text = "SELECT YOUR HULL"
+horizontal_alignment = 1
+
+[node name="ShipName" type="Label" parent="CenterContainer/SelectionPanel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Prototype"
+horizontal_alignment = 1
+
+[node name="ShipDescription" type="Label" parent="CenterContainer/SelectionPanel/Content"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="HullButtons" type="HBoxContainer" parent="CenterContainer/SelectionPanel/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="Scout" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+toggle_mode = true
+text = "SCOUT"
+
+[node name="Corsair" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+toggle_mode = true
+text = "CORSAIR"
+
+[node name="Cutter" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+toggle_mode = true
+text = "CUTTER"
+
+[node name="PilotRow" type="HBoxContainer" parent="CenterContainer/SelectionPanel/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="ColorRow" type="HBoxContainer" parent="CenterContainer/SelectionPanel/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="ColorLabel" type="Label" parent="CenterContainer/SelectionPanel/Content/ColorRow"]
+layout_mode = 2
+text = "HULL COLOR"
+
+[node name="ColorOption" type="OptionButton" parent="CenterContainer/SelectionPanel/Content/ColorRow"]
+custom_minimum_size = Vector2(300, 52)
+layout_mode = 2
+
+[node name="PilotPrevious" type="Button" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+text = "◀"
+
+[node name="PilotName" type="Label" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+custom_minimum_size = Vector2(230, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Dash"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AbilityIcon" type="TextureRect" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PilotNext" type="Button" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+text = "▶"
+
+[node name="Confirm" type="Button" parent="CenterContainer/SelectionPanel/Content"]
+custom_minimum_size = Vector2(300, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "CONFIRM AND BEGIN"
+
+[node name="Preview" type="Sprite2D" parent="CenterContainer/SelectionPanel"]
+position = Vector2(450, 530)
+rotation = 1.5707963
+scale = Vector2(2.5, 2.5)
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 64)
+
+[node name="EventAudioBankMounter" type="Node" parent="."]
+script = ExtResource("2_audio_mounter")
+_audio_bank_resource = ExtResource("3_audio_bank")

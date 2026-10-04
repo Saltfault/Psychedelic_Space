@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://cnb1wkdxicrb1"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_n87km"]
+
+[resource]
+script = ExtResource("1_n87km")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([]),
+&"class_restrictions": Array[StringName]([&"WeaponDefinition"]),
+&"recursive_scan": false,
+&"scan_directories": Array[String](["res://assets/data/weapons"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://byhev1wj87228": &"scatter_cannon",
+&"uid://dllus48a6xbqv": &"lance",
+&"uid://mosxk10ukg46": &"pulse_cannon"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"lance": &"uid://dllus48a6xbqv",
+&"pulse_cannon": &"uid://mosxk10ukg46",
+&"scatter_cannon": &"uid://byhev1wj87228"
+})

@@ -6,9 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="4_panels"]
 [ext_resource type="Script" uid="uid://bwbh17iq4lvxi" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="5_audio_mounter"]
 [ext_resource type="Resource" uid="uid://cv3antahgajo7" path="res://assets/audio/event_bank.tres" id="6_audio_bank"]
-[ext_resource type="Script" uid="uid://dsu6i05k2dija" path="res://scripts/audio/music_director.gd" id="7_music_director"]
-[ext_resource type="AudioStream" uid="uid://de4j620wl73ko" path="res://assets/audio/music/cosmos_cinematic_120bpm_c_minor.wav" id="8_music_stream"]
-[ext_resource type="PackedScene" path="res://scenes/world/space_background.tscn" id="9_starfield"]
+[ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="9_starfield"]
+[ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="10_music_director"]
 
 [sub_resource type="AtlasTexture" id="MenuPanelAtlas"]
 atlas = ExtResource("4_panels")
@@ -62,7 +61,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="SpaceBackground" parent="." instance=ExtResource("9_starfield")]
+[node name="SpaceBackground" parent="." unique_id=475517137 instance=ExtResource("9_starfield")]
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1157569184]
 layout_mode = 1
@@ -140,22 +139,9 @@ stretch_mode = 4
 [node name="SettingsPanel" parent="." unique_id=1856454373 instance=ExtResource("2_settings")]
 visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -380.0
-offset_top = -320.0
-offset_right = 380.0
-offset_bottom = 320.0
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="EventAudioBankMounter" type="Node" parent="." unique_id=72441587]
 script = ExtResource("5_audio_mounter")
 _audio_bank_resource = ExtResource("6_audio_bank")
 
-[node name="MusicDirector" type="Node" parent="." unique_id=513372771]
-script = ExtResource("7_music_director")
-music_stream = ExtResource("8_music_stream")
+[node name="MusicDirector" parent="." unique_id=409659771 instance=ExtResource("10_music_director")]

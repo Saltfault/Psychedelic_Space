@@ -13,7 +13,6 @@ signal modules_changed
 ## Emitted when the ship's active primary weapon changes.
 signal weapon_changed(weapon: WeaponDefinition)
 
-const SHIPS: Registry = preload("res://assets/data/registries/ships.tres")
 const UNEQUIPPED_MODULE_CAPACITY: int = 25
 ## All hulls and pilots start with this independent weapon; pickups replace it during a run.
 const STARTING_WEAPON_ID: StringName = &"pulse_cannon"
@@ -22,10 +21,7 @@ const FALLBACK_PROJECTILE_SPEED: float = 1000.0
 const FALLBACK_PROJECTILE_DAMAGE: float = 10.0
 
 ## Stable YARD ID of the ShipDefinition that provides this ship's baseline statistics.
-@export_custom(
-	Registry.PROPERTY_HINT_CUSTOM,
-	"res://assets/data/registries/ships.tres",
-) var ship_id: StringName = &"prototype_ship"
+@export var ship_id: StringName = &"prototype_ship"
 
 ## Combat team used by projectiles to decide whether this ship is a valid target.
 @export var team: int = 0
@@ -81,7 +77,7 @@ var _previous_wrapped_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	# Resolve authored stats once, then disable processing if the ID is invalid.
-	definition = SHIPS.load_entry(ship_id) as ShipDefinition
+	definition = RunState.get_ship(ship_id)
 
 	if definition == null:
 		Log.error("YARD could not load ShipDefinition ID", ship_id)
@@ -358,19 +354,39 @@ func store_module(module: ModuleDefinition) -> bool:
 
 
 ## Move a reserve module into an available equipment slot and apply its stats.
-func equip_module(inventory_index: int) -> bool:
+## A slot index may be supplied to preserve the position selected by drag-and-drop.
+func equip_module(inventory_index: int, equipped_slot_index: int = -1) -> bool:
 	if inventory_index < 0 or inventory_index >= unequipped_modules.size():
 		return false
 	if installed_modules.size() >= module_slots:
 		return false
+	var requested_index: int = installed_modules.size() if equipped_slot_index < 0 else equipped_slot_index
+	if requested_index < 0 or requested_index >= module_slots:
+		return false
+	var target_index: int = mini(requested_index, installed_modules.size())
 
 	var module: ModuleDefinition = unequipped_modules[inventory_index]
 	unequipped_modules.remove_at(inventory_index)
-	if not install_module(module):
-		unequipped_modules.insert(inventory_index, module)
+	installed_modules.insert(target_index, module)
+	_rebuild_stats(false)
+	modules_changed.emit()
+	Log.info("Module equipped from inventory", module.display_name)
+	return true
+
+
+## Exchange an equipped module with a reserve module without changing either store's size.
+func swap_equipped_with_reserve(equipped_index: int, reserve_index: int) -> bool:
+	if equipped_index < 0 or equipped_index >= installed_modules.size():
+		return false
+	if reserve_index < 0 or reserve_index >= unequipped_modules.size():
 		return false
 
-	Log.info("Module equipped from inventory", module.display_name)
+	var equipped_module: ModuleDefinition = installed_modules[equipped_index]
+	installed_modules[equipped_index] = unequipped_modules[reserve_index]
+	unequipped_modules[reserve_index] = equipped_module
+	_rebuild_stats(false)
+	modules_changed.emit()
+	Log.info("Equipped and reserve modules swapped", equipped_module.display_name, reserve_index)
 	return true
 
 

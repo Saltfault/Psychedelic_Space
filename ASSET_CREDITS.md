@@ -17,6 +17,8 @@ By Dolkyns. https://dolkyns.itch.io/engine-flames. The player ship's engine flam
 
 ## Audio, shield, ship, and planet assets
 
+- **Pixel Planet and Pixel Dither shaders** — Francisco Cidade, https://fcidade.com/ and https://fcidade.itch.io/. Both downloaded shader files declare CC0. The Pixel Planet shader drives all planet and moon surface presets; the Pixel Dither shader is adapted to sample the final viewport and is user-tunable in Video options.
+
 - **Pixel Spaceship Megapack** — Guardian (`https://guardian5.itch.io/spaceship-megapack`). Personal and commercial use and editing are allowed; standalone or asset-pack redistribution is prohibited. Credit is appreciated but not required. The project's ship atlases are under `assets/sprites/ships/guardian5/`.
 - **PIPOYA FREE VFX HEX Shield** — Pipoya (`https://pipoya.itch.io/pipoya-free-vfx-hex-shield`). Personal/commercial project use and edits are allowed; asset resale/redistribution is prohibited; attribution is not required. Ram's shield animation sheets are under `assets/effects/ram_shield/`.
 - **3D Planet Generator** — Naejimer (`https://naejimer.itch.io/godot-3d-planet-generator`). MIT, with attribution appreciated but not required. The sample resources are copied under `addons/naejimer_3d_planet_generator/` to preserve their `res://` references; it is sample content, not an enabled editor plugin. The upstream source/license is recorded there and in `THIRD_PARTY_NOTICES.md`.

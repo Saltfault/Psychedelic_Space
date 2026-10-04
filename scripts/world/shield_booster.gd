@@ -2,7 +2,7 @@ extends Area2D
 ## Collectible that restores a fixed amount of the player's current shield.
 
 ## Shield points restored to a PlayerShip when this pickup is collected.
-@export var shield_amount: float = 25.0
+@export var shield_amount: float = 12.0
 
 
 func _ready() -> void:
@@ -12,4 +12,5 @@ func _ready() -> void:
 func _on_body_entered(body: Node) -> void:
 	if body is PlayerShip:
 		body.restore_shield(shield_amount)
+		Juicee.preset_pickup(self)
 		queue_free()

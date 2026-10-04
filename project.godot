@@ -36,10 +36,12 @@ window/vsync/vsync_mode=0
 
 Console="*uid://ouiu5xh1cs8n"
 LitManager="*uid://brf2hvdtyyw3q"
-RunState="*uid://cukvf0upyjtl7"
+RunState="*res://scenes/run_state.tscn"
 GameSettings="*res://scripts/autoload/game_settings.gd"
+DitherOverlay="*res://scenes/ui/dither_overlay.tscn"
 SectorSpace="*uid://b8vh0l0qrnjlk"
-DevConsoleCommands="*res://scripts/autoload/dev_console_commands.gd"
+DevConsoleCommands="*res://scenes/dev_console_commands.tscn"
+SceneRouter="*res://scenes/scene_router.tscn"
 Profily="*uid://qmnu1ehm866e"
 Conductor="*uid://c5rvmkaorxynb"
 EventAudio="*uid://be741v81fj3xc"
@@ -56,7 +58,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/GDQuest_GDScript_formatter/plugin.cfg", "res://addons/conductor/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/event_audio/plugin.cfg", "res://addons/global_asset_manager/plugin.cfg", "res://addons/godit/plugin.cfg", "res://addons/godoban/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/godot_doctor/plugin.cfg", "res://addons/input_helper/plugin.cfg", "res://addons/inspector_tabs/plugin.cfg", "res://addons/juicee/plugin.cfg", "res://addons/licenses/plugin.cfg", "res://addons/lit/plugin.cfg", "res://addons/log/plugin.cfg", "res://addons/profily/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg", "res://addons/quill-ide/plugin.cfg", "res://addons/terminal/plugin.cfg", "res://addons/yard/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+enabled=PackedStringArray("res://addons/GDQuest_GDScript_formatter/plugin.cfg", "res://addons/conductor/plugin.cfg", "res://addons/console/plugin.cfg", "res://addons/event_audio/plugin.cfg", "res://addons/global_asset_manager/plugin.cfg", "res://addons/godit/plugin.cfg", "res://addons/godoban/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/input_helper/plugin.cfg", "res://addons/inspector_tabs/plugin.cfg", "res://addons/juicee/plugin.cfg", "res://addons/licenses/plugin.cfg", "res://addons/lit/plugin.cfg", "res://addons/log/plugin.cfg", "res://addons/profily/plugin.cfg", "res://addons/project-time-tracker/plugin.cfg", "res://addons/quill-ide/plugin.cfg", "res://addons/terminal/plugin.cfg", "res://addons/yard/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 
 [gui]
 

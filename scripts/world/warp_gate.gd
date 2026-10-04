@@ -5,7 +5,7 @@ class_name WarpGate
 ## Emitted once when the nearby player activates an unlocked gate.
 signal warp_requested
 
-@onready var prompt: Label = $Prompt
+@onready var prompt: Label = $PromptLayer/Prompt
 
 var player_inside: PlayerShip = null
 var _warp_requested: bool = false
@@ -25,6 +25,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Keep this world prompt in the crisp UI canvas rather than under the dither pass.
+	prompt.position = global_position + Vector2(-220.0, -260.0)
 	if not is_instance_valid(player_inside):
 		player_inside = null
 		prompt.hide()

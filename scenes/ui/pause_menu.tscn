@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://c3en3itnhfxua"]
+
+[ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="1_panels"]
+[ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="2_icons"]
+
+[sub_resource type="AtlasTexture" id="PausePanelAtlas"]
+atlas = ExtResource("1_panels")
+region = Rect2(60, 245, 204, 252)
+
+[sub_resource type="StyleBoxTexture" id="PausePanelFrame"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+texture = SubResource("PausePanelAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+
+[sub_resource type="AtlasTexture" id="PauseButtonAtlas"]
+atlas = ExtResource("1_panels")
+region = Rect2(232, 26, 162, 94)
+
+[sub_resource type="StyleBoxTexture" id="PauseButtonFrame"]
+texture = SubResource("PauseButtonAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dyovk"]
+atlas = ExtResource("2_icons")
+region = Rect2(56, 9, 22, 28)
+
+[sub_resource type="AtlasTexture" id="OptionsIcon"]
+atlas = ExtResource("2_icons")
+region = Rect2(8, 38, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gsjul"]
+atlas = ExtResource("2_icons")
+region = Rect2(77, 9, 29, 30)
+
+[node name="PauseMenu" type="Control" unique_id=671264099]
+process_mode = 2
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Shade" type="ColorRect" parent="." unique_id=184239468]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.005, 0.015, 0.04, 0.76)
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1889712691]
+custom_minimum_size = Vector2(520, 620)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -310.0
+offset_right = 260.0
+offset_bottom = 310.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PausePanelFrame")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1648500038]
+layout_mode = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 34
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 34
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer" unique_id=20577060]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1585417464]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=2147217021]
+custom_minimum_size = Vector2(360, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("PauseButtonFrame")
+theme_override_styles/pressed = SubResource("PauseButtonFrame")
+theme_override_styles/hover = SubResource("PauseButtonFrame")
+text = "RESUME"
+icon = SubResource("AtlasTexture_dyovk")
+
+[node name="OptionsButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=206141894]
+custom_minimum_size = Vector2(360, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("PauseButtonFrame")
+theme_override_styles/pressed = SubResource("PauseButtonFrame")
+theme_override_styles/hover = SubResource("PauseButtonFrame")
+text = "OPTIONS"
+icon = SubResource("OptionsIcon")
+
+[node name="MainMenuButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=396844610]
+custom_minimum_size = Vector2(360, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("PauseButtonFrame")
+theme_override_styles/pressed = SubResource("PauseButtonFrame")
+theme_override_styles/hover = SubResource("PauseButtonFrame")
+text = "MAIN MENU"
+icon = SubResource("AtlasTexture_gsjul")

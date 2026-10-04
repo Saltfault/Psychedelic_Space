@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://r16kek1px44c"
+path="res://.godot/imported/Swords  130 BPM  G Minor  @_oli_oxen_.wav-c038e2d046e006b7a77dc260216199af.sample"
+
+[deps]
+
+source_file="res://assets/audio/music/Swords  130 BPM  G Minor  @_oli_oxen_.wav"
+dest_files=["res://.godot/imported/Swords  130 BPM  G Minor  @_oli_oxen_.wav-c038e2d046e006b7a77dc260216199af.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

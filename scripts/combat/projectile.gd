@@ -46,7 +46,7 @@ func _physics_process(delta: float) -> void:
 
 	lifetime -= delta
 	if lifetime <= 0.0:
-		queue_free()
+		_retire()
 
 
 func _exit_tree() -> void:
@@ -78,4 +78,23 @@ func _on_body_entered(body: Node) -> void:
 		body.take_damage(damage)
 		Log.debug("Projectile hit a damageable body", body.name, damage, team)
 
+	_retire()
+
+
+## Consume this projectile at a shield without applying its damage to the ship.
+func absorb() -> void:
+	if has_impacted:
+		return
+	has_impacted = true
+	_retire()
+
+
+func _retire() -> void:
+	# Hide the real sprite and wrap copies immediately; queue_free alone renders through frame end.
+	var sprite: Sprite2D = get_node_or_null("Sprite2D") as Sprite2D
+	if sprite != null:
+		sprite.hide()
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	SectorSpace.unregister_wrap_visual(self)
 	queue_free()

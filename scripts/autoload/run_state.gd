@@ -8,14 +8,41 @@ signal credits_changed(new_value: int)
 ## Emitted whenever the persisted Dev Mode preference changes.
 signal dev_mode_changed(enabled: bool)
 
-# Registry assets are the source of truth for authored module content.
-const MODULES: Registry = preload("res://assets/data/registries/modules.tres")
+@export var module_registry: Registry
+@export var weapon_registry: Registry
+@export var planet_registry: Registry
+@export var ship_registry: Registry
+@export var pilot_registry: Registry
+@export var solar_system_registry: Registry
+## Every authored player hull shares this palette; all textures use the same atlas regions.
+const SHIP_COLOR_IDS: Array[StringName] = [
+	&"blue", &"gold", &"green", &"green_yellow", &"green_yellow_blue", &"light_blue",
+	&"orange_blue_white", &"pink_blue_orange", &"red_blue_yellow",
+	&"silver_charcoal_red", &"violet_red_orange",
+]
+const SHIP_COLOR_LABELS: Array[String] = [
+	"Blue", "Gold", "Green", "Green / Yellow", "Green / Yellow / Blue", "Light Blue",
+	"Orange / Blue / White", "Pink / Blue / Orange", "Red / Blue / Yellow",
+	"Silver / Charcoal / Red", "Violet / Red / Orange",
+]
+@export var ship_color_textures: Array[Texture2D] = []
 const SETTINGS_PATH: String = "user://settings.cfg"
+const RUN_SAVE_PATH: String = "user://current_run.cfg"
 const SETTINGS_SECTION: String = "developer"
 const DEV_MODE_KEY: String = "dev_mode_enabled"
 
-## Semantic sectors visited by the caravan; it never occupies the player start or warp exit.
-const CARAVAN_ROUTE: Array[String] = ["patrol", "nebula", "station", "outpost"]
+## The hostile caravan avoids both the player start and peaceful station sectors.
+const CARAVAN_ROUTE: Array[String] = ["patrol", "nebula", "generic"]
+
+const CAMPAIGN_SYSTEM_IDS: Array[StringName] = [&"frontier", &"ember", &"glacial"]
+
+var current_system_index: int = 0
+var current_system_id: StringName = &"frontier"
+## Stable YARD selections retained across menu transitions and Continue.
+var selected_ship_id: StringName = &"prototype_ship"
+var selected_pilot_id: StringName = &"dash"
+## Set by ship selection so Game does not reset a just-created campaign twice.
+var fresh_campaign_pending: bool = false
 
 ## Seed shared by this run's procedurally generated route and sector layouts.
 var run_seed: int = 0
@@ -41,6 +68,13 @@ var outpost_reinforcement_level: int = 0
 var caravan_route_index: int = 0
 var known_caravan_sector: String = CARAVAN_ROUTE[0]
 var dev_mode_enabled: bool = false
+## Set by the main menu when Continue is selected; consumed by Game on scene entry.
+var resume_pending: bool = false
+## Saved map-node identity used to rebuild the deterministic route on Continue.
+var saved_map_node_id: String = "node_start"
+## Whether the saved sector had already reached its clear state.
+var saved_sector_clear: bool = false
+var _saved_player_data: Dictionary = {}
 
 
 func _ready() -> void:
@@ -53,6 +87,8 @@ func _ready() -> void:
 ## Reset run progress to its starting values while preserving the user's Dev Mode preference.
 func reset_run() -> void:
 	# Reset only run progress; the user's developer-mode preference is not run data.
+	current_system_index = 0
+	current_system_id = CAMPAIGN_SYSTEM_IDS[0]
 	current_sector_id = "start"
 	current_sector_clear = false
 	world_tick = 0
@@ -75,6 +111,194 @@ func reset_run() -> void:
 	run_state_changed.emit()
 	credits_changed.emit(credits)
 	Log.info("Run state reset", current_sector_id, credits)
+	resume_pending = false
+	_saved_player_data.clear()
+	clear_saved_run()
+
+
+## Start a new campaign from the first authored solar system.
+func start_new_campaign() -> void:
+	reset_run()
+	fresh_campaign_pending = true
+	Log.info("Phase 2 campaign started", current_system_id)
+
+
+## Return the authored solar system selected by the current campaign index.
+func get_current_system() -> SolarSystemDefinition:
+	if solar_system_registry == null:
+		Log.error("RunState scene has no solar-system YARD registry")
+		return null
+	return solar_system_registry.load_entry(current_system_id) as SolarSystemDefinition
+
+
+## Return the shared atlas texture selected for player hulls, defaulting safely to blue.
+func get_ship_color_texture(color_id: StringName) -> Texture2D:
+	var color_index: int = SHIP_COLOR_IDS.find(color_id)
+	if color_index < 0 or color_index >= ship_color_textures.size():
+		color_index = 0
+	return ship_color_textures[color_index] if not ship_color_textures.is_empty() else null
+
+
+## Move to the next campaign system; false means the final system was active.
+func advance_solar_system() -> bool:
+	if current_system_index + 1 >= CAMPAIGN_SYSTEM_IDS.size():
+		return false
+	current_system_index += 1
+	current_system_id = CAMPAIGN_SYSTEM_IDS[current_system_index]
+	current_sector_id = ""
+	current_sector_clear = false
+	main_objective_complete = false
+	side_objective_complete = false
+	side_objective_expired = false
+	outpost_alerted = false
+	outpost_destroyed = false
+	outpost_reinforcement_level = 0
+	world_tick = 0
+	run_state_changed.emit()
+	Log.info("Solar system advanced", current_system_index, current_system_id)
+	return true
+
+
+## Return whether a readable resumable run save exists for the main menu.
+func has_saved_run() -> bool:
+	var config := ConfigFile.new()
+	return config.load(RUN_SAVE_PATH) == OK and bool(config.get_value("run", "valid", false))
+
+
+## Restore campaign state into the autoload and flag the next Game scene to resume it.
+func load_saved_run() -> bool:
+	var config := ConfigFile.new()
+	var load_error: Error = config.load(RUN_SAVE_PATH)
+	if load_error != OK or not bool(config.get_value("run", "valid", false)):
+		Log.warn("Continue requested without a valid run save", error_string(load_error))
+		return false
+
+	run_seed = int(config.get_value("run", "run_seed", 0))
+	current_sector_id = str(config.get_value("run", "sector_id", "start"))
+	saved_map_node_id = str(config.get_value("run", "map_node_id", "node_start"))
+	saved_sector_clear = bool(config.get_value("run", "sector_clear", false))
+	world_tick = int(config.get_value("run", "world_tick", 0))
+	credits = int(config.get_value("run", "credits", 25))
+	main_objective_complete = bool(config.get_value("run", "main_objective_complete", false))
+	side_objective_complete = bool(config.get_value("run", "side_objective_complete", false))
+	side_objective_expired = bool(config.get_value("run", "side_objective_expired", false))
+	outpost_alerted = bool(config.get_value("run", "outpost_alerted", false))
+	outpost_destroyed = bool(config.get_value("run", "outpost_destroyed", false))
+	outpost_reinforcement_level = int(config.get_value("run", "outpost_reinforcement_level", 0))
+	caravan_route_index = clampi(int(config.get_value("run", "caravan_route_index", 0)), 0, CARAVAN_ROUTE.size() - 1)
+	current_system_index = clampi(int(config.get_value("run", "system_index", 0)), 0, CAMPAIGN_SYSTEM_IDS.size() - 1)
+	current_system_id = CAMPAIGN_SYSTEM_IDS[current_system_index]
+	known_caravan_sector = str(config.get_value("run", "known_caravan_sector", CARAVAN_ROUTE[caravan_route_index]))
+	var player_snapshot: Variant = config.get_value("player", "data", {})
+	_saved_player_data = player_snapshot.duplicate(true) if player_snapshot is Dictionary else {}
+	# Phase 1 saves may lack these IDs; validate each against YARD before scene entry.
+	var saved_ship_id: StringName = StringName(str(_saved_player_data.get("ship_id", "prototype_ship")))
+	var saved_pilot_id: StringName = StringName(str(_saved_player_data.get("pilot_id", "dash")))
+	selected_ship_id = saved_ship_id if get_ship(saved_ship_id) != null else &"prototype_ship"
+	selected_pilot_id = saved_pilot_id if get_pilot(saved_pilot_id) != null else &"dash"
+	resume_pending = true
+	run_state_changed.emit()
+	credits_changed.emit(credits)
+	Log.info("Saved run loaded", current_sector_id, world_tick, credits)
+	return true
+
+
+## Capture campaign and player equipment state before leaving an active run for the menu.
+func save_active_run() -> bool:
+	var player: PlayerShip = get_tree().get_first_node_in_group("player_ship") as PlayerShip
+	var map: SystemMap = get_tree().get_first_node_in_group("system_map") as SystemMap
+	if not is_instance_valid(player) or not is_instance_valid(map):
+		Log.error("Cannot save run without the active player and system map")
+		return false
+
+	var installed_ids: Array[String] = []
+	for module in player.installed_modules:
+		installed_ids.append(module.resource_path.get_file().get_basename())
+	var reserve_ids: Array[String] = []
+	for module in player.unequipped_modules:
+		reserve_ids.append(module.resource_path.get_file().get_basename())
+
+	var config := ConfigFile.new()
+	config.set_value("run", "valid", true)
+	config.set_value("run", "run_seed", run_seed)
+	config.set_value("run", "sector_id", current_sector_id)
+	config.set_value("run", "map_node_id", map.current_node_id)
+	config.set_value("run", "sector_clear", current_sector_clear)
+	config.set_value("run", "world_tick", world_tick)
+	config.set_value("run", "credits", credits)
+	config.set_value("run", "main_objective_complete", main_objective_complete)
+	config.set_value("run", "side_objective_complete", side_objective_complete)
+	config.set_value("run", "side_objective_expired", side_objective_expired)
+	config.set_value("run", "outpost_alerted", outpost_alerted)
+	config.set_value("run", "outpost_destroyed", outpost_destroyed)
+	config.set_value("run", "outpost_reinforcement_level", outpost_reinforcement_level)
+	config.set_value("run", "caravan_route_index", caravan_route_index)
+	config.set_value("run", "known_caravan_sector", known_caravan_sector)
+	config.set_value("run", "system_index", current_system_index)
+	config.set_value("run", "system_id", String(current_system_id))
+	config.set_value("player", "ship_id", String(player.ship_id))
+	config.set_value("player", "pilot_id", String(player.pilot_id))
+	config.set_value("player", "weapon_id", String(player.active_weapon_id))
+	config.set_value("player", "data", {
+		"hull": player.hull,
+		"shield": player.shield,
+		"position": player.global_position,
+		"velocity": player.velocity,
+		"pilot_cooldown_left": player.pilot_cooldown_left,
+		"ship_id": String(player.ship_id),
+		"pilot_id": String(player.pilot_id),
+		"weapon_id": String(player.active_weapon_id),
+		"installed_modules": installed_ids,
+		"unequipped_modules": reserve_ids,
+	})
+	var save_error: Error = config.save(RUN_SAVE_PATH)
+	if save_error != OK:
+		Log.error("Could not save current run", error_string(save_error))
+		return false
+	Log.info("Current run saved", current_sector_id, map.current_node_id, world_tick)
+	return true
+
+
+## Reinstall saved YARD modules and restore player damage, movement, and ability cooldown.
+func apply_saved_player_state(player: PlayerShip) -> void:
+	if not resume_pending or not is_instance_valid(player):
+		return
+	player.installed_modules.clear()
+	player.unequipped_modules.clear()
+	for module_id in _saved_player_data.get("installed_modules", []):
+		var module: ModuleDefinition = get_module(StringName(str(module_id)))
+		if module != null:
+			player.install_module(module)
+	for module_id in _saved_player_data.get("unequipped_modules", []):
+		var module: ModuleDefinition = get_module(StringName(str(module_id)))
+		if module != null:
+			player.store_module(module)
+	player.hull = clampf(float(_saved_player_data.get("hull", player.max_hull)), 0.0, player.max_hull)
+	player.shield = clampf(float(_saved_player_data.get("shield", player.max_shield)), 0.0, player.max_shield)
+	var saved_velocity: Variant = _saved_player_data.get("velocity", Vector2.ZERO)
+	if saved_velocity is Vector2:
+		player.velocity = saved_velocity
+	player.pilot_cooldown_left = maxf(float(_saved_player_data.get("pilot_cooldown_left", 0.0)), 0.0)
+	var saved_weapon_id: StringName = StringName(str(_saved_player_data.get("weapon_id", "")))
+	if saved_weapon_id != &"" and not player.equip_weapon(saved_weapon_id, false):
+		player.equip_weapon(BaseShip.STARTING_WEAPON_ID, false)
+	player.hull_changed.emit(player.hull, player.max_hull)
+	player.shield_changed.emit(player.shield, player.max_shield)
+	player.modules_changed.emit()
+
+
+## Return the saved player coordinate, or a zero vector when no usable snapshot exists.
+func get_saved_player_position() -> Vector2:
+	var saved_position: Variant = _saved_player_data.get("position", Vector2.ZERO)
+	return saved_position if saved_position is Vector2 else Vector2.ZERO
+
+
+## Remove the continue save after starting or completing a run.
+func clear_saved_run() -> void:
+	if FileAccess.file_exists(RUN_SAVE_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(RUN_SAVE_PATH))
+	resume_pending = false
+	_saved_player_data.clear()
 
 
 ## Publish the active sector's objective-and-hostile clear state when it changes.
@@ -143,6 +367,11 @@ func advance_world() -> void:
 	Log.debug("World advanced", world_tick, get_actual_caravan_sector())
 
 
+## Return the compounded hostile-stat multiplier for the committed sector count.
+func enemy_difficulty_multiplier() -> float:
+	return pow(1.002, float(maxi(world_tick, 0)))
+
+
 ## Idempotently complete the main objective, persist outpost destruction, and award credits.
 func complete_main_objective() -> void:
 	# Make completion idempotent so duplicate triggers do not award credits twice.
@@ -169,13 +398,51 @@ func complete_side_objective() -> void:
 ## Load a module by its stable YARD ID; returns null if the registry entry is missing.
 func get_module(module_id: StringName) -> ModuleDefinition:
 	# Resolve one stable YARD ID and keep callers independent of resource paths.
-	return MODULES.load_entry(module_id) as ModuleDefinition
+	return module_registry.load_entry(module_id) as ModuleDefinition if module_registry != null else null
+
+
+## Load a weapon by its stable YARD ID; null signals an invalid or removed entry.
+func get_weapon(weapon_id: StringName) -> WeaponDefinition:
+	return weapon_registry.load_entry(weapon_id) as WeaponDefinition if weapon_registry != null else null
+
+
+## Load a celestial-body definition by its stable YARD ID.
+func get_planet(planet_id: StringName) -> PlanetDefinition:
+	return planet_registry.load_entry(planet_id) as PlanetDefinition if planet_registry != null else null
+
+
+## Load a hull definition by stable ID for selection and player setup.
+func get_ship(ship_id: StringName) -> ShipDefinition:
+	return ship_registry.load_entry(ship_id) as ShipDefinition if ship_registry != null else null
+
+
+## Load a pilot definition by stable ID for selection and player setup.
+func get_pilot(pilot_id: StringName) -> PilotDefinition:
+	return pilot_registry.load_entry(pilot_id) as PilotDefinition if pilot_registry != null else null
+
+
+## Return every valid weapon entry for weighted drops and UI selection.
+func get_all_weapons() -> Array[WeaponDefinition]:
+	if weapon_registry == null:
+		return []
+	var loaded: Dictionary[StringName, Resource] = weapon_registry.load_all_blocking()
+	var by_id: Dictionary[StringName, WeaponDefinition] = {}
+	for resource in loaded.values():
+		if resource is WeaponDefinition:
+			var weapon: WeaponDefinition = resource as WeaponDefinition
+			by_id[weapon.weapon_id] = weapon
+	var result: Array[WeaponDefinition] = []
+	for weapon in by_id.values():
+		result.append(weapon)
+	return result
 
 
 ## Load all valid module resources from the canonical YARD registry.
 func get_all_modules() -> Array[ModuleDefinition]:
 	# Load the small prototype catalogue and discard entries of an unexpected type.
-	var loaded: Dictionary[StringName, Resource] = MODULES.load_all_blocking()
+	if module_registry == null:
+		return []
+	var loaded: Dictionary[StringName, Resource] = module_registry.load_all_blocking()
 	var result: Array[ModuleDefinition] = []
 
 	for resource in loaded.values():
@@ -189,10 +456,12 @@ func get_all_modules() -> Array[ModuleDefinition]:
 func get_modules_by_category(category: String) -> Array[ModuleDefinition]:
 	# Use the registry index to load only modules matching this category.
 	var result: Array[ModuleDefinition] = []
-	var ids: Array[StringName] = MODULES.filter(&"category", category)
+	if module_registry == null:
+		return []
+	var ids: Array[StringName] = module_registry.filter(&"category", category)
 
 	for module_id in ids:
-		var module := MODULES.load_entry(module_id) as ModuleDefinition
+		var module := module_registry.load_entry(module_id) as ModuleDefinition
 
 		if module != null:
 			result.append(module)
@@ -209,6 +478,24 @@ func get_random_module() -> ModuleDefinition:
 		return null
 
 	return modules.pick_random()
+
+
+## Choose a weapon using YARD's relative drop weights.
+func get_random_weapon() -> WeaponDefinition:
+	var candidates: Array[WeaponDefinition] = []
+	var total_weight: float = 0.0
+	for weapon: WeaponDefinition in get_all_weapons():
+		if weapon.drop_weight > 0.0 and weapon.projectile_scene != null:
+			candidates.append(weapon)
+			total_weight += weapon.drop_weight
+	if candidates.is_empty() or total_weight <= 0.0:
+		return null
+	var roll: float = randf() * total_weight
+	for weapon: WeaponDefinition in candidates:
+		roll -= weapon.drop_weight
+		if roll <= 0.0:
+			return weapon
+	return candidates.back()
 
 
 ## Persist and immediately apply the Developer Console preference; failures stay fail-closed.

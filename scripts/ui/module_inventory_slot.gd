@@ -2,14 +2,8 @@ extends TextureButton
 ## A saved visual slot that participates in drag-and-drop between module stores.
 class_name ModuleInventorySlot
 
-const DRAG_PREVIEW_SCENE: PackedScene = preload("res://scenes/ui/module_drag_preview.tscn")
-const RARITY_ICONS: Array[Texture2D] = [
-	preload("res://assets/sprites/pickups/module_common_green.png"),
-	preload("res://assets/sprites/pickups/module_uncommon_blue.png"),
-	preload("res://assets/sprites/pickups/module_rare_violet.png"),
-	preload("res://assets/sprites/pickups/module_epic_yellow.png"),
-	preload("res://assets/sprites/pickups/module_legendary_red.png"),
-]
+@export var drag_preview_scene: PackedScene
+@export var rarity_icons: Array[Texture2D] = []
 
 var module: ModuleDefinition
 var slot_index: int = -1
@@ -37,8 +31,13 @@ func configure(
 		icon_node.hide()
 		label_node.text = "LOCKED" if equipped and index >= unlocked_equipped_slots else "EMPTY"
 		label_node.modulate = Color(0.72, 0.83, 0.9, 0.65)
+		tooltip_text = "Drop a module here to equip it." if equipped else "Drop a module here to store it."
 		return
-	icon_node.texture = RARITY_ICONS[clampi(int(module.rarity), 0, RARITY_ICONS.size() - 1)]
+	if rarity_icons.size() < 5:
+		Log.error("ModuleInventorySlot scene is missing its rarity icons", get_path())
+		icon_node.hide()
+		return
+	icon_node.texture = rarity_icons[clampi(int(module.rarity), 0, rarity_icons.size() - 1)]
 	icon_node.show()
 	label_node.text = module.display_name
 	label_node.modulate = Color.WHITE
@@ -47,6 +46,24 @@ func configure(
 		module.description,
 		_stat_change_text(module),
 	]
+	tooltip_text += "\n\nDouble-click to %s; drag to move." % ("unequip" if equipped else "equip")
+
+
+func _gui_input(event: InputEvent) -> void:
+	if not event is InputEventMouseButton:
+		return
+	var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+	if (
+		module == null
+		or mouse_event.button_index != MOUSE_BUTTON_LEFT
+		or not mouse_event.pressed
+		or not mouse_event.double_click
+		or not is_instance_valid(inventory_screen)
+		or not inventory_screen.has_method("quick_move_module")
+	):
+		return
+	inventory_screen.call("quick_move_module", is_equipped, slot_index)
+	accept_event()
 
 
 func _stat_change_text(definition: ModuleDefinition) -> String:
@@ -88,14 +105,27 @@ func _format_stat(value: float) -> String:
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	if module == null:
 		return null
-	var preview := DRAG_PREVIEW_SCENE.instantiate() as ModuleDragPreview
-	preview.configure(module)
-	set_drag_preview(preview)
+	if inventory_screen.has_method("begin_module_drag"):
+		inventory_screen.call("begin_module_drag", module)
+	else:
+		# Preserve the engine preview for other reusable inventory contexts.
+		if drag_preview_scene == null:
+			Log.error("ModuleInventorySlot scene has no saved drag-preview scene", get_path())
+			return null
+		var preview := drag_preview_scene.instantiate() as ModuleDragPreview
+		preview.configure(module)
+		set_drag_preview(preview)
 	return {
 		"source_equipped": is_equipped,
 		"source_index": slot_index,
 		"module": module,
 	}
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_DRAG_END and is_instance_valid(inventory_screen):
+		if inventory_screen.has_method("end_module_drag"):
+			inventory_screen.call("end_module_drag")
 
 
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:

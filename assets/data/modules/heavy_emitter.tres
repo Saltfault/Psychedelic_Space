@@ -6,6 +6,7 @@
 script = ExtResource("1_ma03p")
 display_name = "Heavy Emitter"
 category = "offense"
+rarity = 3
 price = 60
 effect = 3
 value = 1.5

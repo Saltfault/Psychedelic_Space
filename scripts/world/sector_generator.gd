@@ -2,7 +2,6 @@ extends Node
 ## Builds deterministic sector content by composing reusable encounters and landmarks.
 class_name SectorGenerator
 
-const ASTEROID_SCRIPT: Script = preload("res://scripts/world/asteroid.gd")
 const ASTEROID_CLEARANCE: float = 48.0
 const MINIMAP_SPAWN_CLEARANCE: float = 1600.0
 const PATROL_FORMATION_RADIUS: float = 170.0
@@ -11,11 +10,6 @@ const ASTEROID_RING_CLUSTER_MINIMUM: int = 18
 const ASTEROID_RING_CLUSTER_MAXIMUM: int = 24
 const ASTEROID_RING_ROCKS_PER_CLUSTER_MINIMUM: int = 5
 const ASTEROID_RING_ROCKS_PER_CLUSTER_MAXIMUM: int = 8
-const FALLBACK_ENEMY_SCENES: Array[PackedScene] = [
-	preload("res://scenes/enemies/enemy_corsair.tscn"),
-	preload("res://scenes/enemies/enemy_cutter.tscn"),
-]
-
 ## Optional station landmark used in station-role sectors.
 @export var station_scene: PackedScene
 ## Interactive sensor-interference field used in nebula-role sectors.
@@ -30,6 +24,10 @@ const FALLBACK_ENEMY_SCENES: Array[PackedScene] = [
 @export var warp_gate_scene: PackedScene
 ## Physical planet collider; its visual is selected by the map node's PlanetDefinition.
 @export var planet_scene: PackedScene
+## Scene-authored hostile choices used when a solar system has no custom enemy list.
+@export var enemy_scenes: Array[PackedScene] = []
+## Scene-authored physics body used for generated asteroids.
+@export var asteroid_scene: PackedScene
 ## Number of hostile arrival waves before a non-station sector can clear.
 @export_range(1, 8, 1) var waves_per_sector: int = 3
 
@@ -93,9 +91,17 @@ func _spawn_next_enemy_wave() -> void:
 	sector.call_deferred("_refresh_clear_state")
 
 
+## Cancel delayed and future hostile arrivals for a developer force-clear.
+func stop_enemy_waves() -> void:
+	if is_instance_valid(enemy_wave_timer):
+		enemy_wave_timer.stop()
+	waves_remaining = 0
+	enemy_budget_remaining = 0
+
+
 func _enemy_scene_choices() -> Array[PackedScene]:
 	var system: SolarSystemDefinition = RunState.get_current_system()
-	return system.enemy_scenes if system != null and not system.enemy_scenes.is_empty() else FALLBACK_ENEMY_SCENES
+	return system.enemy_scenes if system != null and not system.enemy_scenes.is_empty() else enemy_scenes
 
 
 func _instantiate_wave_enemy() -> EnemyShip:
@@ -209,13 +215,16 @@ func _generate_asteroids(sector: SectorRoot) -> void:
 			if rock_position.x < 0.0:
 				continue
 
-			var rock: RigidBody2D = ASTEROID_SCRIPT.new() as RigidBody2D
-			if rock == null:
-				Log.error("Could not instantiate asteroid physics body")
+			if asteroid_scene == null:
+				Log.error("SectorGenerator has no asteroid scene assigned")
 				return
-			var visual: Polygon2D = Polygon2D.new()
-			var collision: CollisionShape2D = CollisionShape2D.new()
-			var collision_circle: CircleShape2D = CircleShape2D.new()
+			var rock: RigidBody2D = asteroid_scene.instantiate() as RigidBody2D
+			if rock == null:
+				Log.error("Asteroid scene root must be a RigidBody2D")
+				return
+			var visual: Polygon2D = rock.get_node("Visual") as Polygon2D
+			var collision: CollisionShape2D = rock.get_node("CollisionShape2D") as CollisionShape2D
+			var collision_circle: CircleShape2D = collision.shape as CircleShape2D
 			var points: PackedVector2Array = _make_rock_polygon(rock_radius)
 			visual.polygon = points
 			visual.color = Color(
@@ -228,13 +237,15 @@ func _generate_asteroids(sector: SectorRoot) -> void:
 			# matches the conservative radius used by the placement-overlap test.
 			collision_circle.radius = rock_radius
 			collision.shape = collision_circle
-			rock.add_child(visual)
-			rock.add_child(collision)
 			rock.collision_layer = 1
 			rock.collision_mask = 6
+			rock.gravity_scale = 0.0
 			rock.mass = rng.randf_range(7.0, 12.0)
 			rock.linear_damp = 2.2
 			rock.angular_damp = 2.5
+			rock.linear_velocity = Vector2.ZERO
+			rock.angular_velocity = 0.0
+			rock.sleeping = true
 			rock.add_to_group("sensor_contact")
 			rock.add_to_group("asteroid")
 			rock.set_meta("contact_type", "asteroid")
@@ -256,7 +267,10 @@ func _find_asteroid_position(sector: SectorRoot, cluster_center: Vector2, radius
 		candidate.x = clampf(candidate.x, radius + 24.0, sector.sector_size.x - radius - 24.0)
 		candidate.y = clampf(candidate.y, radius + 24.0, sector.sector_size.y - radius - 24.0)
 		var player_position: Vector2 = _player_position(sector)
-		var spawn_clearance: float = maxf(_screen_world_radius(sector), MINIMAP_SPAWN_CLEARANCE)
+		var spawn_clearance: float = maxf(
+			_screen_world_radius(sector),
+			maxf(MINIMAP_SPAWN_CLEARANCE, _player_sensor_range()),
+		) + OFFSCREEN_SPAWN_MARGIN
 		if SectorSpace.wrapped_distance(candidate, player_position) < spawn_clearance + radius + 80.0:
 			continue
 
@@ -315,8 +329,13 @@ func _spawn_planet(sector: SectorRoot) -> void:
 	if planet == null:
 		Log.error("Planet scene root must use PlanetBody.gd", planet_scene.resource_path)
 		return
-	planet.configure(planet_definition)
-	planet.position = _random_open_position(sector, planet_definition.radius + 300.0, 1600.0)
+	planet.configure(planet_definition, sector.sector_seed + hash(sector.map_node_id))
+	planet.position = _random_open_position(
+		sector,
+		PlanetDefinition.BODY_RADIUS + 500.0,
+		PlanetDefinition.BODY_RADIUS + 500.0,
+		PlanetDefinition.BODY_RADIUS + 250.0,
+	)
 	sector.get_node("Landmarks").add_child(planet)
 	reserved_positions.append(planet.position)
 
@@ -411,6 +430,12 @@ func _player_position(sector: SectorRoot) -> Vector2:
 	return player.global_position if is_instance_valid(player) else sector.spawn_position
 
 
+func _player_sensor_range() -> float:
+	# Spawned hazards should not enter radar immediately, including after sensor upgrades.
+	var player: PlayerShip = get_tree().get_first_node_in_group("player_ship") as PlayerShip
+	return player.sensor_range if is_instance_valid(player) else 0.0
+
+
 func _screen_world_radius(sector: SectorRoot) -> float:
 	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	var camera: Camera2D = get_viewport().get_camera_2d()
@@ -436,12 +461,17 @@ func _random_open_position(
 	sector: SectorRoot,
 	clearance: float = 600.0,
 	minimum_spawn_distance: float = 1600.0,
+	edge_clearance: float = 250.0,
 ) -> Vector2:
 	# Bounded attempts avoid spawning a landmark on the player, a rock, or another actor.
+	var safe_edge: float = minf(
+		maxf(edge_clearance, 250.0),
+		minf(sector.sector_size.x, sector.sector_size.y) * 0.45,
+	)
 	for attempt in range(96):
 		var candidate: Vector2 = Vector2(
-			rng.randf_range(250.0, sector.sector_size.x - 250.0),
-			rng.randf_range(250.0, sector.sector_size.y - 250.0),
+			rng.randf_range(safe_edge, sector.sector_size.x - safe_edge),
+			rng.randf_range(safe_edge, sector.sector_size.y - safe_edge),
 		)
 		var player_position: Vector2 = _player_position(sector)
 		var required_distance: float = maxf(
@@ -469,6 +499,8 @@ func _random_open_position(
 		var fallback: Vector2 = SectorSpace.wrap_position(
 			fallback_player_position + Vector2.RIGHT.rotated(angle) * fallback_radius,
 		)
+		fallback.x = clampf(fallback.x, safe_edge, sector.sector_size.x - safe_edge)
+		fallback.y = clampf(fallback.y, safe_edge, sector.sector_size.y - safe_edge)
 		if SectorSpace.wrapped_distance(fallback, fallback_player_position) < fallback_required_distance:
 			continue
 		var blocked: bool = false

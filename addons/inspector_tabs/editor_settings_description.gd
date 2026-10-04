@@ -22,7 +22,8 @@ static func _static_init() -> void:
 	var si = editor_settings_window.find_children("","SectionedInspector",true,false)[-1]
 	_editor_setting_inspector = si.find_child("EditorInspector",true,false)
 	var tree:Tree = si.find_child("Tree",true,false)
-	tree.cell_selected.connect(_on_editor_inspector_changed)
+	if not tree.cell_selected.is_connected(_on_editor_inspector_changed):
+		tree.cell_selected.connect(_on_editor_inspector_changed)
 
 	_scene_tree = editor_settings_window.get_tree()
 
@@ -32,7 +33,8 @@ static func _static_init() -> void:
 	si = general.find_children("","SectionedInspector",true,false)[-1]
 	_project_setting_inspector = si.find_child("EditorInspector",true,false)
 	tree = si.find_child("Tree",true,false)
-	tree.cell_selected.connect(_on_project_inspector_changed)
+	if not tree.cell_selected.is_connected(_on_project_inspector_changed):
+		tree.cell_selected.connect(_on_project_inspector_changed)
 	_on_editor_inspector_changed()
 
 static func _on_editor_inspector_changed() -> void:

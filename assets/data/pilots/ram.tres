@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PilotDefinition" format=3 uid="uid://dn1ov7cjkpnw4"]
+
+[ext_resource type="Script" uid="uid://c1kvsrnt502i0" path="res://scripts/data/pilot_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dk2wjxwx2x2u1" path="res://assets/ui/map_icons/ability_ram.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+display_name = "Ram"
+ability = 1
+ability_icon = ExtResource("2_icon")
+cooldown = 0.0

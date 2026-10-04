@@ -1,0 +1,22 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/autoload/dev_console_commands.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_corsair.tscn" id="2_corsair"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_cutter.tscn" id="3_cutter"]
+[ext_resource type="PackedScene" path="res://scenes/world/outpost.tscn" id="4_outpost"]
+[ext_resource type="PackedScene" path="res://scenes/ships/projectile.tscn" id="5_projectile"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/module_pickup.tscn" id="6_module"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/shield_booster.tscn" id="7_shield"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/large_shield_booster.tscn" id="8_large_shield"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/intel_beacon.tscn" id="9_intel"]
+
+[node name="DevConsoleCommands" type="Node"]
+script = ExtResource("1_script")
+enemy_ids = Array[StringName]([&"corsair", &"cutter"])
+enemy_scenes = Array[PackedScene]([ExtResource("2_corsair"), ExtResource("3_cutter")])
+outpost_scene = ExtResource("4_outpost")
+projectile_scene = ExtResource("5_projectile")
+module_pickup_scene = ExtResource("6_module")
+shield_pickup_scene = ExtResource("7_shield")
+large_shield_pickup_scene = ExtResource("8_large_shield")
+intel_pickup_scene = ExtResource("9_intel")

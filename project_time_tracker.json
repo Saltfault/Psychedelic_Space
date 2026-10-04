@@ -1,14 +1,15 @@
 {
-  "2D": 14239.023,
-  "3D": 16.822,
-  "AFK": 55222.687,
-  "Asset Store": 1565.401,
+  "2D": 23059.93,
+  "3D": 1416.677,
+  "AFK": 114595.321,
+  "Asset Store": 5220.445,
+  "AssetHub": 301.87,
   "AssetManager": 1.487,
   "Documentation": 2.534,
-  "Game": 2700.438,
-  "Godoban": 3711.539,
-  "Registry": 54.929,
-  "Script": 22955.166,
+  "Game": 15065.381,
+  "Godoban": 5370.106,
+  "Registry": 209.946,
+  "Script": 23543.288,
   "Tasks": 5.128,
   "Terminal": 58.469
 }

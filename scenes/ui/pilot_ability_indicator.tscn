@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://bbeh7wjheqskv"]
+
+[ext_resource type="Texture2D" uid="uid://dorox5ju6obsh" path="res://assets/ui/scifi_ui/Portrait.png" id="1_portrait"]
+[ext_resource type="Texture2D" uid="uid://dtok5jcc4h4au" path="res://assets/ui/scifi_ui/All.png" id="2_icons"]
+
+[sub_resource type="AtlasTexture" id="AbilityIcon"]
+atlas = ExtResource("2_icons")
+region = Rect2(250, 382, 25, 25)
+
+[node name="PilotAbilityIndicator" type="Control" unique_id=1725688494]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="PortraitFrame" type="TextureRect" parent="." unique_id=703970494]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_portrait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CooldownBase" type="TextureRect" parent="." unique_id=1730653044]
+modulate = Color(0.4, 0.55, 0.68, 0.42)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -29.0
+offset_top = -29.0
+offset_right = 29.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("AbilityIcon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AbilityCharge" type="TextureProgressBar" parent="." unique_id=692312087]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -29.0
+offset_top = -29.0
+offset_right = 29.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+value = 100.0
+fill_mode = 3
+texture_progress = SubResource("AbilityIcon")

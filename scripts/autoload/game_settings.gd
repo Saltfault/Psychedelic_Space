@@ -11,6 +11,10 @@ signal settings_changed
 
 var master_volume_db: float = 0.0
 var master_muted: bool = false
+var music_volume_db: float = 0.0
+var sfx_volume_db: float = 0.0
+var menu_volume_db: float = 0.0
+var selected_ship_color_id: StringName = &"blue"
 var fullscreen: bool = false
 var borderless: bool = false
 var vsync_enabled: bool = true
@@ -21,6 +25,17 @@ var auto_fire: bool = false
 var show_minimap: bool = true
 var performance_profile: int = 0
 var screen_shake_strength: float = 1.0
+var controller_vibration: bool = true
+var reduced_motion: bool = false
+var reduce_flashing: bool = false
+var dither_enabled: bool = true
+var dither_pixel_size: int = 1
+var dither_palette_mode: int = 0
+var dither_levels: int = 8
+var dither_mode: int = 1
+var dither_strength: float = 0.18
+var dither_brightness: float = 0.0
+var dither_contrast: float = 1.0
 
 var _was_paused_before_focus_loss: bool = false
 ## True only for tree pausing caused by an earlier focus-out event.
@@ -41,6 +56,10 @@ func _ready() -> void:
 
 	master_volume_db = clampf(float(config.get_value(SECTION, "master_volume_db", 0.0)), -40.0, 6.0)
 	master_muted = bool(config.get_value(SECTION, "master_muted", false))
+	music_volume_db = clampf(float(config.get_value(SECTION, "music_volume_db", 0.0)), -40.0, 6.0)
+	sfx_volume_db = clampf(float(config.get_value(SECTION, "sfx_volume_db", 0.0)), -40.0, 6.0)
+	menu_volume_db = clampf(float(config.get_value(SECTION, "menu_volume_db", 0.0)), -40.0, 6.0)
+	selected_ship_color_id = StringName(str(config.get_value(SECTION, "ship_color_id", "blue")))
 	fullscreen = bool(config.get_value(SECTION, "fullscreen", false))
 	borderless = bool(config.get_value(SECTION, "borderless", false))
 	vsync_enabled = bool(config.get_value(SECTION, "vsync_enabled", true))
@@ -50,6 +69,17 @@ func _ready() -> void:
 	show_minimap = bool(config.get_value(SECTION, "show_minimap", true))
 	performance_profile = clampi(int(config.get_value(SECTION, "performance_profile", 0)), 0, 4)
 	screen_shake_strength = clampf(float(config.get_value(SECTION, "screen_shake_strength", 1.0)), 0.0, 2.0)
+	controller_vibration = bool(config.get_value(SECTION, "controller_vibration", true))
+	reduced_motion = bool(config.get_value(SECTION, "reduced_motion", false))
+	reduce_flashing = bool(config.get_value(SECTION, "reduce_flashing", false))
+	dither_enabled = bool(config.get_value(SECTION, "dither_enabled", true))
+	dither_pixel_size = clampi(int(config.get_value(SECTION, "dither_pixel_size", 1)), 1, 32)
+	dither_palette_mode = clampi(int(config.get_value(SECTION, "dither_palette_mode", 0)), 0, 8)
+	dither_levels = clampi(int(config.get_value(SECTION, "dither_levels", 8)), 2, 16)
+	dither_mode = clampi(int(config.get_value(SECTION, "dither_mode", 1)), 0, 2)
+	dither_strength = clampf(float(config.get_value(SECTION, "dither_strength", 0.18)), 0.0, 1.0)
+	dither_brightness = clampf(float(config.get_value(SECTION, "dither_brightness", 0.0)), -0.5, 0.5)
+	dither_contrast = clampf(float(config.get_value(SECTION, "dither_contrast", 1.0)), 0.5, 2.0)
 	var saved_size: Variant = config.get_value(SECTION, "window_size", Vector2i(1280, 720))
 	if saved_size is Vector2i:
 		window_size = saved_size
@@ -65,6 +95,7 @@ func _ready() -> void:
 			if InputMap.has_action(action):
 				set_key_binding(action, int(saved_bindings[action_name]), false)
 	_apply()
+	_apply_accessibility()
 	call_deferred("_apply_profily_profile")
 
 
@@ -78,6 +109,37 @@ func set_master_volume(value_db: float) -> void:
 func set_master_muted(muted: bool) -> void:
 	master_muted = muted
 	_apply_audio()
+	_queue_save()
+	settings_changed.emit()
+
+
+## Apply and persist the dedicated music bus level.
+func set_music_volume(value_db: float) -> void:
+	music_volume_db = clampf(value_db, -40.0, 6.0)
+	_apply_audio()
+	_queue_save()
+	settings_changed.emit()
+
+
+## Apply and persist the gameplay sound-effects bus level.
+func set_sfx_volume(value_db: float) -> void:
+	sfx_volume_db = clampf(value_db, -40.0, 6.0)
+	_apply_audio()
+	_queue_save()
+	settings_changed.emit()
+
+
+## Apply and persist the menu/interface sound bus level.
+func set_menu_volume(value_db: float) -> void:
+	menu_volume_db = clampf(value_db, -40.0, 6.0)
+	_apply_audio()
+	_queue_save()
+	settings_changed.emit()
+
+
+## Save the cosmetic hull palette selection made in the ship-selection screen.
+func set_selected_ship_color(color_id: StringName) -> void:
+	selected_ship_color_id = color_id
 	_queue_save()
 	settings_changed.emit()
 
@@ -138,6 +200,56 @@ func set_show_minimap(enabled: bool) -> void:
 	settings_changed.emit()
 
 
+## Persist and broadcast whether the global screen dither is active.
+func set_dither_enabled(enabled: bool) -> void:
+	dither_enabled = enabled
+	_queue_save()
+	settings_changed.emit()
+
+
+## Set one shader tuning value while keeping it inside the shader's supported range.
+func set_dither_pixel_size(value: int) -> void:
+	dither_pixel_size = clampi(value, 1, 32)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_palette_mode(value: int) -> void:
+	dither_palette_mode = clampi(value, 0, 8)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_levels(value: int) -> void:
+	dither_levels = clampi(value, 2, 16)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_mode(value: int) -> void:
+	dither_mode = clampi(value, 0, 2)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_strength(value: float) -> void:
+	dither_strength = clampf(value, 0.0, 1.0)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_brightness(value: float) -> void:
+	dither_brightness = clampf(value, -0.5, 0.5)
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_dither_contrast(value: float) -> void:
+	dither_contrast = clampf(value, 0.5, 2.0)
+	_queue_save()
+	settings_changed.emit()
+
+
 func set_performance_profile(profile: int) -> void:
 	performance_profile = clampi(profile, 0, 4)
 	_apply_profily_profile()
@@ -147,6 +259,27 @@ func set_performance_profile(profile: int) -> void:
 
 func set_screen_shake_strength(value: float) -> void:
 	screen_shake_strength = clampf(value, 0.0, 2.0)
+	_apply_accessibility()
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_controller_vibration(enabled: bool) -> void:
+	controller_vibration = enabled
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_reduced_motion(enabled: bool) -> void:
+	reduced_motion = enabled
+	_apply_accessibility()
+	_queue_save()
+	settings_changed.emit()
+
+
+func set_reduce_flashing(enabled: bool) -> void:
+	reduce_flashing = enabled
+	_apply_accessibility()
 	_queue_save()
 	settings_changed.emit()
 
@@ -172,7 +305,7 @@ func set_key_binding(action: StringName, physical_keycode: int, save_changes: bo
 		if event is InputEventKey:
 			InputMap.action_erase_event(action, event)
 	var key_event := InputEventKey.new()
-	key_event.physical_keycode = physical_keycode
+	key_event.physical_keycode = physical_keycode as Key
 	InputMap.action_add_event(action, key_event)
 	if save_changes:
 		_save()
@@ -182,6 +315,10 @@ func set_key_binding(action: StringName, physical_keycode: int, save_changes: bo
 func reset_to_defaults() -> void:
 	master_volume_db = 0.0
 	master_muted = false
+	music_volume_db = 0.0
+	sfx_volume_db = 0.0
+	menu_volume_db = 0.0
+	selected_ship_color_id = &"blue"
 	fullscreen = false
 	borderless = false
 	vsync_enabled = true
@@ -192,6 +329,17 @@ func reset_to_defaults() -> void:
 	show_minimap = true
 	performance_profile = 0
 	screen_shake_strength = 1.0
+	controller_vibration = true
+	reduced_motion = false
+	reduce_flashing = false
+	dither_enabled = true
+	dither_pixel_size = 1
+	dither_palette_mode = 0
+	dither_levels = 8
+	dither_mode = 1
+	dither_strength = 0.18
+	dither_brightness = 0.0
+	dither_contrast = 1.0
 	for action in default_key_bindings:
 		set_key_binding(action, int(default_key_bindings[action]), false)
 	_apply()
@@ -207,6 +355,13 @@ func _apply() -> void:
 		DisplayServer.VSYNC_ENABLED if vsync_enabled else DisplayServer.VSYNC_DISABLED
 	)
 	Engine.max_fps = fps_limit
+	_apply_accessibility()
+
+
+func _apply_accessibility() -> void:
+	Juicee.accessibility.reduced_motion = reduced_motion
+	Juicee.accessibility.no_screenshake = reduced_motion or screen_shake_strength <= 0.0
+	Juicee.accessibility.no_flash = reduce_flashing
 
 
 func _apply_audio() -> void:
@@ -214,6 +369,14 @@ func _apply_audio() -> void:
 	if master_bus >= 0:
 		AudioServer.set_bus_volume_db(master_bus, master_volume_db)
 		AudioServer.set_bus_mute(master_bus, master_muted)
+	for bus_control: Dictionary in [
+		{"name": "Music", "volume": music_volume_db},
+		{"name": "SFX", "volume": sfx_volume_db},
+		{"name": "Menu", "volume": menu_volume_db},
+	]:
+		var bus_index: int = AudioServer.get_bus_index(String(bus_control["name"]))
+		if bus_index >= 0:
+			AudioServer.set_bus_volume_db(bus_index, float(bus_control["volume"]))
 
 
 func _apply_display() -> void:
@@ -292,6 +455,10 @@ func _save() -> void:
 		return
 	config.set_value(SECTION, "master_volume_db", master_volume_db)
 	config.set_value(SECTION, "master_muted", master_muted)
+	config.set_value(SECTION, "music_volume_db", music_volume_db)
+	config.set_value(SECTION, "sfx_volume_db", sfx_volume_db)
+	config.set_value(SECTION, "menu_volume_db", menu_volume_db)
+	config.set_value(SECTION, "ship_color_id", String(selected_ship_color_id))
 	config.set_value(SECTION, "fullscreen", fullscreen)
 	config.set_value(SECTION, "borderless", borderless)
 	config.set_value(SECTION, "vsync_enabled", vsync_enabled)
@@ -302,6 +469,17 @@ func _save() -> void:
 	config.set_value(SECTION, "show_minimap", show_minimap)
 	config.set_value(SECTION, "performance_profile", performance_profile)
 	config.set_value(SECTION, "screen_shake_strength", screen_shake_strength)
+	config.set_value(SECTION, "controller_vibration", controller_vibration)
+	config.set_value(SECTION, "reduced_motion", reduced_motion)
+	config.set_value(SECTION, "reduce_flashing", reduce_flashing)
+	config.set_value(SECTION, "dither_enabled", dither_enabled)
+	config.set_value(SECTION, "dither_pixel_size", dither_pixel_size)
+	config.set_value(SECTION, "dither_palette_mode", dither_palette_mode)
+	config.set_value(SECTION, "dither_levels", dither_levels)
+	config.set_value(SECTION, "dither_mode", dither_mode)
+	config.set_value(SECTION, "dither_strength", dither_strength)
+	config.set_value(SECTION, "dither_brightness", dither_brightness)
+	config.set_value(SECTION, "dither_contrast", dither_contrast)
 	var bindings: Dictionary = {}
 	for action in REMAPPABLE_ACTIONS:
 		bindings[String(action)] = get_key_binding(action)

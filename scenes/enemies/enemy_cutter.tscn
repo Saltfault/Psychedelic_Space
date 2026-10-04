@@ -4,7 +4,7 @@
 
 [node name="EnemyCutter" instance=ExtResource("1_enemy_ship")]
 ship_id = &"cutter"
-ai_style = 0
+ai_style = 3
 
 [node name="Hull" parent="Visuals" index="0"]
 region_rect = Rect2(149, 24, 34, 22)

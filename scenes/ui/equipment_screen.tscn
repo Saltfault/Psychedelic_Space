@@ -1,8 +1,11 @@
-[gd_scene format=3 uid="uid://m4hrvoo27ngs"]
+[gd_scene load_steps=12 format=3 uid="uid://m4hrvoo27ngs"]
 
 [ext_resource type="Script" uid="uid://bgj56oombbvni" path="res://scripts/ui/equipment_screen.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="3_icons"]
+[ext_resource type="PackedScene" path="res://scenes/ui/module_drag_preview.tscn" id="4_drag_preview"]
+[ext_resource type="PackedScene" path="res://scenes/ui/module_inventory_slot.tscn" id="5_module_slot"]
+[ext_resource type="PackedScene" path="res://scenes/ui/weapon_loadout_slot.tscn" id="6_weapon_slot"]
 
 [sub_resource type="AtlasTexture" id="EquipmentPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -44,6 +47,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
+slot_scene = ExtResource("5_module_slot")
+weapon_slot_scene = ExtResource("6_weapon_slot")
+
+[node name="DragPreview" parent="." instance=ExtResource("4_drag_preview")]
+visible = false
+z_index = 100
+top_level = true
 
 [node name="Shade" type="ColorRect" parent="." unique_id=795129702]
 layout_mode = 1

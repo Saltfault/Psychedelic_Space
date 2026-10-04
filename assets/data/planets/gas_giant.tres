@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PlanetDefinition" format=3 uid="uid://bjj4vio2pjl56"]
+
+[ext_resource type="Script" uid="uid://463xvwg3tiet" path="res://scripts/data/planet_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://pepx3p1koe4g" path="res://assets/ui/map_icons/planet_pack/GasGiant.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+planet_id = &"gas_giant"
+display_name = "Gas Giant"
+planet_type = 4
+map_icon = ExtResource("3_icon")
+sensor_signature = 1.1

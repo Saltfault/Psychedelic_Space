@@ -3,8 +3,8 @@ extends PanelContainer
 class_name WeaponLoadoutSlot
 
 @onready var weapon_icon: TextureRect = $MarginContainer/Content/WeaponIcon
-@onready var weapon_name: Label = $MarginContainer/Content/WeaponName
-@onready var weapon_hint: Label = $MarginContainer/Content/WeaponHint
+@onready var weapon_name: Label = $MarginContainer/Content/Text/WeaponName
+@onready var weapon_hint: Label = $MarginContainer/Content/Text/WeaponHint
 
 var equipment_screen: Control
 

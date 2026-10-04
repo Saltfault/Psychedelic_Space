@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://drlk3w04dcenc"]
+
+[ext_resource type="Script" uid="uid://45gast35b2ua" path="res://scripts/ui/system_map_route.gd" id="1_script"]
+
+[node name="SystemMapRoute" type="Node2D" unique_id=1427697323]
+script = ExtResource("1_script")
+
+[node name="RouteLine" type="Line2D" parent="." unique_id=932827380]
+width = 3.0
+default_color = Color(0.25, 0.55, 0.72, 0.85)
+antialiased = true
+
+[node name="ArrowUpper" type="Line2D" parent="." unique_id=1881628120]
+width = 3.0
+antialiased = true
+
+[node name="ArrowLower" type="Line2D" parent="." unique_id=548057330]
+width = 3.0
+antialiased = true

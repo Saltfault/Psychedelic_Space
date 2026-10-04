@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/module_inventory_slot.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Slots.png" id="2_slots"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_rare_violet.png" id="5_rare"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_epic_yellow.png" id="6_epic"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_legendary_red.png" id="7_legendary"]
+[ext_resource type="PackedScene" path="res://scenes/ui/module_drag_preview.tscn" id="8_drag_preview"]
 
 [sub_resource type="AtlasTexture" id="SlotAtlas"]
 atlas = ExtResource("2_slots")
@@ -15,6 +16,8 @@ region = Rect2(143, 125, 32, 33)
 [node name="ModuleSlot" type="TextureButton"]
 custom_minimum_size = Vector2(72, 72)
 script = ExtResource("1_script")
+drag_preview_scene = ExtResource("8_drag_preview")
+rarity_icons = Array[Texture2D]([ExtResource("3_common"), ExtResource("4_uncommon"), ExtResource("5_rare"), ExtResource("6_epic"), ExtResource("7_legendary")])
 texture_normal = SubResource("SlotAtlas")
 texture_hover = SubResource("SlotAtlas")
 ignore_texture_size = true

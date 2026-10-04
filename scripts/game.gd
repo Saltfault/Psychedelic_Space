@@ -1,6 +1,6 @@
 extends Node
 
-const GENERATED_SECTOR_SCENE: PackedScene = preload("res://scenes/sectors/generated_sector.tscn")
+@export var generated_sector_scene: PackedScene
 
 @onready var sector_container: Node2D = $SectorContainer
 @onready var player: PlayerShip = $PlayerShip
@@ -13,6 +13,7 @@ var run_finished: bool = false
 
 
 func _ready() -> void:
+	add_to_group("dithered_world_scene")
 	var restoring_run: bool = RunState.resume_pending
 	if not restoring_run and not RunState.fresh_campaign_pending:
 		RunState.reset_run()
@@ -90,7 +91,10 @@ func _load_map_node(node_data: Dictionary, restore_clear: bool = false) -> void:
 
 	RunState.current_sector_id = String(node_data["role"])
 
-	active_sector = GENERATED_SECTOR_SCENE.instantiate() as SectorRoot
+	if generated_sector_scene == null:
+		Log.error("Game scene has no saved generated-sector scene")
+		return
+	active_sector = generated_sector_scene.instantiate() as SectorRoot
 	active_sector.configure_for_map_node(node_data)
 	active_sector.skip_hostile_spawns = restore_clear
 	# Move the live player before generated content reads its location.

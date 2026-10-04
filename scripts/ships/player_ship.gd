@@ -2,12 +2,7 @@ extends BaseShip
 ## Player-controlled BaseShip; reads input and applies the selected pilot ability.
 class_name PlayerShip
 
-const PILOTS: Registry = preload("res://assets/data/registries/pilots.tres")
-
-@export_custom(
-	Registry.PROPERTY_HINT_CUSTOM,
-	"res://assets/data/registries/pilots.tres,true",
-) var pilot_id: StringName = &"dash"
+@export var pilot_id: StringName = &"dash"
 
 var pilot: PilotDefinition = null
 ## When enabled by the developer console, player damage is ignored.
@@ -18,16 +13,17 @@ var dash_time_left: float = 0.0
 var engine_flame_frame_time: float = 0.0
 
 @onready var engine_flame: Sprite2D = $Visuals/EngineFlame
-@onready var camera: Camera2D = $Camera2D
+@onready var ram_shield: RamShield = $RamShield
 
-var camera_rest_offset: Vector2 = Vector2.ZERO
-var camera_shake_time_left: float = 0.0
-var camera_shake_strength: float = 0.0
 
 
 func _ready() -> void:
+	if RunState.selected_ship_id != &"":
+		ship_id = RunState.selected_ship_id
+	if RunState.selected_pilot_id != &"":
+		pilot_id = RunState.selected_pilot_id
 	if pilot_id != &"":
-		pilot = PILOTS.load_entry(pilot_id) as PilotDefinition
+		pilot = RunState.get_pilot(pilot_id)
 
 	if pilot == null:
 		Log.warn("YARD could not load PilotDefinition ID", pilot_id)
@@ -36,16 +32,22 @@ func _ready() -> void:
 
 	team = 0
 	super._ready()
-	camera_rest_offset = camera.offset
+	if pilot != null:
+		ram_shield.configure(pilot)
 
 
 func take_damage(amount: float) -> void:
 	if god_mode:
 		return
+	var was_dead: bool = is_dead
 	super.take_damage(amount)
 	if amount > 0.0:
-		camera_shake_time_left = 0.16
-		camera_shake_strength = 5.0 * GameSettings.screen_shake_strength
+		if GameSettings.screen_shake_strength > 0.0:
+			Juicee.shake_camera(self, 5.0 * GameSettings.screen_shake_strength, 0.16, 22.0)
+		if EventAudio.instance != null:
+			EventAudio.instance.play_2d("player_hull_hit", self, "SFX")
+	if not was_dead and is_dead:
+		Juicee.preset_death(self)
 
 
 ## Kill the player even while God Mode is active; reserved for the explicit dev kill command.
@@ -55,7 +57,6 @@ func debug_kill() -> void:
 
 
 func _process(delta: float) -> void:
-	_update_camera_shake(delta)
 	# Animate the imported 16-frame plume only while the player is thrusting.
 	if command_thrust <= 0.0:
 		engine_flame.visible = false
@@ -68,20 +69,6 @@ func _process(delta: float) -> void:
 	while engine_flame_frame_time >= 1.0 / 24.0:
 		engine_flame_frame_time -= 1.0 / 24.0
 		engine_flame.frame = (engine_flame.frame + 1) % 16
-
-
-func _update_camera_shake(delta: float) -> void:
-	if camera_shake_time_left > 0.0 and GameSettings.screen_shake_strength > 0.0:
-		camera_shake_time_left = maxf(camera_shake_time_left - delta, 0.0)
-		var fade: float = camera_shake_time_left / 0.16
-		var amplitude: float = camera_shake_strength * fade
-		camera.offset = camera_rest_offset + Vector2(
-			randf_range(-amplitude, amplitude),
-			randf_range(-amplitude, amplitude),
-		)
-	else:
-		camera_shake_time_left = 0.0
-		camera.offset = camera_rest_offset
 
 
 func _gather_commands(delta: float) -> void:
@@ -109,8 +96,8 @@ func _gather_commands(delta: float) -> void:
 func _try_use_pilot_ability() -> void:
 	if pilot == null:
 		return
-
-	if pilot_cooldown_left > 0.0:
+	var is_ram: bool = pilot.ability == PilotDefinition.ActiveAbility.RAM_SHIELD
+	if (not is_ram and pilot_cooldown_left > 0.0) or (is_ram and ram_shield.current_health < pilot.ram_activation_cost):
 		return
 
 	match pilot.ability:
@@ -120,11 +107,25 @@ func _try_use_pilot_ability() -> void:
 			velocity = forward * pilot.dash_speed
 			dash_time_left = pilot.dash_duration
 			pilot_cooldown_left = pilot.cooldown
+			if GameSettings.screen_shake_strength > 0.0:
+				Juicee.shake_camera(self, 1.8 * GameSettings.screen_shake_strength, 0.11, 28.0)
 			Log.info("Pilot dash used", pilot.display_name, pilot.dash_speed)
+			if EventAudio.instance != null:
+				EventAudio.instance.play_2d("player_dash", self, "SFX")
+		PilotDefinition.ActiveAbility.RAM_SHIELD:
+			if not ram_shield.activate(pilot):
+				return
+			if GameSettings.screen_shake_strength > 0.0:
+				Juicee.shake_camera(self, 1.2 * GameSettings.screen_shake_strength, 0.1, 24.0)
+			Log.info("Ram shield activated", pilot.display_name, ram_shield.get_charge_ratio())
 
 
 func get_pilot_cooldown_ratio() -> float:
-	if pilot == null or pilot.cooldown <= 0.0:
+	if pilot == null:
+		return 0.0
+	if pilot.ability == PilotDefinition.ActiveAbility.RAM_SHIELD:
+		return ram_shield.get_charge_ratio()
+	if pilot.cooldown <= 0.0:
 		return 0.0
 
 	return clamp(pilot_cooldown_left / pilot.cooldown, 0.0, 1.0)

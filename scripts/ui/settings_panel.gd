@@ -6,11 +6,24 @@ signal close_requested
 
 @onready var volume_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Audio/VolumeSlider
 @onready var volume_value: Label = $MarginContainer/VBoxContainer/Tabs/Audio/VolumeValue
-@onready var resolution_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/ResolutionOption
-@onready var fullscreen_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/FullscreenToggle
-@onready var borderless_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/BorderlessToggle
-@onready var vsync_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/VSyncToggle
-@onready var fps_limit_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/FPSLimitOption
+@onready var resolution_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/ResolutionOption
+@onready var fullscreen_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/FullscreenToggle
+@onready var borderless_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/BorderlessToggle
+@onready var vsync_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/VSyncToggle
+@onready var fps_limit_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/FPSLimitOption
+@onready var dither_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherToggle
+@onready var dither_palette_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherPaletteOption
+@onready var dither_mode_option: OptionButton = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherModeOption
+@onready var dither_pixel_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherPixelRow/DitherPixelSlider
+@onready var dither_pixel_value: Label = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherPixelRow/DitherPixelValue
+@onready var dither_levels_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherLevelsRow/DitherLevelsSlider
+@onready var dither_levels_value: Label = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherLevelsRow/DitherLevelsValue
+@onready var dither_strength_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherStrengthRow/DitherStrengthSlider
+@onready var dither_strength_value: Label = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherStrengthRow/DitherStrengthValue
+@onready var dither_brightness_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherBrightnessRow/DitherBrightnessSlider
+@onready var dither_brightness_value: Label = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherBrightnessRow/DitherBrightnessValue
+@onready var dither_contrast_slider: HSlider = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherContrastRow/DitherContrastSlider
+@onready var dither_contrast_value: Label = $MarginContainer/VBoxContainer/Tabs/Video/Options/DitherContrastRow/DitherContrastValue
 @onready var dev_mode_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/General/DevModeToggle
 @onready var pause_focus_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/PauseFocusToggle
 @onready var auto_fire_toggle: CheckButton = $MarginContainer/VBoxContainer/Tabs/Gameplay/AutoFireToggle
@@ -69,6 +82,13 @@ func _ready() -> void:
 		fps_limit_option.add_item("Unlimited" if limit == 0 else "%d FPS" % limit, limit)
 	for profile_name in PROFILY_PROFILE_NAMES:
 		profily_option.add_item(profile_name)
+	for palette_name in [
+		"Posterize", "PICO-8", "Game Boy", "Sweetie 16", "Commodore 64",
+		"Endesga 32", "CGA", "Resurrect 64", "1-bit",
+	]:
+		dither_palette_option.add_item(palette_name)
+	for dither_name in ["Off", "Bayer 4x4", "Bayer 8x8"]:
+		dither_mode_option.add_item(dither_name)
 	volume_slider.set_value_no_signal(GameSettings.master_volume_db)
 	volume_value.text = _format_volume(GameSettings.master_volume_db)
 	_sync_audio_sliders()
@@ -91,6 +111,14 @@ func _ready() -> void:
 	pause_focus_toggle.toggled.connect(GameSettings.set_pause_on_focus_loss)
 	auto_fire_toggle.toggled.connect(GameSettings.set_auto_fire)
 	minimap_toggle.toggled.connect(GameSettings.set_show_minimap)
+	dither_toggle.toggled.connect(GameSettings.set_dither_enabled)
+	dither_palette_option.item_selected.connect(GameSettings.set_dither_palette_mode)
+	dither_mode_option.item_selected.connect(GameSettings.set_dither_mode)
+	dither_pixel_slider.value_changed.connect(_on_dither_pixel_changed)
+	dither_levels_slider.value_changed.connect(_on_dither_levels_changed)
+	dither_strength_slider.value_changed.connect(_on_dither_strength_changed)
+	dither_brightness_slider.value_changed.connect(_on_dither_brightness_changed)
+	dither_contrast_slider.value_changed.connect(_on_dither_contrast_changed)
 	profily_option.item_selected.connect(GameSettings.set_performance_profile)
 	profily_option.item_selected.connect(_on_profily_profile_selected)
 	dev_mode_toggle.toggled.connect(RunState.set_dev_mode)
@@ -129,6 +157,26 @@ func _on_fps_limit_selected(index: int) -> void:
 		GameSettings.set_fps_limit(FPS_LIMITS[index])
 
 
+func _on_dither_pixel_changed(value: float) -> void:
+	GameSettings.set_dither_pixel_size(roundi(value))
+
+
+func _on_dither_levels_changed(value: float) -> void:
+	GameSettings.set_dither_levels(roundi(value))
+
+
+func _on_dither_strength_changed(value: float) -> void:
+	GameSettings.set_dither_strength(value)
+
+
+func _on_dither_brightness_changed(value: float) -> void:
+	GameSettings.set_dither_brightness(value)
+
+
+func _on_dither_contrast_changed(value: float) -> void:
+	GameSettings.set_dither_contrast(value)
+
+
 func _select_resolution() -> void:
 	var nearest_index: int = 0
 	var nearest_distance: int = 2147483647
@@ -156,6 +204,19 @@ func _sync_controls() -> void:
 	pause_focus_toggle.set_pressed_no_signal(GameSettings.pause_on_focus_loss)
 	auto_fire_toggle.set_pressed_no_signal(GameSettings.auto_fire)
 	minimap_toggle.set_pressed_no_signal(GameSettings.show_minimap)
+	dither_toggle.set_pressed_no_signal(GameSettings.dither_enabled)
+	dither_palette_option.select(GameSettings.dither_palette_mode)
+	dither_mode_option.select(GameSettings.dither_mode)
+	dither_pixel_slider.set_value_no_signal(GameSettings.dither_pixel_size)
+	dither_pixel_value.text = str(GameSettings.dither_pixel_size)
+	dither_levels_slider.set_value_no_signal(GameSettings.dither_levels)
+	dither_levels_value.text = str(GameSettings.dither_levels)
+	dither_strength_slider.set_value_no_signal(GameSettings.dither_strength)
+	dither_strength_value.text = "%d%%" % roundi(GameSettings.dither_strength * 100.0)
+	dither_brightness_slider.set_value_no_signal(GameSettings.dither_brightness)
+	dither_brightness_value.text = "%.2f" % GameSettings.dither_brightness
+	dither_contrast_slider.set_value_no_signal(GameSettings.dither_contrast)
+	dither_contrast_value.text = "%.2f" % GameSettings.dither_contrast
 	shake_slider.set_value_no_signal(GameSettings.screen_shake_strength)
 	shake_value.text = "%d%%" % roundi(GameSettings.screen_shake_strength * 100.0)
 	vibration_toggle.set_pressed_no_signal(GameSettings.controller_vibration)

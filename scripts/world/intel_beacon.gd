@@ -1,11 +1,14 @@
 extends Area2D
 ## Completes the optional signal-recovery objective when the player reaches the beacon.
 
+@onready var icon: Sprite2D = $Icon
+
 
 func _ready() -> void:
 	add_to_group("sensor_contact")
 	add_to_group("side_objective")
 	set_meta("contact_type", "intel")
+	icon.modulate = Color.RED
 
 	body_entered.connect(_on_body_entered)
 
@@ -18,4 +21,5 @@ func _on_body_entered(body: Node) -> void:
 		return
 
 	RunState.complete_side_objective()
+	Juicee.preset_pickup(self, "INTEL")
 	queue_free()

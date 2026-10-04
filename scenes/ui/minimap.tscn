@@ -1,0 +1,79 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Minimap.png" id="2_frame"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/minimap_disc.svg" id="3_disc"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/minimap_player.svg" id="4_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/minimap_marker.tscn" id="5_marker"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/station.svg" id="6_station"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/outpost.svg" id="7_outpost"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/enemy.svg" id="8_enemy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/intel_nut_red.png" id="9_intel"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/warp_gate.svg" id="10_warp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/weapon_common_green.png" id="11_weapon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_common_green.png" id="12_module"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/asteroid.svg" id="13_asteroid"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/nebula.svg" id="14_nebula"]
+[ext_resource type="Texture2D" path="res://assets/ui/map_icons/planet_terran.svg" id="15_planet"]
+
+[node name="Minimap" type="Control"]
+mouse_filter = 2
+map_range = 1400.0
+script = ExtResource("1_script")
+marker_scene = ExtResource("5_marker")
+station_icon = ExtResource("6_station")
+outpost_icon = ExtResource("7_outpost")
+enemy_icon = ExtResource("8_enemy")
+intel_icon = ExtResource("9_intel")
+warp_icon = ExtResource("10_warp")
+weapon_icon = ExtResource("11_weapon")
+module_icon = ExtResource("12_module")
+asteroid_icon = ExtResource("13_asteroid")
+nebula_icon = ExtResource("14_nebula")
+planet_icon = ExtResource("15_planet")
+
+[node name="RadarDisc" type="TextureRect" parent="."]
+layout_mode = 1
+anchor_left = 0.19
+anchor_top = 0.19
+anchor_right = 0.81
+anchor_bottom = 0.81
+mouse_filter = 2
+texture = ExtResource("3_disc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Markers" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PlayerMarker" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("4_player")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MinimapFrame" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_frame")
+expand_mode = 3

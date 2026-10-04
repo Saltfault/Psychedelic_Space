@@ -1,3 +1,0 @@
-Asset: Warped Shooting FX, Luis Zuno (ansimuz).
-Source: https://ansimuz.itch.io/warped-shooting-fx
-License: CC0 1.0 Universal, as stated by the creator. Attribution is optional. The original public-license.pdf is preserved in this folder.

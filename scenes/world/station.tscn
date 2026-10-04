@@ -25,7 +25,20 @@ shader_parameter/directional_horizontal_scale = 32.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_lh148"]
 radius = 47.67599
 
+[sub_resource type="Gradient" id="StationGlowGradient"]
+colors = PackedColorArray(0.6, 0.9, 1, 0.95, 0.6, 0.9, 1, 0)
+offsets = PackedFloat32Array(0, 1)
+
+[sub_resource type="GradientTexture2D" id="StationGlowTexture"]
+gradient = SubResource("StationGlowGradient")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+width = 128
+height = 128
+
 [node name="Station" type="Area2D" unique_id=2011792350]
+scale = Vector2(4, 4)
 script = ExtResource("1_6wnxa")
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1736087758]
@@ -40,3 +53,11 @@ metadata/_custom_type_script = "uid://drrhypxeb6nsg"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2062137619]
 shape = SubResource("CircleShape2D_lh148")
+
+[node name="BeaconLight" type="PointLight2D" parent="."]
+position = Vector2(0, -12)
+texture = SubResource("StationGlowTexture")
+texture_scale = 5.0
+color = Color(0.55, 0.8, 1, 1)
+energy = 2.4
+shadow_enabled = false

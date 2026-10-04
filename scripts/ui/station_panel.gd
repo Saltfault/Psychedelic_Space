@@ -1,7 +1,7 @@
 extends PanelContainer
 ## Paused station shop with module inventories, drag sorting, sales, and hull repair.
 
-const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.tscn")
+@export var slot_scene: PackedScene
 
 @onready var credits_label: Label = $MarginContainer/VBoxContainer/Credits
 @onready var hull_label: Label = $MarginContainer/VBoxContainer/Hull
@@ -18,6 +18,7 @@ const SLOT_SCENE: PackedScene = preload("res://scenes/ui/module_inventory_slot.t
 @onready var unequipped_grid: GridContainer = $MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel/MarginContainer/VBoxContainer/Grid
 @onready var equipped_grid: GridContainer = $MarginContainer/VBoxContainer/InventoryRow/EquippedPanel/MarginContainer/VBoxContainer/Grid
 @onready var sell_zone: ModuleSellDropZone = $MarginContainer/VBoxContainer/SellZone
+@onready var drag_preview: ModuleDragPreview = $DragPreview
 
 var player: PlayerShip = null
 var offers: Array[ModuleDefinition] = []
@@ -27,6 +28,7 @@ func _ready() -> void:
 	add_to_group("station_panel")
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	hide()
+	drag_preview.hide()
 
 	for i in range(offer_buttons.size()):
 		offer_buttons[i].pressed.connect(_buy_offer.bind(i))
@@ -57,8 +59,27 @@ func open_for(target_player: PlayerShip) -> void:
 
 ## Hide the station interface and resume the scene tree.
 func close_panel() -> void:
+	end_module_drag()
 	hide()
 	get_tree().paused = false
+
+
+## Show the saved module icon preview above station inventory while dragging.
+func begin_module_drag(module: ModuleDefinition) -> void:
+	drag_preview.configure(module)
+	drag_preview.global_position = get_global_mouse_position() - drag_preview.size * 0.5
+	drag_preview.show()
+
+
+## Hide the temporary saved-scene preview after a drop or canceled drag.
+func end_module_drag() -> void:
+	if is_instance_valid(drag_preview):
+		drag_preview.hide()
+
+
+func _process(_delta: float) -> void:
+	if drag_preview.visible:
+		drag_preview.global_position = get_global_mouse_position() - drag_preview.size * 0.5
 
 
 func _roll_offers() -> void:
@@ -132,7 +153,10 @@ func _refresh_inventories() -> void:
 
 
 func _add_module_slot(grid: GridContainer, module: ModuleDefinition, index: int, equipped: bool) -> void:
-	var slot := SLOT_SCENE.instantiate() as ModuleInventorySlot
+	if slot_scene == null:
+		Log.error("StationPanel scene is missing its saved module slot scene", get_path())
+		return
+	var slot := slot_scene.instantiate() as ModuleInventorySlot
 	slot.custom_minimum_size = Vector2(72, 72)
 	slot.configure(module, index, equipped, self, player.module_slots)
 	grid.add_child(slot)
@@ -156,16 +180,36 @@ func _on_credits_changed(_credits: int) -> void:
 func can_accept_drop(source_equipped: bool, source_index: int, target_equipped: bool, target_index: int) -> bool:
 	if not is_instance_valid(player):
 		return false
-	var source: Array[ModuleDefinition] = player.installed_modules if source_equipped else player.unequipped_modules
-	var target: Array[ModuleDefinition] = player.installed_modules if target_equipped else player.unequipped_modules
+	var source: Array[ModuleDefinition]
+	var target: Array[ModuleDefinition]
+	if source_equipped:
+		source = player.installed_modules
+	else:
+		source = player.unequipped_modules
+	if target_equipped:
+		target = player.installed_modules
+	else:
+		target = player.unequipped_modules
 	if source_index < 0 or source_index >= source.size():
 		return false
 	if source_equipped == target_equipped:
-		var capacity: int = player.module_slots if target_equipped else BaseShip.UNEQUIPPED_MODULE_CAPACITY
+		var capacity: int
+		if target_equipped:
+			capacity = player.module_slots
+		else:
+			capacity = BaseShip.UNEQUIPPED_MODULE_CAPACITY
 		return target_index >= 0 and target_index < capacity and target_index != source_index
 	if source_equipped:
-		return target_index >= target.size() and target_index < BaseShip.UNEQUIPPED_MODULE_CAPACITY and target.size() < BaseShip.UNEQUIPPED_MODULE_CAPACITY
-	return target_index == target.size() and target.size() < player.module_slots
+		return (
+			target_index >= 0
+			and target_index < BaseShip.UNEQUIPPED_MODULE_CAPACITY
+			and (target_index < target.size() or target.size() < BaseShip.UNEQUIPPED_MODULE_CAPACITY)
+		)
+	return (
+		target_index >= 0
+		and target_index < player.module_slots
+		and (target_index < target.size() or target.size() < player.module_slots)
+	)
 
 
 ## Sort, equip, or unequip modules through the same saved slot scenes used by the HUD.
@@ -173,7 +217,11 @@ func move_module_by_drop(source_equipped: bool, source_index: int, target_equipp
 	if not can_accept_drop(source_equipped, source_index, target_equipped, target_index):
 		return false
 	if source_equipped == target_equipped:
-		var inventory: Array[ModuleDefinition] = player.installed_modules if source_equipped else player.unequipped_modules
+		var inventory: Array[ModuleDefinition]
+		if source_equipped:
+			inventory = player.installed_modules
+		else:
+			inventory = player.unequipped_modules
 		if target_index < inventory.size():
 			var displaced: ModuleDefinition = inventory[target_index]
 			inventory[target_index] = inventory[source_index]
@@ -181,10 +229,38 @@ func move_module_by_drop(source_equipped: bool, source_index: int, target_equipp
 		else:
 			var moved: ModuleDefinition = inventory[source_index]
 			inventory.remove_at(source_index)
-			inventory.append(moved)
+			inventory.insert(mini(target_index, inventory.size()), moved)
 		player.modules_changed.emit()
 		return true
-	return player.unequip_module(source_index) if source_equipped else player.equip_module(source_index)
+	var target_inventory: Array[ModuleDefinition]
+	if target_equipped:
+		target_inventory = player.installed_modules
+	else:
+		target_inventory = player.unequipped_modules
+	var target_is_occupied: bool = target_index < target_inventory.size()
+	if target_is_occupied:
+		if source_equipped:
+			return player.swap_equipped_with_reserve(source_index, target_index)
+		return player.swap_equipped_with_reserve(target_index, source_index)
+	if source_equipped:
+		return player.unequip_module(source_index)
+	return player.equip_module(source_index, target_index)
+
+
+## Provide a double-click alternative to dragging in the station inventory.
+func quick_move_module(source_equipped: bool, source_index: int) -> bool:
+	if not is_instance_valid(player):
+		return false
+	var succeeded: bool
+	if source_equipped:
+		succeeded = player.unequip_module(source_index)
+	else:
+		succeeded = player.equip_module(source_index)
+	if succeeded:
+		status_label.text = "Module moved to reserve." if source_equipped else "Module equipped."
+	else:
+		status_label.text = "Could not move module; check available inventory slots."
+	return succeeded
 
 
 func _sell_module_by_drop(payload: Variant) -> void:

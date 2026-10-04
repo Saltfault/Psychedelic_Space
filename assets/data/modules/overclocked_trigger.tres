@@ -6,6 +6,7 @@
 script = ExtResource("1_xxime")
 display_name = "Overclocked Trigger"
 category = "offense"
+rarity = 2
 price = 55
 effect = 2
 value = 0.78

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3 uid="uid://dllus48a6xbqv"]
+
+[ext_resource type="Script" uid="uid://biip5bi1d6ued" path="res://scripts/data/weapon_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ships/lance_projectile.tscn" id="2_projectile"]
+[ext_resource type="Texture2D" uid="uid://dbah4i58smbtj" path="res://assets/sprites/projectiles/projectile_violet.tres" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_id = &"lance"
+rarity = 2
+display_name = "Lance"
+icon = ExtResource("3_icon")
+projectile_scene = ExtResource("2_projectile")
+damage = 22.0
+projectile_speed = 1550.0
+cooldown = 0.72
+drop_weight = 0.7

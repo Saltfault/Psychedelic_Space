@@ -1,0 +1,179 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bt4y5l226xb20"]
+
+[ext_resource type="Texture2D" uid="uid://yjxb1tk0kmvd" path="res://assets/effects/scifi_fx/scifx1_wormhole_loop_large_blue/spritesheet.png" id="1_gate_sheet"]
+
+[sub_resource type="AtlasTexture" id="GateFrame00"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(0, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame01"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(96, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame02"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(192, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame03"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(288, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame04"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(384, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame05"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(480, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame06"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(576, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame07"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(672, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame08"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(768, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame09"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(864, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame10"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(960, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame11"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1056, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame12"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1152, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame13"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1248, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame14"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1344, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame15"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1440, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame16"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1536, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame17"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1632, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame18"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1728, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame19"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1824, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame20"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(1920, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame21"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(2016, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame22"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(2112, 0, 96, 96)
+
+[sub_resource type="AtlasTexture" id="GateFrame23"]
+atlas = ExtResource("1_gate_sheet")
+region = Rect2(2208, 0, 96, 96)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GateFrame00")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame01")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame02")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame03")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame04")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame05")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame06")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame07")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame08")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame09")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame10")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame11")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame12")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame13")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame14")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame15")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame16")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame17")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame18")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame19")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame20")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame21")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame22")
+}, {
+"duration": 1.0,
+"texture": SubResource("GateFrame23")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 12.0
+}]

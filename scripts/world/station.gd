@@ -8,6 +8,7 @@ func _ready() -> void:
 	# The player is on physics layer 2; include it so this Area2D can detect approach.
 	set_collision_mask_value(2, true)
 	add_to_group("sensor_contact")
+	add_to_group("station")
 	set_meta("contact_type", "station")
 
 	body_entered.connect(_on_body_entered)

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c6mhuoolw62u4" path="res://scripts/world/warp_gate.gd" id="1_ep7gb"]
 [ext_resource type="Shader" uid="uid://cadnte8s5ipk7" path="res://addons/lit/shaders/receiver/lit_receiver_fast.gdshader" id="1_xs8d5"]
 [ext_resource type="Script" uid="uid://ccbrgq2jxmujk" path="res://addons/lit/nodes/lit_animated_sprite_2d.gd" id="2_ep7gb"]
-[ext_resource type="SpriteFrames" uid="uid://bt4y5l226xb20" path="res://assets/sprites/effects/warp_gate_frames.tres" id="3_frames"]
+[ext_resource type="SpriteFrames" uid="uid://bt4y5l226xb20" path="res://assets/effects/warp_gate_frames.tres" id="3_frames"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bo7qh"]
 shader = ExtResource("1_xs8d5")
@@ -44,7 +44,11 @@ metadata/_custom_type_script = "uid://ccbrgq2jxmujk"
 position = Vector2(0, 2)
 shape = SubResource("WarpGateInteractionRadius")
 
-[node name="Prompt" type="Label" parent="." unique_id=1996577542]
+[node name="PromptLayer" type="CanvasLayer" parent="."]
+layer = 2
+follow_viewport_enabled = true
+
+[node name="Prompt" type="Label" parent="PromptLayer" unique_id=1996577542]
 visible = false
 offset_left = -220.0
 offset_top = -260.0
@@ -56,3 +60,4 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 22
 text = "DEFEAT HOSTILES TO UNLOCK"
 horizontal_alignment = 1
+mouse_filter = 2

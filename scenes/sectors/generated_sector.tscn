@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://di2pacxb5uoqk"]
+[gd_scene load_steps=16 format=3 uid="uid://di2pacxb5uoqk"]
 
 [ext_resource type="Script" uid="uid://cu2tosaysdsaa" path="res://scripts/world/sector_root.gd" id="1_0sov8"]
 [ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="2_qutw5"]
@@ -13,6 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://bux8k5c07p8xq" path="res://scenes/world/outpost.tscn" id="12_outpost"]
 [ext_resource type="PackedScene" uid="uid://cjrf1sjm060pa" path="res://scenes/world/warp_gate.tscn" id="13_warp_gate"]
 [ext_resource type="PackedScene" path="res://scenes/world/planet_body.tscn" id="14_planet_body"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_corsair.tscn" id="15_corsair"]
+[ext_resource type="PackedScene" path="res://scenes/world/asteroid.tscn" id="16_asteroid"]
 
 [node name="GeneratedSector" type="Node2D" unique_id=845970153]
 script = ExtResource("1_0sov8")
@@ -30,6 +32,8 @@ metadata/_custom_type_script = "uid://dtbtq2iowg33y"
 
 [node name="SectorGenerator" type="Node" parent="." unique_id=1434022841]
 script = ExtResource("4_utapr")
+enemy_scenes = Array[PackedScene]([ExtResource("15_corsair"), ExtResource("6_reinforcement")])
+asteroid_scene = ExtResource("16_asteroid")
 station_scene = ExtResource("9_station")
 nebula_scene = ExtResource("10_nebula")
 intel_beacon_scene = ExtResource("11_beacon")

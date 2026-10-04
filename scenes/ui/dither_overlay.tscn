@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/dither_overlay.gd" id="1_script"]
+[ext_resource type="Shader" path="res://assets/shaders/objects/pixel_dither_screen.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="GlobalDitherMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/pixel_size = 1
+shader_parameter/palette_mode = 0
+shader_parameter/levels = 8
+shader_parameter/dither_mode = 1
+shader_parameter/dither_strength = 0.18
+shader_parameter/brightness = 0.0
+shader_parameter/contrast = 1.0
+
+[node name="DitherOverlay" type="CanvasLayer"]
+layer = 1
+script = ExtResource("1_script")
+
+[node name="Overlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("GlobalDitherMaterial")

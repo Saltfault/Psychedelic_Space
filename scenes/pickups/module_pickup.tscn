@@ -1,0 +1,27 @@
+[gd_scene load_steps=8 format=3 uid="uid://c465ts00j646k"]
+
+[ext_resource type="Script" uid="uid://dtfaxrxmphn0k" path="res://scripts/world/module_pickup.gd" id="1_gejgg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_common_green.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_uncommon_blue.png" id="3_uncommon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_rare_violet.png" id="4_rare"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_epic_yellow.png" id="5_epic"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pickups/module_legendary_red.png" id="6_legendary"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g4v7s"]
+radius = 43.104523
+
+[node name="ModulePickup" type="Area2D" unique_id=1294156965]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_gejgg")
+rarity_textures = Array[Texture2D]([ExtResource("2_icon"), ExtResource("3_uncommon"), ExtResource("4_rare"), ExtResource("5_epic"), ExtResource("6_legendary")])
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=883000980]
+position = Vector2(0, -2)
+texture_filter = 1
+texture = ExtResource("2_icon")
+scale = Vector2(2.4, 2.4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1004933225]
+position = Vector2(2, 2)
+shape = SubResource("CircleShape2D_g4v7s")

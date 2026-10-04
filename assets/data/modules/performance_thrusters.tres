@@ -6,6 +6,7 @@
 script = ExtResource("1_cfcin")
 display_name = "Performance Thrusters"
 category = "mobility"
+rarity = 1
 price = 50
 effect = 4
 value = 1.25

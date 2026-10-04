@@ -130,6 +130,17 @@ func _shortcut_input(event: InputEvent) -> void:
 func open_registry(registry: Registry) -> void:
 	var filepath := registry.resource_path
 	var uid := ResourceUID.path_to_uid(filepath)
+	# YARD persists open registries by UID. Path-only .tres files get filtered out
+	# during save/reload, leaving select_registry with a dictionary key that vanished.
+	if not RegistryIO.is_uid_valid(uid):
+		var generated_uid: int = ResourceUID.create_id()
+		var uid_error: Error = ResourceSaver.set_uid(filepath, generated_uid)
+		if uid_error != OK:
+			push_error("Could not assign a resource UID to registry: %s" % filepath)
+			return
+		if not ResourceUID.has_id(generated_uid):
+			ResourceUID.add_id(generated_uid, filepath)
+		uid = ResourceUID.id_to_text(generated_uid)
 
 	if uid not in _editor_state_data.opened_registries:
 		_editor_state_data.opened_registries[uid] = registry
@@ -169,6 +180,19 @@ func close_all() -> void:
 ## Select a registry on the list and view its content on the right
 ## UID is supposed to be valid
 func select_registry(uid: String) -> void:
+	if not _editor_state_data.opened_registries.has(uid):
+		var target_path: String = uid
+		if ResourceUID.has_id(ResourceUID.text_to_id(uid)):
+			target_path = ResourceUID.get_id_path(ResourceUID.text_to_id(uid))
+		for opened_uid: String in _editor_state_data.opened_registries:
+			var opened_registry: Registry = _editor_state_data.opened_registries[opened_uid]
+			if opened_registry != null and opened_registry.resource_path == target_path:
+				uid = opened_uid
+				break
+		if not _editor_state_data.opened_registries.has(uid):
+			push_warning("Ignoring stale YARD registry selection: %s" % uid)
+			return
+
 	var current_selection := registries_itemlist.get_selected_items()
 	var target_already_selected := false
 

@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://br0vbkspblo1u"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_ljdod"]
+
+[resource]
+script = ExtResource("1_ljdod")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([]),
+&"class_restrictions": Array[StringName]([&"PlanetDefinition"]),
+&"recursive_scan": false,
+&"scan_directories": Array[String](["res://assets/data/planets"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://bjj4vio2pjl56": &"gas_giant",
+&"uid://c3xaojocc2gtb": &"moon",
+&"uid://cps45smitqjc1": &"water_world",
+&"uid://cw4thjkhy7mhh": &"ice",
+&"uid://dlcniwvas0lkd": &"star",
+&"uid://ek5dd6lf6ek": &"lava",
+&"uid://w4su6ry8ntae": &"terran",
+&"uid://wp0f25xof02x": &"desert"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"desert": &"uid://wp0f25xof02x",
+&"gas_giant": &"uid://bjj4vio2pjl56",
+&"ice": &"uid://cw4thjkhy7mhh",
+&"lava": &"uid://ek5dd6lf6ek",
+&"moon": &"uid://c3xaojocc2gtb",
+&"star": &"uid://dlcniwvas0lkd",
+&"terran": &"uid://w4su6ry8ntae",
+&"water_world": &"uid://cps45smitqjc1"
+})

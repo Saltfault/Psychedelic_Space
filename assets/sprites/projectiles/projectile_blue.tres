@@ -1,6 +1,6 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3]
+[gd_resource type="AtlasTexture" format=3 uid="uid://t2r6toli1btv"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/effects/scifi_fx/scifx1_zap_A_small_blue/spritesheet.png" id="1_sheet"]
+[ext_resource type="Texture2D" uid="uid://drxvt8od4aa01" path="res://assets/sprites/projectiles/scifi_fx/scifx1_zap_A_small_blue/spritesheet.png" id="1_sheet"]
 
 [resource]
 atlas = ExtResource("1_sheet")

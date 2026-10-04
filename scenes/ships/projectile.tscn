@@ -11,7 +11,8 @@ radius = 25.0
 height = 50.0
 
 [node name="Projectile" type="Area2D" unique_id=32359805]
-collision_mask = 7
+collision_layer = 8
+collision_mask = 15
 script = ExtResource("1_projectile")
 projectile_visuals = Array[Texture2D]([ExtResource("2_blue"), ExtResource("3_orange"), ExtResource("4_violet")])
 hit_effect_scene = ExtResource("5_hit_spark")

@@ -1,12 +1,17 @@
-[gd_scene format=3 uid="uid://xntj2o1d6rnj"]
+[gd_scene load_steps=9 format=3 uid="uid://xntj2o1d6rnj"]
 
 [ext_resource type="Script" uid="uid://dc1b6eh8bxcxv" path="res://scripts/game.gd" id="1_lnu2h"]
 [ext_resource type="PackedScene" uid="uid://dc14blsepkf65" path="res://scenes/ships/player_ship.tscn" id="1_yqjtg"]
 [ext_resource type="PackedScene" uid="uid://22q7dgeg3fni" path="res://scenes/ui/hud.tscn" id="2_lnu2h"]
 [ext_resource type="PackedScene" uid="uid://bugq3l42agjob" path="res://scenes/ships/projectile.tscn" id="3_lbhrr"]
+[ext_resource type="Script" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="4_audio_mounter"]
+[ext_resource type="Resource" path="res://assets/audio/event_bank.tres" id="5_audio_bank"]
+[ext_resource type="PackedScene" path="res://scenes/sectors/generated_sector.tscn" id="8_generated_sector"]
+[ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="9_music_director"]
 
 [node name="Game" type="Node" unique_id=396239377]
 script = ExtResource("1_lnu2h")
+generated_sector_scene = ExtResource("8_generated_sector")
 
 [node name="SectorContainer" type="Node2D" parent="." unique_id=1604525911]
 
@@ -15,3 +20,9 @@ position = Vector2(-1128, -677)
 projectile_scene = ExtResource("3_lbhrr")
 
 [node name="HUD" parent="." unique_id=789571956 instance=ExtResource("2_lnu2h")]
+
+[node name="EventAudioBankMounter" type="Node" parent="."]
+script = ExtResource("4_audio_mounter")
+_audio_bank_resource = ExtResource("5_audio_bank")
+
+[node name="MusicDirector" parent="." instance=ExtResource("9_music_director")]

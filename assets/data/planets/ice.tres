@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PlanetDefinition" format=3 uid="uid://cw4thjkhy7mhh"]
+
+[ext_resource type="Script" uid="uid://463xvwg3tiet" path="res://scripts/data/planet_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d4jlkhtvdhlsa" path="res://assets/ui/map_icons/planet_pack/Ice.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+planet_id = &"ice"
+display_name = "Glacial World"
+planet_type = 2
+map_icon = ExtResource("3_icon")
+sensor_signature = 0.65

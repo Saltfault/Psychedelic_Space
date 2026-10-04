@@ -1,0 +1,45 @@
+[gd_resource type="Theme" format=3 uid="uid://dxm0apnpg8h80"]
+
+[ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="1_panels"]
+[ext_resource type="FontFile" uid="uid://btv2uubk4iduj" path="res://assets/fonts/pixelosopher/Pixelosopher.ttf" id="2_font"]
+
+[sub_resource type="AtlasTexture" id="ButtonAtlas"]
+atlas = ExtResource("1_panels")
+region = Rect2(232, 26, 162, 94)
+
+[sub_resource type="StyleBoxTexture" id="ButtonNormal"]
+texture = SubResource("ButtonAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+
+[sub_resource type="StyleBoxTexture" id="ButtonHover"]
+texture = SubResource("ButtonAtlas")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+modulate_color = Color(0.78, 0.94, 1, 1)
+
+[resource]
+default_font = ExtResource("2_font")
+default_font_size = 20
+Button/colors/font_hover_color = Color(0.82, 1, 1, 1)
+Button/styles/disabled = SubResource("ButtonNormal")
+Button/styles/focus = SubResource("ButtonHover")
+Button/styles/hover = SubResource("ButtonHover")
+Button/styles/normal = SubResource("ButtonNormal")
+Button/styles/pressed = SubResource("ButtonNormal")
+CheckButton/colors/font_hover_color = Color(0.82, 1, 1, 1)
+CheckButton/styles/disabled = SubResource("ButtonNormal")
+CheckButton/styles/focus = SubResource("ButtonHover")
+CheckButton/styles/hover = SubResource("ButtonHover")
+CheckButton/styles/normal = SubResource("ButtonNormal")
+CheckButton/styles/pressed = SubResource("ButtonNormal")
+OptionButton/colors/font_hover_color = Color(0.82, 1, 1, 1)
+OptionButton/styles/disabled = SubResource("ButtonNormal")
+OptionButton/styles/focus = SubResource("ButtonHover")
+OptionButton/styles/hover = SubResource("ButtonHover")
+OptionButton/styles/normal = SubResource("ButtonNormal")
+OptionButton/styles/pressed = SubResource("ButtonNormal")

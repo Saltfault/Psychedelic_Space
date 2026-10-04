@@ -1,0 +1,30 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/autoload/run_state.gd" id="1_script"]
+[ext_resource type="Resource" path="res://assets/data/registries/modules.tres" id="2_modules"]
+[ext_resource type="Resource" path="res://assets/data/registries/weapons.tres" id="3_weapons"]
+[ext_resource type="Resource" path="res://assets/data/registries/planets.tres" id="4_planets"]
+[ext_resource type="Resource" path="res://assets/data/registries/ships.tres" id="5_ships"]
+[ext_resource type="Resource" path="res://assets/data/registries/pilots.tres" id="6_pilots"]
+[ext_resource type="Resource" path="res://assets/data/registries/solar_systems.tres" id="7_systems"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Blue.png" id="8_blue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Gold.png" id="9_gold"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Green.png" id="10_green"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_GreenYellow.png" id="11_green_yellow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_GreenYellowBlue.png" id="12_green_yellow_blue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_LightBlue.png" id="13_light_blue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_OrangeBlueWhite.png" id="14_orange_blue_white"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_PinkBlueOrange.png" id="15_pink_blue_orange"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_RedBlueYellow.png" id="16_red_blue_yellow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_SilverCharcoalRed.png" id="17_silver_charcoal_red"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_VioletRedOrange.png" id="18_violet_red_orange"]
+
+[node name="RunState" type="Node"]
+script = ExtResource("1_script")
+module_registry = ExtResource("2_modules")
+weapon_registry = ExtResource("3_weapons")
+planet_registry = ExtResource("4_planets")
+ship_registry = ExtResource("5_ships")
+pilot_registry = ExtResource("6_pilots")
+solar_system_registry = ExtResource("7_systems")
+ship_color_textures = Array[Texture2D]([ExtResource("8_blue"), ExtResource("9_gold"), ExtResource("10_green"), ExtResource("11_green_yellow"), ExtResource("12_green_yellow_blue"), ExtResource("13_light_blue"), ExtResource("14_orange_blue_white"), ExtResource("15_pink_blue_orange"), ExtResource("16_red_blue_yellow"), ExtResource("17_silver_charcoal_red"), ExtResource("18_violet_red_orange")])

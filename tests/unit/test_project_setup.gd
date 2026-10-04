@@ -13,34 +13,40 @@ func test_default_audio_layout_has_separate_game_buses() -> void:
 	)
 
 
-func test_planet_registry_uses_distinct_shader_views_and_map_icons() -> void:
+func test_planet_registry_uses_shared_renderers_and_distinct_map_icons() -> void:
 	var planet_paths: PackedStringArray = [
 		"res://assets/data/planets/terran.tres",
+		"res://assets/data/planets/desert.tres",
 		"res://assets/data/planets/gas_giant.tres",
 		"res://assets/data/planets/ice.tres",
 		"res://assets/data/planets/lava.tres",
 		"res://assets/data/planets/moon.tres",
 		"res://assets/data/planets/star.tres",
+		"res://assets/data/planets/water_world.tres",
 	]
-	var view_paths: Array[String] = []
 	var icon_paths: Array[String] = []
 	for path in planet_paths:
 		var planet: PlanetDefinition = load(path) as PlanetDefinition
 		assert_that(planet).is_not_null()
-		assert_that(planet.planet_view_scene).is_not_null()
 		assert_that(planet.map_icon).is_not_null()
-		view_paths.append(planet.planet_view_scene.resource_path)
 		icon_paths.append(planet.map_icon.resource_path)
-	var unique_views: Dictionary = {}
 	var unique_icons: Dictionary = {}
-	for resource_path in view_paths:
-		unique_views[resource_path] = true
 	for resource_path in icon_paths:
 		unique_icons[resource_path] = true
-	assert_that(unique_views.size()).is_equal(6)
-	assert_that(unique_icons.size()).is_equal(6)
-	assert_that(view_paths.has("res://scenes/world/planet_views/planet_lava.tscn")).is_true()
+	assert_that(unique_icons.size()).is_equal(planet_paths.size())
 	assert_that(icon_paths.has("res://assets/ui/map_icons/planet_pack/GasGiant.png")).is_true()
+	assert_that(PlanetDefinition.BODY_DIAMETER).is_equal(2800.0)
+
+
+func test_celestial_body_scene_has_visuals_but_no_collision_nodes() -> void:
+	var body_scene: PackedScene = load("res://scenes/world/planet_body.tscn") as PackedScene
+	var body: PlanetBody = body_scene.instantiate() as PlanetBody
+	assert_that(body).is_not_null()
+	assert_that(body.get_node_or_null("Visual/PixelPlanetView")).is_not_null()
+	assert_that(body.get_node_or_null("Visual/StarView")).is_not_null()
+	assert_that(body.find_children("*", "CollisionShape2D", true, false).size()).is_equal(0)
+	assert_that(body.find_children("*", "Area2D", true, false).size()).is_equal(0)
+	body.free()
 
 
 func test_main_menu_background_uses_saved_star_shader_material() -> void:
@@ -98,8 +104,8 @@ func test_generated_route_contains_a_labeled_asteroid_ring() -> void:
 			ring_found = true
 			break
 	assert_that(ring_found).is_true()
-	assert_that(SystemMap.ICON_GENERIC.resource_path).not_contains("Galaxy")
-	assert_that(SystemMap.ICON_GATE.resource_path).not_contains("Galaxy")
+	assert_that(map.generic_icon.resource_path).not_contains("Galaxy")
+	assert_that(map.gate_icon.resource_path).not_contains("Galaxy")
 	assert_that(SectorGenerator.ASTEROID_RING_CLUSTER_MINIMUM).is_greater(10)
 	assert_that(SectorGenerator.ASTEROID_RING_ROCKS_PER_CLUSTER_MINIMUM).is_greater(4)
 	map.queue_free()

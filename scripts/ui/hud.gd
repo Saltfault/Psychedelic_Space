@@ -281,13 +281,17 @@ func _restart_run() -> void:
 func _return_to_main_menu() -> void:
 	RunState.save_active_run()
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+	_change_to_main_menu()
 
 
 func _return_after_death() -> void:
 	RunState.clear_saved_run()
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+	_change_to_main_menu()
+
+
+func _change_to_main_menu() -> void:
+	SceneRouter.show_main_menu()
 
 
 func _open_pause_menu() -> void:

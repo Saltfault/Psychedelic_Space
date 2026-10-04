@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PlanetDefinition" format=3 uid="uid://wp0f25xof02x"]
+
+[ext_resource type="Script" uid="uid://463xvwg3tiet" path="res://scripts/data/planet_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bhcyg64q6xgcr" path="res://assets/ui/map_icons/planet_pack/Barren.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+planet_id = &"desert"
+display_name = "Desert World"
+planet_type = 1
+sea_level = 0.05
+map_icon = ExtResource("3_icon")
+sensor_signature = 0.75

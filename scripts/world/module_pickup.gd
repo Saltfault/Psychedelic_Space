@@ -1,10 +1,20 @@
 extends Area2D
 ## Adds its configured module to the player's unequipped inventory when collected.
+class_name ModulePickup
 
+@export var rarity_textures: Array[Texture2D] = []
 var module: ModuleDefinition
+@onready var icon: Sprite2D = $Icon
 
 
 func _ready() -> void:
+	if module != null:
+		if rarity_textures.size() >= 5:
+			icon.texture = rarity_textures[clampi(int(module.rarity), 0, rarity_textures.size() - 1)]
+		else:
+			Log.error("ModulePickup scene is missing its rarity textures", get_path())
+		set_meta("module_id", module.resource_path.get_file().get_basename())
+		set_meta("contact_type", "module")
 	body_entered.connect(_on_body_entered)
 
 
@@ -15,4 +25,5 @@ func _on_body_entered(body: Node) -> void:
 
 	if player.store_module(module):
 		Log.info("Module pickup collected", module.display_name)
+		Juicee.preset_pickup(self)
 		queue_free()

@@ -110,7 +110,7 @@ func register_wrap_visual(visual_owner: Node2D, source: Node2D) -> void:
 			ghost.name = "%s_WrapGhost_%d_%d" % [source.name, x_offset, y_offset]
 			ghost.top_level = true
 			ghost.visible = false
-			scene_root.add_child.call_deferred(ghost)
+			call_deferred("_attach_wrap_ghost", ghost, scene_root)
 			ghost.global_transform = source.global_transform
 
 			var pairs: Array[Dictionary] = []
@@ -122,14 +122,24 @@ func register_wrap_visual(visual_owner: Node2D, source: Node2D) -> void:
 	_wrap_visual_entries.append({ "owner": visual_owner, "source": source, "copies": copies })
 
 
-func unregister_wrap_visual(owner: Node) -> void:
+func unregister_wrap_visual(visual_owner_node: Node) -> void:
 	# Free every copy when its real actor leaves the scene.
 	for index in range(_wrap_visual_entries.size() - 1, -1, -1):
 		var entry: Dictionary = _wrap_visual_entries[index]
-		if entry.get("owner") != owner:
+		if entry.get("owner") != visual_owner_node:
 			continue
 		_free_wrap_visual_copies(entry.get("copies", []))
 		_wrap_visual_entries.remove_at(index)
+
+
+func _attach_wrap_ghost(ghost: Node2D, scene_root: Node) -> void:
+	# A projectile can expire before its deferred visual copy is attached to the scene.
+	if (
+		not is_instance_valid(ghost) or ghost.is_queued_for_deletion()
+		or not is_instance_valid(scene_root) or scene_root.is_queued_for_deletion()
+	):
+		return
+	scene_root.add_child(ghost)
 
 
 func _update_wrap_visuals() -> void:
@@ -220,4 +230,5 @@ func _free_wrap_visual_copies(copies: Array) -> void:
 	for copy in copies:
 		var ghost: Node = copy.get("node")
 		if is_instance_valid(ghost):
+			ghost.hide()
 			ghost.queue_free()

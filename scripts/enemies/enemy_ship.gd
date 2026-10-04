@@ -157,9 +157,9 @@ func _gather_commands(delta: float) -> void:
 		return
 
 	if _should_flee():
-		# Fleeing is intentionally slower so a player can close the gap and finish the chase.
+		# Apply full thrust toward safety; the movement cap holds retreat speed to one half.
 		command_heading = -to_player.normalized()
-		command_thrust = 0.45
+		command_thrust = 1.0
 		command_fire = false
 		return
 
@@ -195,7 +195,7 @@ func _gather_commands(delta: float) -> void:
 ## Cap retreat velocity separately so accumulated momentum cannot keep a fleeing enemy fast.
 func _movement_speed_limit() -> float:
 	if _should_flee():
-		return max_speed * 0.55
+		return max_speed * 0.5
 	return super._movement_speed_limit()
 
 
