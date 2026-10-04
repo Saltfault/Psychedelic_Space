@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dtmyhx1b7l3r5"]
 
 [ext_resource type="Script" uid="uid://bt76pwl7g7dc6" path="res://scripts/ui/settings_panel.gd" id="1_settings"]
+[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="3_icons"]
 [ext_resource type="Theme" uid="uid://dxm0apnpg8h80" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
@@ -36,6 +37,9 @@ grow_vertical = 2
 theme = ExtResource("4_theme")
 theme_override_styles/panel = SubResource("SettingsPanelFrame")
 script = ExtResource("1_settings")
+
+[node name="ControllerFocus" type="Node" parent="."]
+script = ExtResource("99_focus")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=779896806]
 layout_mode = 2
@@ -99,13 +103,13 @@ metadata/_tab_index = 2
 
 [node name="ControlsDescription" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=1573609203]
 layout_mode = 2
-text = "Select a binding, then press a key. Escape cancels."
+text = "Select a keyboard or controller binding, then press its input. Escape cancels."
 
 [node name="ThrustRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=1815542821]
 layout_mode = 2
 
 [node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow" unique_id=1478839705]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "THRUST"
 
@@ -113,11 +117,15 @@ text = "THRUST"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="FireRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=1272032837]
 layout_mode = 2
 
 [node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow" unique_id=470825009]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "FIRE"
 
@@ -125,11 +133,15 @@ text = "FIRE"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="DashRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=564816266]
 layout_mode = 2
 
 [node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow" unique_id=164017040]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "DASH"
 
@@ -137,11 +149,15 @@ text = "DASH"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="InteractRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=630857958]
 layout_mode = 2
 
 [node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow" unique_id=1478271057]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "INTERACT"
 
@@ -149,15 +165,39 @@ text = "INTERACT"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="MapRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls" unique_id=1437328252]
 layout_mode = 2
 
 [node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow" unique_id=382100957]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "SYSTEM MAP"
 
 [node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow" unique_id=1496997630]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PauseRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Controls"]
+layout_mode = 2
+
+[node name="ActionLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "PAUSE MENU"
+
+[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 

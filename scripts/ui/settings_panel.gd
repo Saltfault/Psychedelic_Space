@@ -50,6 +50,15 @@ signal close_requested
 	&"pilot_ability": $MarginContainer/VBoxContainer/Tabs/Controls/DashRow/KeyButton,
 	&"interact": $MarginContainer/VBoxContainer/Tabs/Controls/InteractRow/KeyButton,
 	&"system_map": $MarginContainer/VBoxContainer/Tabs/Controls/MapRow/KeyButton,
+	&"pause": $MarginContainer/VBoxContainer/Tabs/Controls/PauseRow/KeyButton,
+}
+@onready var controller_buttons: Dictionary = {
+	&"thrust": $MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow/ControllerButton,
+	&"fire": $MarginContainer/VBoxContainer/Tabs/Controls/FireRow/ControllerButton,
+	&"pilot_ability": $MarginContainer/VBoxContainer/Tabs/Controls/DashRow/ControllerButton,
+	&"interact": $MarginContainer/VBoxContainer/Tabs/Controls/InteractRow/ControllerButton,
+	&"system_map": $MarginContainer/VBoxContainer/Tabs/Controls/MapRow/ControllerButton,
+	&"pause": $MarginContainer/VBoxContainer/Tabs/Controls/PauseRow/ControllerButton,
 }
 
 const RESOLUTIONS: Array[Vector2i] = [
@@ -73,6 +82,7 @@ const PROFILY_PROFILE_DESCRIPTIONS: Array[String] = [
 ]
 
 var awaiting_key_action: StringName = &""
+var awaiting_controller_action: StringName = &""
 
 
 func _ready() -> void:
@@ -125,6 +135,8 @@ func _ready() -> void:
 	for action in key_buttons:
 		var button: Button = key_buttons[action] as Button
 		button.pressed.connect(_begin_key_rebind.bind(action))
+		var controller_button: Button = controller_buttons[action] as Button
+		controller_button.pressed.connect(_begin_controller_rebind.bind(action))
 	close_button.pressed.connect(_on_close_pressed)
 	reset_button.pressed.connect(_on_reset_defaults)
 	RunState.dev_mode_changed.connect(_sync_dev_mode)
@@ -254,31 +266,65 @@ func _on_reset_defaults() -> void:
 
 
 func _begin_key_rebind(action: StringName) -> void:
+	awaiting_controller_action = &""
 	awaiting_key_action = action
 	var button: Button = key_buttons[action] as Button
 	button.text = "PRESS A KEY…"
 
 
+func _begin_controller_rebind(action: StringName) -> void:
+	awaiting_key_action = &""
+	awaiting_controller_action = action
+	var button: Button = controller_buttons[action] as Button
+	button.text = "PRESS A BUTTON…"
+
+
 func _input(event: InputEvent) -> void:
-	if awaiting_key_action.is_empty() or not visible:
+	if not visible:
 		return
-	if not event is InputEventKey:
-		return
-	var key_event: InputEventKey = event as InputEventKey
-	if not key_event.pressed or key_event.echo:
-		return
-	if key_event.keycode == KEY_ESCAPE:
-		awaiting_key_action = &""
+	if not awaiting_key_action.is_empty():
+		if event is not InputEventKey:
+			return
+		var key_event: InputEventKey = event as InputEventKey
+		if not key_event.pressed or key_event.echo:
+			return
+		if key_event.keycode == KEY_ESCAPE:
+			awaiting_key_action = &""
+		else:
+			var physical_code: int = key_event.physical_keycode
+			if physical_code == KEY_NONE:
+				physical_code = key_event.keycode
+			GameSettings.set_key_binding(awaiting_key_action, physical_code)
+			awaiting_key_action = &""
 		_refresh_key_labels()
 		get_viewport().set_input_as_handled()
 		return
-	var physical_code: int = key_event.physical_keycode
-	if physical_code == KEY_NONE:
-		physical_code = key_event.keycode
-	GameSettings.set_key_binding(awaiting_key_action, physical_code)
-	awaiting_key_action = &""
-	_refresh_key_labels()
-	get_viewport().set_input_as_handled()
+	if not awaiting_controller_action.is_empty():
+		if event is InputEventKey and (event as InputEventKey).keycode == KEY_ESCAPE:
+			awaiting_controller_action = &""
+			_refresh_key_labels()
+			get_viewport().set_input_as_handled()
+			return
+		if event is InputEventJoypadButton and (event as InputEventJoypadButton).pressed:
+			GameSettings.set_controller_binding(awaiting_controller_action, event)
+			awaiting_controller_action = &""
+			_refresh_key_labels()
+			get_viewport().set_input_as_handled()
+			return
+		if event is InputEventJoypadMotion:
+			var motion: InputEventJoypadMotion = event as InputEventJoypadMotion
+			if (
+				motion.axis in [JOY_AXIS_TRIGGER_LEFT, JOY_AXIS_TRIGGER_RIGHT]
+				and absf(motion.axis_value) >= 0.75
+			):
+				GameSettings.set_controller_binding(awaiting_controller_action, event)
+				awaiting_controller_action = &""
+				_refresh_key_labels()
+				get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+		_on_close_pressed()
+		get_viewport().set_input_as_handled()
 
 
 func _refresh_key_labels() -> void:
@@ -288,6 +334,12 @@ func _refresh_key_labels() -> void:
 			button.text = "PRESS A KEY…"
 		else:
 			button.text = OS.get_keycode_string(GameSettings.get_key_binding(action))
+		var controller_button: Button = controller_buttons[action] as Button
+		controller_button.text = (
+			"PRESS A BUTTON…"
+			if action == awaiting_controller_action
+			else GameSettings.get_controller_binding_label(action)
+		)
 
 
 func _format_volume(value: float) -> String:
@@ -298,8 +350,9 @@ func _format_volume(value: float) -> String:
 
 func _on_close_pressed() -> void:
 	#Cancel any pending rebind so reopening the panel does not show a stale prompt.
-	if not awaiting_key_action.is_empty():
+	if not awaiting_key_action.is_empty() or not awaiting_controller_action.is_empty():
 		awaiting_key_action = &""
+		awaiting_controller_action = &""
 		_refresh_key_labels()
 	hide()
 	close_requested.emit()

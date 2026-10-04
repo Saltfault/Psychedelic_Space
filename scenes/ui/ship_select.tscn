@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/ship_select.gd" id="1_ship_select"]
+[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Script" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="2_audio_mounter"]
 [ext_resource type="Resource" path="res://assets/audio/event_bank.tres" id="3_audio_bank"]
 [ext_resource type="Theme" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
@@ -28,6 +29,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ship_select")
 theme = ExtResource("4_theme")
+
+[node name="ControllerFocus" type="Node" parent="."]
+script = ExtResource("99_focus")
 
 [node name="MusicDirector" parent="." instance=ExtResource("9_music_director")]
 

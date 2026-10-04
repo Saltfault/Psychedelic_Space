@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://c3en3itnhfxua"]
 
+[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="1_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="2_icons"]
 
@@ -51,6 +52,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
+
+[node name="ControllerFocus" type="Node" parent="."]
+script = ExtResource("99_focus")
 
 [node name="Shade" type="ColorRect" parent="." unique_id=184239468]
 layout_mode = 1

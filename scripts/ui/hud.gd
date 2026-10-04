@@ -80,7 +80,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		and not (event as InputEventKey).echo
 		and (event as InputEventKey).keycode == KEY_ESCAPE
 	)
-	if not is_escape_key and not event.is_action_pressed("ui_cancel"):
+	if (
+		not is_escape_key
+		and not event.is_action_pressed("ui_cancel")
+		and not event.is_action_pressed("pause")
+	):
 		return
 	if death_panel.visible or run_complete_panel.visible:
 		return

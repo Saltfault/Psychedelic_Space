@@ -45,6 +45,12 @@ func _ready() -> void:
 	_update_pilot()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+		SceneRouter.show_main_menu()
+		get_viewport().set_input_as_handled()
+
+
 func _select_ship(ship_id: StringName) -> void:
 	var definition: ShipDefinition = RunState.get_ship(ship_id)
 	if definition == null:

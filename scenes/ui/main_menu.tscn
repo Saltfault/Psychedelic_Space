@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://cv3antahgajo7" path="res://assets/audio/event_bank.tres" id="6_audio_bank"]
 [ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="9_starfield"]
 [ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="10_music_director"]
+[ext_resource type="Script" uid="uid://bh5ud6dl4dfl4" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 
 [sub_resource type="AtlasTexture" id="MenuPanelAtlas"]
 atlas = ExtResource("4_panels")
@@ -60,6 +61,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
+
+[node name="ControllerFocus" type="Node" parent="." unique_id=800017961]
+script = ExtResource("99_focus")
 
 [node name="SpaceBackground" parent="." unique_id=475517137 instance=ExtResource("9_starfield")]
 

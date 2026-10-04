@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://ui4bronbjukn"]
+[gd_scene load_steps=10 format=3 uid="uid://ui4bronbjukn"]
 
 [ext_resource type="Script" uid="uid://cm0k2y85uwley" path="res://scripts/ui/station_panel.gd" id="1_8qgwc"]
+[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_shop_frame"]
 [ext_resource type="Theme" uid="uid://dxm0apnpg8h80" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="3_theme"]
 [ext_resource type="Script" path="res://scripts/ui/module_sell_drop_zone.gd" id="4_sell_zone"]
@@ -40,6 +41,9 @@ theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StationShopFrame")
 script = ExtResource("1_8qgwc")
 slot_scene = ExtResource("6_module_slot")
+
+[node name="ControllerFocus" type="Node" parent="."]
+script = ExtResource("99_focus")
 
 [node name="DragPreview" parent="." instance=ExtResource("5_drag_preview")]
 visible = false

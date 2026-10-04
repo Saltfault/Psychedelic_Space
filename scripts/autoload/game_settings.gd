@@ -4,7 +4,7 @@ extends Node
 const SETTINGS_PATH: String = "user://settings.cfg"
 const SECTION: String = "game"
 const REMAPPABLE_ACTIONS: Array[StringName] = [
-	&"thrust", &"fire", &"pilot_ability", &"interact", &"system_map",
+	&"thrust", &"fire", &"pilot_ability", &"interact", &"system_map", &"pause",
 ]
 
 signal settings_changed
@@ -43,9 +43,11 @@ var _paused_by_focus_loss: bool = false
 ## Coalesces the per-frame writes caused by slider drags into one disk save.
 var _save_scheduled: bool = false
 var default_key_bindings: Dictionary = {}
+var default_controller_bindings: Dictionary = {}
 
 
 func _ready() -> void:
+	_ensure_controller_ui_bindings()
 	var config := ConfigFile.new()
 	var error: int = config.load(SETTINGS_PATH)
 	if error != OK and error != ERR_FILE_NOT_FOUND:
@@ -88,12 +90,20 @@ func _ready() -> void:
 	for action in REMAPPABLE_ACTIONS:
 		if InputMap.has_action(action):
 			default_key_bindings[action] = _read_key_binding(action)
+			default_controller_bindings[action] = _read_controller_binding(action)
 	var saved_bindings: Variant = config.get_value(SECTION, "key_bindings", {})
 	if saved_bindings is Dictionary:
 		for action_name in saved_bindings:
 			var action: StringName = StringName(action_name)
 			if InputMap.has_action(action):
 				set_key_binding(action, int(saved_bindings[action_name]), false)
+	var saved_controller_bindings: Variant = config.get_value(SECTION, "controller_bindings", {})
+	if saved_controller_bindings is Dictionary:
+		for action_name: Variant in saved_controller_bindings:
+			var action: StringName = StringName(action_name)
+			var binding: Variant = saved_controller_bindings[action_name]
+			if InputMap.has_action(action) and binding is Array:
+				_set_controller_binding_data(action, binding, false)
 	_apply()
 	_apply_accessibility()
 	call_deferred("_apply_profily_profile")
@@ -312,6 +322,123 @@ func set_key_binding(action: StringName, physical_keycode: int, save_changes: bo
 		settings_changed.emit()
 
 
+## Return a short readable label for this action's active gamepad binding.
+func get_controller_binding_label(action: StringName) -> String:
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventJoypadButton:
+			return _joypad_button_label((event as InputEventJoypadButton).button_index)
+		if event is InputEventJoypadMotion:
+			var motion: InputEventJoypadMotion = event as InputEventJoypadMotion
+			var axis_name: String = "AXIS %d" % motion.axis
+			if motion.axis == JOY_AXIS_TRIGGER_LEFT:
+				axis_name = "LT"
+			elif motion.axis == JOY_AXIS_TRIGGER_RIGHT:
+				axis_name = "RT"
+			return ("-" if motion.axis_value < 0.0 else "") + axis_name
+	return "UNBOUND"
+
+
+## Replace only this action's gamepad event, keeping its keyboard and mouse events intact.
+func set_controller_binding(action: StringName, event: InputEvent, save_changes: bool = true) -> void:
+	if not InputMap.has_action(action):
+		return
+	if not (event is InputEventJoypadButton or event is InputEventJoypadMotion):
+		return
+	for existing: InputEvent in InputMap.action_get_events(action):
+		if existing is InputEventJoypadButton or existing is InputEventJoypadMotion:
+			InputMap.action_erase_event(action, existing)
+	var stored_event: InputEvent = event.duplicate() as InputEvent
+	stored_event.device = -1
+	InputMap.action_add_event(action, stored_event)
+	if save_changes:
+		_save()
+		settings_changed.emit()
+
+
+func _read_controller_binding(action: StringName) -> Array[int]:
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventJoypadButton:
+			return [0, (event as InputEventJoypadButton).button_index]
+		if event is InputEventJoypadMotion:
+			var motion: InputEventJoypadMotion = event as InputEventJoypadMotion
+			return [1, motion.axis, -1 if motion.axis_value < 0.0 else 1]
+	return []
+
+
+func _set_controller_binding_data(action: StringName, binding: Array, save_changes: bool) -> void:
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+			InputMap.action_erase_event(action, event)
+	if binding.size() >= 2 and int(binding[0]) == 0:
+		var button_event: InputEventJoypadButton = InputEventJoypadButton.new()
+		button_event.button_index = int(binding[1]) as JoyButton
+		button_event.device = -1
+		InputMap.action_add_event(action, button_event)
+	elif binding.size() >= 3 and int(binding[0]) == 1:
+		var axis_event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		axis_event.axis = int(binding[1]) as JoyAxis
+		axis_event.axis_value = float(binding[2])
+		axis_event.device = -1
+		InputMap.action_add_event(action, axis_event)
+	if save_changes:
+		_save()
+		settings_changed.emit()
+
+
+func _joypad_button_label(button_index: int) -> String:
+	match button_index:
+		JOY_BUTTON_A: return "A"
+		JOY_BUTTON_B: return "B"
+		JOY_BUTTON_X: return "X"
+		JOY_BUTTON_Y: return "Y"
+		JOY_BUTTON_BACK: return "BACK"
+		JOY_BUTTON_GUIDE: return "GUIDE"
+		JOY_BUTTON_START: return "START"
+		JOY_BUTTON_LEFT_STICK: return "L3"
+		JOY_BUTTON_RIGHT_STICK: return "R3"
+		JOY_BUTTON_LEFT_SHOULDER: return "LB"
+		JOY_BUTTON_RIGHT_SHOULDER: return "RB"
+		JOY_BUTTON_DPAD_UP: return "DPAD UP"
+		JOY_BUTTON_DPAD_DOWN: return "DPAD DOWN"
+		JOY_BUTTON_DPAD_LEFT: return "DPAD LEFT"
+		JOY_BUTTON_DPAD_RIGHT: return "DPAD RIGHT"
+		_: return "BUTTON %d" % button_index
+
+
+func _ensure_controller_ui_bindings() -> void:
+	var button_actions: Dictionary = {
+		"ui_accept": JOY_BUTTON_A,
+		"ui_cancel": JOY_BUTTON_B,
+		"ui_up": JOY_BUTTON_DPAD_UP,
+		"ui_down": JOY_BUTTON_DPAD_DOWN,
+		"ui_left": JOY_BUTTON_DPAD_LEFT,
+		"ui_right": JOY_BUTTON_DPAD_RIGHT,
+	}
+	for action_name: String in button_actions:
+		var action: StringName = StringName(action_name)
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		var button_event: InputEventJoypadButton = InputEventJoypadButton.new()
+		button_event.button_index = int(button_actions[action_name]) as JoyButton
+		button_event.device = -1
+		if not InputMap.action_has_event(action, button_event):
+			InputMap.action_add_event(action, button_event)
+	var axes: Array[Dictionary] = [
+		{"action": "ui_left", "axis": JOY_AXIS_LEFT_X, "value": -1.0},
+		{"action": "ui_right", "axis": JOY_AXIS_LEFT_X, "value": 1.0},
+		{"action": "ui_up", "axis": JOY_AXIS_LEFT_Y, "value": -1.0},
+		{"action": "ui_down", "axis": JOY_AXIS_LEFT_Y, "value": 1.0},
+	]
+	for data: Dictionary in axes:
+		var motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		motion.axis = int(data["axis"]) as JoyAxis
+		motion.axis_value = float(data["value"])
+		motion.device = -1
+		var action: StringName = StringName(data["action"])
+		if not InputMap.action_has_event(action, motion):
+			InputMap.action_add_event(action, motion)
+
+
 func reset_to_defaults() -> void:
 	master_volume_db = 0.0
 	master_muted = false
@@ -342,6 +469,9 @@ func reset_to_defaults() -> void:
 	dither_contrast = 1.0
 	for action in default_key_bindings:
 		set_key_binding(action, int(default_key_bindings[action]), false)
+	for action in default_controller_bindings:
+		var default_binding: Array = default_controller_bindings[action]
+		_set_controller_binding_data(StringName(action), default_binding, false)
 	_apply()
 	_apply_profily_profile()
 	_queue_save()
@@ -481,9 +611,12 @@ func _save() -> void:
 	config.set_value(SECTION, "dither_brightness", dither_brightness)
 	config.set_value(SECTION, "dither_contrast", dither_contrast)
 	var bindings: Dictionary = {}
+	var controller_bindings: Dictionary = {}
 	for action in REMAPPABLE_ACTIONS:
 		bindings[String(action)] = get_key_binding(action)
+		controller_bindings[String(action)] = _read_controller_binding(action)
 	config.set_value(SECTION, "key_bindings", bindings)
+	config.set_value(SECTION, "controller_bindings", controller_bindings)
 	error = config.save(SETTINGS_PATH)
 	if error != OK:
 		Log.error("Could not save game settings", error_string(error))

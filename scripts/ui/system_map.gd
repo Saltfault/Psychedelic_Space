@@ -32,6 +32,7 @@ var nodes_by_id: Dictionary = { }
 var node_order: Array[String] = []
 var outgoing_links: Dictionary = { }
 var current_node_id: String = ""
+var focused_node_id: String = ""
 var start_node_id: String = ""
 var warp_node_id: String = ""
 var map_seed: int = 0
@@ -45,6 +46,71 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	hide()
 	close_button.pressed.connect(close_map)
+
+
+func _input(event: InputEvent) -> void:
+	if not is_visible_in_tree():
+		return
+	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
+		close_map()
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_accept"):
+		if can_travel_to_node(focused_node_id):
+			var target_id: String = focused_node_id
+			hide()
+			get_tree().paused = false
+			travel_requested.emit(target_id)
+			get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("ui_left"):
+		_move_focused_node(Vector2.LEFT)
+	elif event.is_action_pressed("ui_right"):
+		_move_focused_node(Vector2.RIGHT)
+	elif event.is_action_pressed("ui_up"):
+		_move_focused_node(Vector2.UP)
+	elif event.is_action_pressed("ui_down"):
+		_move_focused_node(Vector2.DOWN)
+	else:
+		return
+	get_viewport().set_input_as_handled()
+
+
+func _move_focused_node(direction: Vector2) -> void:
+	if node_order.is_empty():
+		return
+	if not nodes_by_id.has(focused_node_id):
+		focused_node_id = current_node_id
+	var origin: Vector2 = _screen_position(focused_node_id)
+	var perpendicular: Vector2 = Vector2(-direction.y, direction.x)
+	var next_id: String = ""
+	var best_score: float = INF
+	for node_id in node_order:
+		if node_id == focused_node_id:
+			continue
+		var offset: Vector2 = _screen_position(node_id) - origin
+		var forward: float = offset.dot(direction)
+		if forward <= 1.0:
+			continue
+		var score: float = forward + absf(offset.dot(perpendicular)) * 1.5
+		if score < best_score:
+			best_score = score
+			next_id = node_id
+	if next_id.is_empty():
+		for node_id in node_order:
+			if node_id == focused_node_id:
+				continue
+			var offset: Vector2 = _screen_position(node_id) - origin
+			var backward_distance: float = -offset.dot(direction)
+			if backward_distance <= 1.0:
+				continue
+			var score: float = backward_distance + absf(offset.dot(perpendicular)) * 1.5
+			if score < best_score:
+				best_score = score
+				next_id = node_id
+	if not next_id.is_empty():
+		focused_node_id = next_id
+		_refresh_graph_visuals()
 
 
 ## Deterministically create this run's graph, unique node IDs, and per-node sector seeds.
@@ -237,6 +303,7 @@ func debug_set_current_node(node_id: String) -> bool:
 	if not nodes_by_id.has(node_id):
 		return false
 	current_node_id = node_id
+	focused_node_id = node_id
 	_refresh_graph_visuals()
 	return true
 
@@ -307,6 +374,7 @@ func commit_travel(node_id: String) -> bool:
 		return false
 
 	current_node_id = node_id
+	focused_node_id = node_id
 	_refresh_graph_visuals()
 	return true
 
@@ -314,6 +382,12 @@ func commit_travel(node_id: String) -> bool:
 ## Display the map and pause gameplay until the player closes it or chooses a route.
 func open_map() -> void:
 	_refresh_info()
+	focused_node_id = current_node_id
+	for node_id in node_order:
+		if can_travel_to_node(node_id):
+			focused_node_id = node_id
+			break
+	_refresh_graph_visuals()
 	show()
 	# It is a full-screen overlay; make it the top visible Control before pausing.
 	z_index = 100
@@ -377,7 +451,12 @@ func _refresh_graph_visuals() -> void:
 		var marker: SystemMapNodeVisual = node_visual_scene.instantiate() as SystemMapNodeVisual
 		map_visuals.add_child(marker)
 		marker.position = _screen_position(node_id)
-		var selected: bool = node_id == current_node_id
+		var selected_id: String = (
+			focused_node_id
+			if is_visible_in_tree() and not focused_node_id.is_empty()
+			else current_node_id
+		)
+		var selected: bool = node_id == selected_id
 		var caption: String = node_role.to_upper() if node_role in ["start", "warp"] else ""
 		if node_role == "asteroid_ring":
 			caption = "ASTEROID RING"

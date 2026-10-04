@@ -1,6 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://bdu2k3rton1vi"]
+[gd_scene load_steps=18 format=3 uid="uid://bdu2k3rton1vi"]
 
 [ext_resource type="Script" uid="uid://d6j6l4un6pl4" path="res://scripts/ui/system_map.gd" id="1_y73bs"]
+[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_map_panel"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/sector_node.svg" id="3_sector"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/enemy.svg" id="4_enemy"]
@@ -43,6 +44,9 @@ outpost_icon = ExtResource("8_outpost")
 gate_icon = ExtResource("9_warp")
 nebula_icon = ExtResource("6_nebula")
 enemy_icon = ExtResource("4_enemy")
+
+[node name="ControllerFocus" type="Node" parent="."]
+script = ExtResource("99_focus")
 
 [node name="Background" type="PanelContainer" parent="." unique_id=301785019]
 show_behind_parent = true
