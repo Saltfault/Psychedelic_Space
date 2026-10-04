@@ -119,11 +119,20 @@ jobs:
                   return 1
                 }
                 if [[ "$architecture" == "x86_64" ]]; then
-                  [[ "$description" == *"x86-64"* ]] || return 1
+                  [[ "$description" == *"x86-64"* ]] || {
+                    echo "::error::Expected x86-64 Windows executable; file reports: $description"
+                    return 1
+                  }
                 else
-                  [[ "$description" == *"Aarch64"* || "$description" == *"ARM aarch64"* ]] || return 1
+                  [[ "$description" == *"Aarch64"* || "$description" == *"ARM aarch64"* || "$description" == *"ARM64"* ]] || {
+                    echo "::error::Expected ARM64 Windows executable; file reports: $description"
+                    return 1
+                  }
                 fi
-                objdump -f "$output" >/dev/null || return 1
+                objdump -f "$output" >/dev/null || {
+                  echo "::error::Could not read Windows executable format: $output"
+                  return 1
+                }
                 pck="${output%.*}.pck"
                 test -s "$pck" || {
                   echo "::error::Missing PCK sidecar required by this non-embedded export: $pck"
@@ -137,9 +146,15 @@ jobs:
               linux)
                 machine="$(readelf -h "$output" | sed -n 's/^[[:space:]]*Machine:[[:space:]]*//p')"
                 if [[ "$architecture" == "x86_64" ]]; then
-                  [[ "$machine" == *"X86-64"* ]] || return 1
+                  [[ "$machine" == *"X86-64"* ]] || {
+                    echo "::error::Expected x86-64 Linux executable; readelf reports: ${machine:-no machine field}"
+                    return 1
+                  }
                 else
-                  [[ "$machine" == *"AArch64"* ]] || return 1
+                  [[ "$machine" == *"AArch64"* ]] || {
+                    echo "::error::Expected ARM64 Linux executable; readelf reports: ${machine:-no machine field}"
+                    return 1
+                  }
                 fi
                 pck="${output%.*}.pck"
                 test -s "$pck" || {
@@ -152,8 +167,14 @@ jobs:
                 }
                 ;;
               macos)
-                unzip -tq "$output" || return 1
-                unzip -Z1 "$output" | grep '/Contents/MacOS/PsychedelicSpaceGame$' >/dev/null || return 1
+                unzip -tq "$output" || {
+                  echo "::error::Invalid macOS export archive: $output"
+                  return 1
+                }
+                unzip -Z1 "$output" | grep '/Contents/MacOS/PsychedelicSpaceGame$' >/dev/null || {
+                  echo "::error::macOS archive is missing the PsychedelicSpaceGame app executable"
+                  return 1
+                }
                 ;;
             esac
             echo "Validated $format $architecture export: $output ($size bytes)"
