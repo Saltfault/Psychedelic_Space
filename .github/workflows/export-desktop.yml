@@ -18,7 +18,10 @@ env:
 
 jobs:
   export-desktop:
-    name: Export Windows, Linux, and macOS
+    name: Export Windows, Linux, and macOS (GitHub only)
+    # Forgejo also discovers workflows in .github/workflows when no Forgejo-specific workflow exists.
+    # Keep this export job exclusive to GitHub.com.
+    if: github.server_url == 'https://github.com'
     runs-on: ubuntu-24.04
     steps:
       - name: Check out project and Git LFS assets
