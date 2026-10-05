@@ -261,6 +261,7 @@ jobs:
         run: |
           set -euo pipefail
           gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
             build/windows-x86_64/PsychedelicSpaceGame.exe \
             build/windows-x86_64/PsychedelicSpaceGame.pck \
             build/windows-arm64/PsychedelicSpaceGame.exe \
