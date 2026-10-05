@@ -260,8 +260,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          assets=(
-            build/windows-x86_64/PsychedelicSpaceGame.exe \
+          source_assets=(
+            build/windows-x86_64/PsychedelicSpaceGame.exe
             build/windows-x86_64/PsychedelicSpaceGame.pck
             build/windows-arm64/PsychedelicSpaceGame.exe
             build/windows-arm64/PsychedelicSpaceGame.pck
@@ -269,13 +269,35 @@ jobs:
             build/PsychedelicSpace-Linux-ARM64.tar.gz
             build/macos-universal/PsychedelicSpaceGame.zip
           )
-          for asset in "${assets[@]}"; do
+          for asset in "${source_assets[@]}"; do
             if [[ ! -s "$asset" ]]; then
               available_assets="$(find build -type f -printf '%P, ' | cut -c1-1500)"
               echo "::error title=Missing release asset::$asset (available: ${available_assets:-none})"
               exit 1
             fi
           done
+
+          cp build/windows-x86_64/PsychedelicSpaceGame.exe build/PsychedelicSpaceGame-Windows-x86_64.exe
+          cp build/windows-x86_64/PsychedelicSpaceGame.pck build/PsychedelicSpaceGame-Windows-x86_64.pck
+          cp build/windows-arm64/PsychedelicSpaceGame.exe build/PsychedelicSpaceGame-Windows-ARM64.exe
+          cp build/windows-arm64/PsychedelicSpaceGame.pck build/PsychedelicSpaceGame-Windows-ARM64.pck
+          assets=(
+            build/PsychedelicSpaceGame-Windows-x86_64.exe
+            build/PsychedelicSpaceGame-Windows-x86_64.pck
+            build/PsychedelicSpaceGame-Windows-ARM64.exe
+            build/PsychedelicSpaceGame-Windows-ARM64.pck
+            build/PsychedelicSpace-Linux-x86_64.tar.gz
+            build/PsychedelicSpace-Linux-ARM64.tar.gz
+            build/macos-universal/PsychedelicSpaceGame.zip
+          )
+
+          existing_release_draft="$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null || true)"
+          if [[ "$existing_release_draft" == "true" ]]; then
+            gh release delete "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --yes
+          elif [[ "$existing_release_draft" == "false" ]]; then
+            echo "::error title=Release already published::Refusing to replace the published $GITHUB_REF_NAME release."
+            exit 1
+          fi
 
           if ! gh release create \
             --repo "$GITHUB_REPOSITORY" \
