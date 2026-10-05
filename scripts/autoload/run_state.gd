@@ -213,10 +213,18 @@ func save_active_run() -> bool:
 
 	var installed_ids: Array[String] = []
 	for module in player.installed_modules:
-		installed_ids.append(module.resource_path.get_file().get_basename())
+		var installed_module_id: StringName = get_module_id(module)
+		if installed_module_id == &"":
+			Log.error("Cannot save a module without a stable YARD ID", module.display_name)
+			return false
+		installed_ids.append(String(installed_module_id))
 	var reserve_ids: Array[String] = []
 	for module in player.unequipped_modules:
-		reserve_ids.append(module.resource_path.get_file().get_basename())
+		var reserve_module_id: StringName = get_module_id(module)
+		if reserve_module_id == &"":
+			Log.error("Cannot save a module without a stable YARD ID", module.display_name)
+			return false
+		reserve_ids.append(String(reserve_module_id))
 
 	var config := ConfigFile.new()
 	config.set_value("run", "valid", true)
@@ -399,6 +407,18 @@ func complete_side_objective() -> void:
 func get_module(module_id: StringName) -> ModuleDefinition:
 	# Resolve one stable YARD ID and keep callers independent of resource paths.
 	return module_registry.load_entry(module_id) as ModuleDefinition if module_registry != null else null
+
+
+## Return the stable YARD ID registered for a module resource, or empty when unregistered.
+func get_module_id(module: ModuleDefinition) -> StringName:
+	if module_registry == null or module == null:
+		return &""
+	# Compare the loaded definition against registry entries; save identity stays in YARD IDs.
+	for module_id: StringName in module_registry.get_all_string_ids():
+		var registered_module: ModuleDefinition = module_registry.load_entry(module_id) as ModuleDefinition
+		if registered_module == module:
+			return module_id
+	return &""
 
 
 ## Load a weapon by its stable YARD ID; null signals an invalid or removed entry.

@@ -55,6 +55,14 @@ var search_time_left: float = 0.0
 ## Heading maintained while unaware, before patrol-group overrides.
 @export var unaware_heading: Vector2 = Vector2.RIGHT
 
+## --- NEW (Issue 3 fix) -----------------------------------------------------------
+## When true and the enemy is unnoticed (UNAWARE), it slowly drifts toward the
+## player's current position instead of standing still. Search/AGGRO behavior,
+## firing ranges, and the four AI tactics are unchanged.
+@export var drift_toward_player: bool = true
+## Cap (pixels per second) for the slow drift while UNAWARE. Set to 0 to disable.
+@export_range(0.0, 600.0, 5.0) var drift_speed: float = 60.0
+
 ## Optional death effect and pickups assigned by the enemy scene.
 @export var explosion_scene: PackedScene
 ## Optional shield pickup spawned on death.
@@ -98,6 +106,7 @@ func _apply_sector_difficulty() -> void:
 
 
 func _gather_commands(delta: float) -> void:
+	command_speed_limit = max_speed * 0.5 if _should_flee() else max_speed
 	# Resolve the player lazily so scene entry order does not matter.
 	if not is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player_ship") as Node2D
@@ -137,9 +146,21 @@ func _gather_commands(delta: float) -> void:
 	var distance: float = to_player.length()
 
 	if state == State.UNAWARE:
+		command_fire = false
+		# NEW (Issue 3): slow drift toward the player's CURRENT position.
+		# drifting patrol groups (unaware_thrust > 0) keep their authored path,
+		# so only plain enemies and non-drifting groups pick up the chase.
+		if drift_toward_player and drift_speed > 0.0 and unaware_thrust <= 0.0:
+			# shortest_delta() is wrap-aware: crossing a sector seam measures the
+			# short way around the torus instead of across the whole map.
+			var to_live_player := SectorSpace.shortest_delta(global_position, player.global_position)
+			if to_live_player.length() > 40.0:
+				command_heading = to_live_player.normalized()
+				command_speed_limit = minf(command_speed_limit, drift_speed)
+				command_thrust = 1.0
+				return
 		command_heading = unaware_heading.normalized()
 		command_thrust = unaware_thrust
-		command_fire = false
 		return
 
 	if state == State.SEARCH:
@@ -190,13 +211,6 @@ func _gather_commands(delta: float) -> void:
 		command_thrust = 0.8 if distance > preferred_range else 0.0
 		if distance < preferred_range * 0.65:
 			command_thrust = 1.0
-
-
-## Cap retreat velocity separately so accumulated momentum cannot keep a fleeing enemy fast.
-func _movement_speed_limit() -> float:
-	if _should_flee():
-		return max_speed * 0.5
-	return super._movement_speed_limit()
 
 
 func _should_flee() -> bool:

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="1_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="2_icons"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="PausePanelAtlas"]
 atlas = ExtResource("1_panels")
@@ -65,6 +66,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.005, 0.015, 0.04, 0.76)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="Panel" type="PanelContainer" parent="." unique_id=1889712691]
 custom_minimum_size = Vector2(520, 620)
 layout_mode = 1
@@ -81,6 +85,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("PausePanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1648500038]
 layout_mode = 2
 theme_override_constants/margin_left = 34

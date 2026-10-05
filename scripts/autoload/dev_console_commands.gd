@@ -124,7 +124,7 @@ func _complete_main_obj() -> void:
 		for node in sector.find_children("*", "Outpost", true, false):
 			var outpost: Outpost = node as Outpost
 			if outpost != null and not outpost.is_queued_for_deletion():
-				outpost.take_damage(outpost.hull)
+				outpost.take_damage(outpost.hull + outpost.shield + 1.0)
 				_say("Main objective completed.")
 				Log.info("Developer command completed main objective")
 				return

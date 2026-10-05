@@ -8,6 +8,9 @@ custom_minimum_size = Vector2(300, 70)
 mouse_filter = 0
 script = ExtResource("1_script")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2

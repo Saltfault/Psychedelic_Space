@@ -20,6 +20,7 @@
 script = ExtResource("1_0sov8")
 caravan_scene = ExtResource("5_caravan")
 reinforcement_enemy_scene = ExtResource("6_reinforcement")
+reinforcement_spawn_positions = Array[Vector2]([Vector2(1600, 1600), Vector2(6400, 1600), Vector2(4000, 6400)])
 
 [node name="SpaceBackground" parent="." unique_id=854795771 instance=ExtResource("2_qutw5")]
 

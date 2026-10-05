@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/stats_panel.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Panels.png" id="2_panels"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="StatsPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -42,6 +43,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.005, 0.015, 0.04, 0.82)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="Panel" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(850, 710)
 layout_mode = 1
@@ -58,6 +62,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StatsPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 36

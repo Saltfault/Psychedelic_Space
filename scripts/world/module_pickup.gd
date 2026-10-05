@@ -13,7 +13,11 @@ func _ready() -> void:
 			icon.texture = rarity_textures[clampi(int(module.rarity), 0, rarity_textures.size() - 1)]
 		else:
 			Log.error("ModulePickup scene is missing its rarity textures", get_path())
-		set_meta("module_id", module.resource_path.get_file().get_basename())
+		var module_id: StringName = RunState.get_module_id(module)
+		if module_id != &"":
+			set_meta("module_id", module_id)
+		else:
+			Log.error("Module pickup resource is missing from the YARD registry", module.display_name)
 		set_meta("contact_type", "module")
 	body_entered.connect(_on_body_entered)
 

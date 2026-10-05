@@ -1,12 +1,22 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/audio/music_director.gd" id="1_script"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/cosmos_cinematic_120bpm_c_minor.wav" id="2_menu"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/cosmos_pyscho_125bpm_d_minor.wav" id="3_calm"]
 [ext_resource type="AudioStream" path="res://assets/audio/music/cosmos_dishonor_140bpm_e_minor.wav" id="4_intense"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Rain : 130 BPM : A Minor : @_oli_oxen_.wav" id="5_start"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Voices : 95 BPM : G Min : @_oli_oxen_.wav" id="6_station"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Emotional Guitar : 150 BPM : E Minor : @_oli_oxen_.wav" id="7_planet"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Disconnect : 144 BPM : D MINOR : @_oli_oxen_.wav" id="8_nebula"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Mistake : 150 BPM : D# Minor : @_oli_oxen_.wav" id="9_moon"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Rogue : 150 BPM : D Minor : @_oli_oxen_.wav" id="10_warp"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Omens : 155 BPM : A Minor : @_oli_oxen_.wav" id="11_outpost"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/RIP : 140 : F Minor : @_oli_oxen_.wav" id="12_finished"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Swords : 130 BPM : G Minor : @_oli_oxen_.wav" id="13_glacial"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/Forces : 130 BPM : B Minor : @_oli_oxen_.wav" id="14_star"]
 
 [node name="MusicDirector" type="Node"]
 script = ExtResource("1_script")
 music_stream = ExtResource("2_menu")
-track_streams = Array[AudioStream]([ExtResource("2_menu"), ExtResource("3_calm"), ExtResource("4_intense")])
+track_streams = Array[AudioStream]([ExtResource("2_menu"), ExtResource("3_calm"), ExtResource("4_intense"), ExtResource("5_start"), ExtResource("6_station"), ExtResource("7_planet"), ExtResource("8_nebula"), ExtResource("9_moon"), ExtResource("10_warp"), ExtResource("11_outpost"), ExtResource("12_finished"), ExtResource("13_glacial"), ExtResource("14_star")])
 music_bpm = 120.0

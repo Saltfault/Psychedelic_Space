@@ -19,6 +19,8 @@ signal clear_state_changed(is_clear: bool)
 
 ## Enemy scene used for persistent outpost reinforcements.
 @export var reinforcement_enemy_scene: PackedScene
+## Scene-authored sector positions used as deterministic reinforcement spawn slots.
+@export var reinforcement_spawn_positions: Array[Vector2] = []
 ## The map node identity and seed configure campaign-generated sector content.
 @onready var sector_generator: Node = get_node_or_null("SectorGenerator")
 
@@ -66,11 +68,12 @@ func configure_for_map_node(node_data: Dictionary) -> void:
 
 func _ready() -> void:
 	SectorSpace.sector_size = sector_size
+	# Apply persisted objective state before procedural content creates this visit's actors.
+	_handle_persistent_objectives()
 	# Authored Section 23 fixtures have no generator; leave their layouts untouched.
 	if sector_generator != null and sector_generator.has_method("generate_sector"):
 		sector_generator.call("generate_sector", self)
 
-	_handle_persistent_objectives()
 	_spawn_caravan_if_present()
 	_spawn_outpost_reinforcements()
 
@@ -205,10 +208,13 @@ func _spawn_outpost_reinforcements() -> void:
 	if reinforcement_enemy_scene == null:
 		return
 
-	var count: int = clampi(RunState.outpost_reinforcement_level, 0, 3)
+	var count: int = clampi(
+		RunState.outpost_reinforcement_level, 0, reinforcement_spawn_positions.size(),
+	)
+	if count == 0:
+		return
 
 	var player: Node2D = get_tree().get_first_node_in_group("player_ship") as Node2D
-	var angle_offset: float = randf() * TAU
 	var spawn_distance: float = 1700.0
 	var player_ship: PlayerShip = player as PlayerShip
 	if is_instance_valid(player_ship):
@@ -219,10 +225,18 @@ func _spawn_outpost_reinforcements() -> void:
 		var enemy: Node2D = reinforcement_enemy_scene.instantiate() as Node2D
 		if enemy == null:
 			continue
-		var center: Vector2 = spawn_position
+		var reinforcement_position: Vector2 = reinforcement_spawn_positions[i]
 		if is_instance_valid(player):
-			center = player.global_position
-		var direction: Vector2 = Vector2.RIGHT.rotated(angle_offset + TAU * float(i) / float(maxi(count, 1)))
-		# Reinforcements obey the same off-screen, beyond-sensor spawn floor as wave enemies.
-		enemy.global_position = SectorSpace.wrap_position(center + direction * (spawn_distance + 120.0))
+			var player_position: Vector2 = player.global_position
+			var to_slot: Vector2 = SectorSpace.shortest_delta(player_position, reinforcement_position)
+			var required_distance: float = spawn_distance + 120.0
+			if to_slot.length() < required_distance:
+				var direction: Vector2 = to_slot.normalized()
+				if direction.length_squared() < 0.001:
+					direction = Vector2.RIGHT.rotated(TAU * float(i) / float(count))
+				reinforcement_position = SectorSpace.wrap_position(
+					player_position + direction * required_distance,
+				)
+		# Use the authored slot unless it would violate the off-screen/sensor spawn floor.
+		enemy.global_position = SectorSpace.wrap_position(reinforcement_position)
 		add_child(enemy)

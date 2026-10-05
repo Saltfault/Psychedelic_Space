@@ -5,8 +5,6 @@ class_name PlayerShip
 @export var pilot_id: StringName = &"dash"
 
 var pilot: PilotDefinition = null
-## When enabled by the developer console, player damage is ignored.
-var god_mode: bool = false
 var pilot_cooldown_left: float = 0.0
 # Counts down the temporary faster-than-cruise movement cap.
 var dash_time_left: float = 0.0
@@ -36,20 +34,6 @@ func _ready() -> void:
 		ram_shield.configure(pilot)
 
 
-func take_damage(amount: float) -> void:
-	if god_mode:
-		return
-	var was_dead: bool = is_dead
-	super.take_damage(amount)
-	if amount > 0.0:
-		if GameSettings.screen_shake_strength > 0.0:
-			Juicee.shake_camera(self, 5.0 * GameSettings.screen_shake_strength, 0.16, 22.0)
-		if EventAudio.instance != null:
-			EventAudio.instance.play_2d("player_hull_hit", self, "SFX")
-	if not was_dead and is_dead:
-		Juicee.preset_death(self)
-
-
 ## Kill the player even while God Mode is active; reserved for the explicit dev kill command.
 func debug_kill() -> void:
 	god_mode = false
@@ -74,13 +58,14 @@ func _process(delta: float) -> void:
 func _gather_commands(delta: float) -> void:
 	pilot_cooldown_left = max(pilot_cooldown_left - delta, 0.0)
 	dash_time_left = maxf(dash_time_left - delta, 0.0)
+	command_speed_limit = max_speed
 
 	var controller_aim := Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 
 	if controller_aim.length() > 0.2:
 		command_heading = controller_aim.normalized()
 	else:
-		var mouse_delta := (get_global_mouse_position() - global_position)
+		var mouse_delta: Vector2 = SectorSpace.shortest_delta(global_position, get_global_mouse_position())
 
 		if mouse_delta.length_squared() > 1.0:
 			command_heading = mouse_delta.normalized()
@@ -91,6 +76,8 @@ func _gather_commands(delta: float) -> void:
 
 	if Input.is_action_just_pressed("pilot_ability"):
 		_try_use_pilot_ability()
+	if dash_time_left > 0.0 and pilot != null:
+		command_speed_limit = maxf(max_speed, pilot.dash_speed)
 
 
 func _try_use_pilot_ability() -> void:
@@ -130,9 +117,3 @@ func get_pilot_cooldown_ratio() -> float:
 
 	return clamp(pilot_cooldown_left / pilot.cooldown, 0.0, 1.0)
 
-
-## Override the base cap only while the Dash impulse is active.
-func _movement_speed_limit() -> float:
-	if dash_time_left > 0.0 and pilot != null:
-		return maxf(max_speed, pilot.dash_speed)
-	return max_speed

@@ -25,6 +25,8 @@ const FALLBACK_PROJECTILE_DAMAGE: float = 10.0
 
 ## Combat team used by projectiles to decide whether this ship is a valid target.
 @export var team: int = 0
+## Developer invulnerability consumed by the shared damage pipeline for the player team.
+var god_mode: bool = false
 ## Projectile scene with the Projectile script; required when this ship can fire.
 @export var projectile_scene: PackedScene
 
@@ -41,6 +43,8 @@ var active_weapon_id: StringName = &""
 var command_heading: Vector2 = Vector2.RIGHT
 var command_thrust: float = 0.0
 var command_fire: bool = false
+## Optional controller-requested speed cap; negative keeps the authored ship maximum.
+var command_speed_limit: float = -1.0
 
 var max_speed: float
 var thrust_acceleration: float
@@ -157,7 +161,13 @@ func _physics_process(delta: float) -> void:
 	var raw_position: Vector2 = global_position
 	unwrapped_world_position += SectorSpace.shortest_delta(_previous_wrapped_position, raw_position)
 	var wrapped_position: Vector2 = SectorSpace.wrap_position(raw_position)
-	if raw_position.distance_squared_to(wrapped_position) > 0.0001:
+	var outside_sector_bounds: bool = (
+		raw_position.x < 0.0
+		or raw_position.x >= SectorSpace.sector_size.x
+		or raw_position.y < 0.0
+		or raw_position.y >= SectorSpace.sector_size.y
+	)
+	if outside_sector_bounds:
 		global_position = wrapped_position
 		# Avoid rendering interpolation across the large coordinate discontinuity.
 		reset_physics_interpolation()
@@ -200,7 +210,8 @@ func _update_movement(delta: float) -> void:
 	var forward: Vector2 = Vector2.RIGHT.rotated(rotation)
 	if command_thrust > 0.0:
 		velocity += forward * thrust_acceleration * command_thrust * delta
-	velocity = velocity.move_toward(Vector2.ZERO, linear_drag * delta)
+	else:
+		velocity = velocity.move_toward(Vector2.ZERO, linear_drag * delta)
 
 	# Use a virtual limit so a short player Dash is not erased by the normal hull cap.
 	var speed_limit: float = _movement_speed_limit()
@@ -209,7 +220,7 @@ func _update_movement(delta: float) -> void:
 
 
 func _movement_speed_limit() -> float:
-	return max_speed
+	return command_speed_limit if command_speed_limit >= 0.0 else max_speed
 
 
 func _update_shield(delta: float) -> void:
@@ -278,7 +289,7 @@ func equip_weapon(weapon_id: StringName, announce: bool = true) -> bool:
 ## Apply nonnegative damage to shields first, then hull; emits change and death signals.
 func take_damage(amount: float) -> void:
 	# Damage is absorbed by shields first; only overflow reaches hull.
-	if is_dead or amount <= 0.0:
+	if is_dead or amount <= 0.0 or (team == 0 and god_mode):
 		return
 
 	shield_regen_block_time = shield_regen_delay
@@ -299,7 +310,12 @@ func take_damage(amount: float) -> void:
 	_update_shield_visual()
 	if hull_visual != null and is_instance_valid(hull_visual):
 		Juicee.flash(hull_visual, Color(1.0, 0.75, 0.8), 0.08)
-	if team != 0 and GameSettings.screen_shake_strength > 0.0:
+	if team == 0:
+		if GameSettings.screen_shake_strength > 0.0:
+			Juicee.shake_camera(self, 5.0 * GameSettings.screen_shake_strength, 0.16, 22.0)
+		if EventAudio.instance != null:
+			EventAudio.instance.play_2d("player_hull_hit", self, "SFX")
+	elif GameSettings.screen_shake_strength > 0.0:
 		Juicee.shake_camera(self, 0.7 * GameSettings.screen_shake_strength, 0.055, 32.0)
 	Log.debug("Ship took damage", amount, shield, hull)
 
@@ -489,5 +505,7 @@ func _die() -> void:
 
 	is_dead = true
 	Log.info("Ship destroyed", name, team)
+	if team == 0:
+		Juicee.preset_death(self)
 	died.emit(self)
 	queue_free()

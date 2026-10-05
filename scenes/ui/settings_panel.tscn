@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="2_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="3_icons"]
 [ext_resource type="Theme" uid="uid://dxm0apnpg8h80" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="SettingsPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -38,6 +39,9 @@ theme = ExtResource("4_theme")
 theme_override_styles/panel = SubResource("SettingsPanelFrame")
 script = ExtResource("1_settings")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ControllerFocus" type="Node" parent="."]
 script = ExtResource("99_focus")
 
@@ -275,6 +279,9 @@ min_value = 1.0
 max_value = 8.0
 step = 1.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DitherPixelValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options/DitherPixelRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -296,6 +303,9 @@ min_value = 2.0
 max_value = 16.0
 step = 1.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DitherLevelsValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options/DitherLevelsRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -316,6 +326,9 @@ size_flags_horizontal = 3
 max_value = 1.0
 step = 0.01
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DitherStrengthValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options/DitherStrengthRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -337,6 +350,9 @@ min_value = -0.5
 max_value = 0.5
 step = 0.01
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DitherBrightnessValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options/DitherBrightnessRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -358,6 +374,9 @@ min_value = 0.5
 max_value = 2.0
 step = 0.01
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DitherContrastValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options/DitherContrastRow"]
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
@@ -383,6 +402,9 @@ layout_mode = 2
 min_value = -40.0
 max_value = 6.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="VolumeValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Audio" unique_id=2045170119]
 layout_mode = 2
 text = "0 dB"
@@ -397,6 +419,9 @@ layout_mode = 2
 min_value = -40.0
 max_value = 6.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MusicVolumeValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Audio"]
 layout_mode = 2
 text = "0 dB"
@@ -411,6 +436,9 @@ layout_mode = 2
 min_value = -40.0
 max_value = 6.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="SFXVolumeValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Audio"]
 layout_mode = 2
 text = "0 dB"
@@ -425,6 +453,9 @@ layout_mode = 2
 min_value = -40.0
 max_value = 6.0
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MenuVolumeValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Audio"]
 layout_mode = 2
 text = "0 dB"
@@ -461,6 +492,9 @@ layout_mode = 2
 max_value = 2.0
 step = 0.1
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ScreenShakeValue" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=847516474]
 layout_mode = 2
 text = "100%"

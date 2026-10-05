@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ui4bronbjukn"]
+[gd_scene load_steps=11 format=3 uid="uid://ui4bronbjukn"]
 
 [ext_resource type="Script" uid="uid://cm0k2y85uwley" path="res://scripts/ui/station_panel.gd" id="1_8qgwc"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/ui/module_sell_drop_zone.gd" id="4_sell_zone"]
 [ext_resource type="PackedScene" path="res://scenes/ui/module_drag_preview.tscn" id="5_drag_preview"]
 [ext_resource type="PackedScene" path="res://scenes/ui/module_inventory_slot.tscn" id="6_module_slot"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="StationPanelAtlas"]
 atlas = ExtResource("2_shop_frame")
@@ -42,6 +43,9 @@ theme_override_styles/panel = SubResource("StationShopFrame")
 script = ExtResource("1_8qgwc")
 slot_scene = ExtResource("6_module_slot")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ControllerFocus" type="Node" parent="."]
 script = ExtResource("99_focus")
 
@@ -108,6 +112,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StationShopFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/InventoryRow/UnequippedPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
@@ -139,6 +146,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StationShopFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/InventoryRow/EquippedPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
@@ -168,6 +178,9 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 script = ExtResource("4_sell_zone")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="SellLabel" type="Label" parent="MarginContainer/VBoxContainer/SellZone"]
 layout_mode = 2
 mouse_filter = 2

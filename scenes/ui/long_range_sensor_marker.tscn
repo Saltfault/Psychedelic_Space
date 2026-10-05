@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/long_range_sensor_marker.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/planet_pack/Tech.png" id="2_station"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/planet_pack/Tech2.png" id="3_outpost"]
 [ext_resource type="Texture2D" path="res://assets/ui/map_icons/warp_gate.svg" id="4_warp_gate"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [node name="LongRangeSensorMarker" type="Node2D"]
 script = ExtResource("1_script")
@@ -14,6 +15,9 @@ texture = ExtResource("2_station")
 scale = Vector2(1.5, 1.5)
 modulate = Color(0.35, 1, 0.68, 1)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="OutpostIcon" type="Sprite2D" parent="."]
 visible = false
 texture_filter = 1
@@ -21,6 +25,9 @@ texture = ExtResource("3_outpost")
 scale = Vector2(1.5, 1.5)
 modulate = Color(1, 0.35, 0.25, 1)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="DirectionTip" type="Polygon2D" parent="."]
 position = Vector2(0, -13)
 color = Color(0.8, 0.95, 1, 1)
@@ -32,3 +39,6 @@ texture_filter = 1
 texture = ExtResource("4_warp_gate")
 scale = Vector2(1.5, 1.5)
 modulate = Color(0.35, 0.8, 1, 1)
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]

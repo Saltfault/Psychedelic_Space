@@ -47,8 +47,10 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
-		SceneRouter.show_main_menu()
+		# Capture the viewport FIRST: change_scene_to_packed() frees this scene,
+		# and a freed node reports get_viewport() == null (the escape crash).
 		get_viewport().set_input_as_handled()
+		SceneRouter.show_main_menu()
 
 
 func _select_ship(ship_id: StringName) -> void:

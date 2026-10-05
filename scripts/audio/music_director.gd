@@ -7,33 +7,43 @@ class_name MusicDirector
 @export_range(40.0, 240.0, 1.0) var music_bpm: float = 120.0
 @export_range(0.0, 2.0, 0.001) var first_beat_offset: float = 0.0
 
+## Every stream index used by TRACKS/SYSTEM_TRACKS below. The array itself is
+## authored on the MusicDirector scene (scenes/music_director.tscn):
+## 0 menu/intro theme, 1 calm loop, 2 tense loop, 3 Rain, 4 Voices, 5 Emotional
+## Guitar, 6 Disconnect, 7 Mistake, 8 Rogue, 9 Omens, 10 RIP, 11 Swords, 12 Forces.
 const TRACKS: Dictionary = {
 	&"menu": [0, 120.0],
-	&"sector_start": [0, 120.0],
+	&"sector_start": [3, 130.0],
 	&"sector_generic": [1, 125.0],
 	&"sector_patrol": [2, 140.0],
-	&"sector_station": [0, 120.0],
-	&"sector_nebula": [1, 125.0],
-	&"sector_warp": [2, 140.0],
-	&"sector_outpost": [2, 140.0],
-	&"sector_planet": [1, 125.0],
-	&"sector_moon": [0, 120.0],
-	&"sector_star": [2, 140.0],
-	&"pause": [1, 125.0],
-	&"run_finished": [2, 140.0],
+	&"sector_station": [4, 95.0],
+	&"sector_nebula": [6, 144.0],
+	&"sector_warp": [8, 150.0],
+	&"sector_outpost": [9, 155.0],
+	&"sector_planet": [5, 150.0],
+	&"sector_moon": [7, 150.0],
+	&"sector_star": [12, 130.0],
+	&"run_finished": [10, 140.0],
 }
 const SYSTEM_TRACKS: Dictionary = {
 	&"frontier": [0, 120.0],
-	&"ember": [2, 140.0],
-	&"glacial": [1, 125.0],
+	&"ember": [9, 155.0],
+	&"glacial": [11, 130.0],
 }
 
 var _current_track_key: StringName = &""
 var _gameplay_track_key: StringName = &""
+## Survives across scene changes so a new MusicDirector instance in the next
+## scene recognizes that the SAME track is already playing and lets the single
+## shared Conductor keep playing it without a restart (menu -> ship select).
+static var _playing_track_key: StringName = &""
 
 
 func _ready() -> void:
 	Conductor.bus = "Music"
+	# The shared music player must run while the tree is paused, or the pause
+	# menu would silence the sector theme it is meant to sit atop of.
+	Conductor.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("music_director")
 	if not Conductor.beat.is_connected(_on_beat):
 		Conductor.beat.connect(_on_beat)
@@ -55,17 +65,6 @@ func play_sector_track(sector_id: String, has_outpost_objective: bool = false) -
 	_play_track(track_key)
 
 
-## Play the dedicated pause-menu track without losing the active gameplay context.
-func play_pause_track() -> void:
-	_play_track(&"pause")
-
-
-## Restore the active sector track when play resumes.
-func resume_gameplay_track() -> void:
-	if _gameplay_track_key != &"":
-		_play_track(_gameplay_track_key)
-
-
 ## Replace gameplay music with the run's terminal-screen track.
 func play_run_finished() -> void:
 	_play_track(&"run_finished")
@@ -80,7 +79,11 @@ func play_system_track(system_id: StringName) -> void:
 
 
 func _play_track(track_key: StringName) -> void:
-	if _current_track_key == track_key:
+	# Continuity check uses the SHARED key (see _playing_track_key): a MusicDirector
+	# freshly instanced by the next scene sees the track already playing and does
+	# not restart the shared Conductor.
+	if _playing_track_key == track_key:
+		_current_track_key = track_key
 		return
 	if not TRACKS.has(track_key):
 		Log.error("Unknown music context", track_key)
@@ -109,8 +112,9 @@ func _play_stream(track_key: StringName, selected_stream: AudioStream, selected_
 		Log.error("Music BPM must be positive", track_key, selected_bpm)
 		return
 	# Imported loop files may not include loop metadata in their source WAV.
-	if selected_stream is AudioStreamWAV:
-		(selected_stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	# Looping is embedded on the import side instead (edit/loop_mode=1 in each
+	# cosmos_*.wav.import) because mutating a QOA-compressed imported stream's
+	# loop at runtime produced a playing-but-silent playback on Godot 4.7.
 	var music_bus_index: int = AudioServer.get_bus_index("Music")
 	if music_bus_index < 0:
 		Log.error("Music bus is missing; routing the selected track to Master", track_key)
@@ -123,11 +127,30 @@ func _play_stream(track_key: StringName, selected_stream: AudioStream, selected_
 	Conductor.stream = null
 	Conductor.set_song(selected_stream, selected_bpm, 4, first_beat_offset)
 	Conductor.stream_paused = false
+	# MODIFIED (Issue 1): schedule the actual start one frame later. Stop/swap/play
+	# inside the same frame can be dropped by some audio backends - it looks and
+	# behaves exactly like "the music never plays". Deferring play() removes that
+	# window, and the retry below recovers one dropped start automatically.
+	_deferred_play(track_key, selected_stream)
+
+
+## Deferred start of the shared Conductor player; waits one frame so the stop(),
+## stream swap and play() land in separate audio-server ticks. The stream is
+## passed along: the deferred body only needs these two values.
+func _deferred_play(track_key: StringName, selected_stream: AudioStream) -> void:
+	await get_tree().process_frame
 	Conductor.play()
+	await get_tree().process_frame
 	if not Conductor.playing:
-		Log.error("Conductor did not start the selected track", track_key)
-		return
+		Log.error("Conductor did not start the selected track; retrying once", track_key)
+		Conductor.play()
+		if not Conductor.playing:
+			Log.error("Conductor start failed twice; audio output may be muted or missing", track_key)
+			return
 	_current_track_key = track_key
+	# Publish the shared key ONLY after playback is confirmed, so a failed start
+	# leaves the previous track's continuity intact.
+	_playing_track_key = track_key
 	Log.info("Music track started", track_key, selected_stream.resource_path)
 
 

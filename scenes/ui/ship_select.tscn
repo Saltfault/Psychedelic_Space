@@ -52,6 +52,9 @@ layout_mode = 2
 theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("SelectionPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="Content" type="VBoxContainer" parent="CenterContainer/SelectionPanel"]
 layout_mode = 2
 theme_override_constants/separation = 18
@@ -156,6 +159,9 @@ scale = Vector2(2.5, 2.5)
 region_enabled = true
 region_rect = Rect2(0, 0, 64, 64)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="EventAudioBankMounter" type="Node" parent="."]
 script = ExtResource("2_audio_mounter")
 _audio_bank_resource = ExtResource("3_audio_bank")

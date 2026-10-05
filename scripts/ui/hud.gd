@@ -302,18 +302,13 @@ func _open_pause_menu() -> void:
 	if death_panel.visible or station_panel.visible or system_map.visible:
 		return
 	pause_overlay.show()
+	# Pausing no longer swaps music: the sector theme keeps playing under the menu.
 	get_tree().paused = true
-	var director: MusicDirector = get_tree().get_first_node_in_group("music_director") as MusicDirector
-	if director != null:
-		director.play_pause_track()
 
 
 func _resume_game() -> void:
 	pause_overlay.hide()
 	get_tree().paused = false
-	var director: MusicDirector = get_tree().get_first_node_in_group("music_director") as MusicDirector
-	if director != null:
-		director.resume_gameplay_track()
 
 
 func _play_run_finished_music() -> void:

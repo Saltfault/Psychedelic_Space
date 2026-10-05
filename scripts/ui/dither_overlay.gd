@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Applies the saved dither shader to gameplay before the HUD is drawn.
+## Applies saved dither settings to gameplay and scene-authored UI visuals while keeping text crisp.
 
 @onready var overlay: ColorRect = $Overlay
 @onready var shader_material: ShaderMaterial = overlay.material as ShaderMaterial
@@ -13,7 +13,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	# Keep the screen-wide pass on gameplay; scene-authored UI art gets its own text-safe material.
+	# The screen pass stays below the HUD; scene visuals opt into the local pass so labels stay crisp.
 	_sync_visibility()
 
 
@@ -26,7 +26,7 @@ func _sync_settings() -> void:
 
 
 func _on_scene_node_added(node: Node) -> void:
-	# Scene-authored icon and meter materials join the effect as their UI scenes enter the tree.
+	# Scene-authored visual nodes join settings updates as their UI scenes enter the tree.
 	if node.is_in_group("dither_ui_visual") and node is CanvasItem:
 		_apply_dither_settings((node as CanvasItem).material as ShaderMaterial)
 

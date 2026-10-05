@@ -107,65 +107,71 @@ vec3 nearest(vec3 c, int start, int count) {
 
 void fragment() {
 	vec2 size = sample_local_texture ? vec2(textureSize(TEXTURE, 0)) : vec2(textureSize(screen_source, 0));
+	// >>> CHANGED (Issue 2 fix) --------------------------------------------------
+	// Before: the "effect off" branch ended with `return;`, which GDShader
+	// rejects inside fragment() (the whole file then failed to compile).
+	// Now: an if/else structure, byte-equivalent output for both branches.
+	// Everything below inside the else { ... } block is UNCHANGED existing code.
+	// <<<
 	if (!effect_enabled) {
 		COLOR = sample_local_texture ? texture(TEXTURE, UV) * COLOR : texture(screen_source, SCREEN_UV);
-		return;
+	} else { // >>> CHANGED (Issue 2 fix): `return` removed, remainder intentionally kept
+		float ps = float(pixel_size);
+
+		// Sample the middle of each big pixel.
+		vec2 source_uv = sample_local_texture ? UV : SCREEN_UV;
+		vec2 cell = floor(source_uv * size / ps);
+		vec2 uv = clamp((cell + 0.5) * ps / size, vec2(0.0), vec2(1.0) - 0.5 / size);
+		vec4 tex = sample_local_texture ? texture(TEXTURE, uv) : texture(screen_source, uv);
+
+		vec3 source_rgb = sample_local_texture ? tex.rgb * COLOR.rgb : tex.rgb;
+		vec3 c = (source_rgb - 0.5) * contrast + 0.5 + brightness;
+
+		// Dither: push the color up or down a little before snapping, by an amount
+		// that depends on how far apart the palette colors are.
+		// Dither strength is scaled by how far apart the palette colors are: few colors need a
+		// wide spread, many colors a narrow one.
+		float spread = 0.2;
+		if (palette_mode == 0) {
+			spread = 1.0 / float(levels - 1);
+		} else if (palette_mode == 2) {
+			spread = 0.35;
+		} else if (palette_mode == 5) {
+			spread = 0.15;
+		} else if (palette_mode == 6) {
+			spread = 0.4;
+		} else if (palette_mode == 7) {
+			spread = 0.1;
+		} else if (palette_mode == 8) {
+			spread = 0.5;
+		}
+		if (dither_mode > 0) {
+			c += (bayer(ivec2(cell), dither_mode) - 0.5) * dither_strength * spread;
+		}
+		c = clamp(c, 0.0, 1.0);
+
+		vec3 result;
+		if (palette_mode == 0) {
+			float steps = float(levels - 1);
+			result = floor(c * steps + 0.5) / steps;
+		} else if (palette_mode == 1) {
+			result = nearest(c, 0, 16);
+		} else if (palette_mode == 2) {
+			result = nearest(c, 16, 4);
+		} else if (palette_mode == 3) {
+			result = nearest(c, 20, 16);
+		} else if (palette_mode == 4) {
+			result = nearest(c, 36, 16);
+		} else if (palette_mode == 5) {
+			result = nearest(c, 52, 32);
+		} else if (palette_mode == 6) {
+			result = nearest(c, 84, 4);
+		} else if (palette_mode == 7) {
+			result = nearest(c, 88, 64);
+		} else {
+			result = nearest(c, 152, 2);
+		}
+
+		COLOR = sample_local_texture ? vec4(result, tex.a * COLOR.a) : vec4(result, tex.a);
 	}
-	float ps = float(pixel_size);
-
-	// Sample the middle of each big pixel.
-	vec2 source_uv = sample_local_texture ? UV : SCREEN_UV;
-	vec2 cell = floor(source_uv * size / ps);
-	vec2 uv = clamp((cell + 0.5) * ps / size, vec2(0.0), vec2(1.0) - 0.5 / size);
-	vec4 tex = sample_local_texture ? texture(TEXTURE, uv) : texture(screen_source, uv);
-
-	vec3 source_rgb = sample_local_texture ? tex.rgb * COLOR.rgb : tex.rgb;
-	vec3 c = (source_rgb - 0.5) * contrast + 0.5 + brightness;
-
-	// Dither: push the color up or down a little before snapping, by an amount
-	// that depends on how far apart the palette colors are.
-	// Dither strength is scaled by how far apart the palette colors are: few colors need a
-	// wide spread, many colors a narrow one.
-	float spread = 0.2;
-	if (palette_mode == 0) {
-		spread = 1.0 / float(levels - 1);
-	} else if (palette_mode == 2) {
-		spread = 0.35;
-	} else if (palette_mode == 5) {
-		spread = 0.15;
-	} else if (palette_mode == 6) {
-		spread = 0.4;
-	} else if (palette_mode == 7) {
-		spread = 0.1;
-	} else if (palette_mode == 8) {
-		spread = 0.5;
-	}
-	if (dither_mode > 0) {
-		c += (bayer(ivec2(cell), dither_mode) - 0.5) * dither_strength * spread;
-	}
-	c = clamp(c, 0.0, 1.0);
-
-	vec3 result;
-	if (palette_mode == 0) {
-		float steps = float(levels - 1);
-		result = floor(c * steps + 0.5) / steps;
-	} else if (palette_mode == 1) {
-		result = nearest(c, 0, 16);
-	} else if (palette_mode == 2) {
-		result = nearest(c, 16, 4);
-	} else if (palette_mode == 3) {
-		result = nearest(c, 20, 16);
-	} else if (palette_mode == 4) {
-		result = nearest(c, 36, 16);
-	} else if (palette_mode == 5) {
-		result = nearest(c, 52, 32);
-	} else if (palette_mode == 6) {
-		result = nearest(c, 84, 4);
-	} else if (palette_mode == 7) {
-		result = nearest(c, 88, 64);
-	} else {
-		result = nearest(c, 152, 2);
-	}
-
-	COLOR = sample_local_texture ? vec4(result, tex.a * COLOR.a) : vec4(result, tex.a);
 }

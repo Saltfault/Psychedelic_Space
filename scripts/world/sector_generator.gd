@@ -52,7 +52,11 @@ func _ready() -> void:
 			and not RunState.outpost_destroyed
 			and sector.reinforcement_enemy_scene != null
 		):
-			reinforcement_count = clampi(RunState.outpost_reinforcement_level, 0, 3)
+			reinforcement_count = clampi(
+				RunState.outpost_reinforcement_level,
+				0,
+				sector.reinforcement_spawn_positions.size(),
+			)
 		enemy_budget_remaining = maxi(0, total_enemy_budget - reinforcement_count)
 		waves_remaining = mini(waves_per_sector, enemy_budget_remaining)
 	call_deferred("_start_enemy_waves")
@@ -106,7 +110,13 @@ func _enemy_scene_choices() -> Array[PackedScene]:
 
 func _instantiate_wave_enemy() -> EnemyShip:
 	var choices: Array[PackedScene] = _enemy_scene_choices()
+	if choices.is_empty():
+		Log.error("No enemy scenes are assigned to this solar system or SectorGenerator")
+		return null
 	var enemy_scene: PackedScene = choices[rng.randi_range(0, choices.size() - 1)]
+	if enemy_scene == null:
+		Log.error("Selected enemy scene is not assigned")
+		return null
 	var enemy: EnemyShip = enemy_scene.instantiate() as EnemyShip
 	if enemy == null:
 		Log.error("Wave enemy scene root must use EnemyShip.gd", enemy_scene.resource_path)
@@ -298,11 +308,15 @@ func _make_rock_polygon(base_radius: float) -> PackedVector2Array:
 
 
 func _spawn_nebula_objective(sector: SectorRoot) -> void:
-	# Keep the beacon near the nebula while avoiding a direct overlap with its center.
+	# The nebula is environmental content; the intel beacon is a one-time objective.
 	var nebula_position: Vector2 = _random_open_position(
 		sector, 2500.0, _screen_world_radius(sector) + 2400.0,
 	)
 	_spawn_scene(nebula_scene, sector.get_node("Landmarks"), nebula_position)
+	if RunState.side_objective_complete or RunState.side_objective_expired:
+		return
+
+	# Keep the beacon near the nebula while avoiding a direct overlap with its center.
 	var beacon_position: Vector2 = nebula_position + Vector2(950.0, 250.0)
 	beacon_position.x = clampf(beacon_position.x, 250.0, sector.sector_size.x - 250.0)
 	beacon_position.y = clampf(beacon_position.y, 250.0, sector.sector_size.y - 250.0)

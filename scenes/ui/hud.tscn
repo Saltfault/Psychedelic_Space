@@ -222,6 +222,9 @@ mouse_filter = 2
 theme_type_variation = &"BracketPanel"
 theme_override_styles/panel = SubResource("MissionPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MissionLabel" type="Label" parent="Root" unique_id=713059633]
 layout_mode = 0
 offset_left = 1406.0
@@ -256,6 +259,9 @@ position = Vector2(48.65974, 30.250124)
 scale = Vector2(3.049874, 1.4651057)
 texture = SubResource("AtlasTexture_g4v7s")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ModuleInventoryButton" type="Button" parent="Root" unique_id=73238272]
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 1
@@ -370,6 +376,9 @@ offset_bottom = 90.0
 theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StatusPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ControllerFocus" type="Node" parent="Root/RunCompletePanel"]
 script = ExtResource("99_focus")
 
@@ -393,6 +402,9 @@ offset_bottom = 180.0
 theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StatusPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="ControllerFocus" type="Node" parent="Root/DeathPanel"]
 script = ExtResource("99_focus")
 

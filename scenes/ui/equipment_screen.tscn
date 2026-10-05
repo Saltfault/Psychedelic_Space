@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://m4hrvoo27ngs"]
+[gd_scene load_steps=14 format=3 uid="uid://m4hrvoo27ngs"]
 
 [ext_resource type="Script" uid="uid://bgj56oombbvni" path="res://scripts/ui/equipment_screen.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/module_drag_preview.tscn" id="4_drag_preview"]
 [ext_resource type="PackedScene" path="res://scenes/ui/module_inventory_slot.tscn" id="5_module_slot"]
 [ext_resource type="PackedScene" path="res://scenes/ui/weapon_loadout_slot.tscn" id="6_weapon_slot"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="EquipmentPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -68,6 +69,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.005, 0.015, 0.04, 0.82)
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="Panel" type="PanelContainer" parent="." unique_id=32906478]
 custom_minimum_size = Vector2(1160, 830)
 layout_mode = 1
@@ -84,6 +88,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("EquipmentPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=686075913]
 layout_mode = 2
 theme_override_constants/margin_left = 34
@@ -139,6 +146,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("EquipmentPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/ContentRow/UnequippedPanel" unique_id=830003709]
 layout_mode = 2
 theme_override_constants/margin_left = 8
@@ -170,6 +180,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("EquipmentPanelFrame")
 
+
+material = ExtResource("dither_ui")
+groups = ["dither_ui_visual"]
 [node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/VBoxContainer/ContentRow/EquippedPanel" unique_id=2091457563]
 layout_mode = 2
 theme_override_constants/margin_left = 8
