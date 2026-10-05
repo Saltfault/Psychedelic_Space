@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://22q7dgeg3fni"]
 
 [ext_resource type="Script" uid="uid://bwc3tvwye75ri" path="res://scripts/ui/hud.gd" id="1_hud"]
-[ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
-[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 [ext_resource type="PackedScene" uid="uid://bdu2k3rton1vi" path="res://scenes/ui/system_map.tscn" id="3_system_map"]
 [ext_resource type="PackedScene" uid="uid://ui4bronbjukn" path="res://scenes/ui/station_panel.tscn" id="4_station_panel"]
 [ext_resource type="Texture2D" uid="uid://d2hon7wqtk4nr" path="res://assets/ui/super_pixel_scifi_meter_icons/hp_red.png" id="5_health_icon"]
@@ -20,6 +18,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/minimap.tscn" id="19_minimap"]
 [ext_resource type="PackedScene" path="res://scenes/ui/long_range_sensor.tscn" id="20_long_range_sensor"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stats_panel.tscn" id="21_stats_panel"]
+[ext_resource type="Script" uid="uid://bh5ud6dl4dfl4" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
+[ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="MissionPanelAtlas"]
 atlas = ExtResource("10_ui_panels")
@@ -83,7 +83,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="ControllerFocus" type="Node" parent="Root"]
+[node name="ControllerFocus" type="Node" parent="Root" unique_id=1373034297]
 script = ExtResource("99_focus")
 focus_on_ready = false
 
@@ -97,7 +97,6 @@ text = "HULL -- / --"
 
 [node name="HullIcon" type="TextureRect" parent="Root" unique_id=2029061002]
 material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_left = 109.0
 offset_top = 97.00001
@@ -110,7 +109,6 @@ stretch_mode = 5
 
 [node name="HullBar" type="TextureProgressBar" parent="Root" unique_id=2029061003]
 material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_left = 147.0
 offset_top = 125.0
@@ -135,7 +133,6 @@ text = "SHIELD -- / --"
 
 [node name="ShieldIcon" type="TextureRect" parent="Root" unique_id=2029061004]
 material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_left = 110.0
 offset_top = 151.0
@@ -147,7 +144,6 @@ stretch_mode = 5
 
 [node name="ShieldBar" type="TextureProgressBar" parent="Root" unique_id=2029061005]
 material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_left = 146.0
 offset_top = 177.0
@@ -186,7 +182,6 @@ text = "Pilot: none"
 
 [node name="WeaponIcon" type="TextureRect" parent="Root" unique_id=81615391]
 material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 layout_mode = 0
 offset_left = 26.0
 offset_top = 202.0
@@ -213,6 +208,7 @@ offset_bottom = 97.0
 text = "SENSORS DISRUPTED"
 
 [node name="MissionPanel" type="PanelContainer" parent="Root" unique_id=2029061006]
+material = ExtResource("dither_ui")
 layout_mode = 0
 offset_left = 1388.0
 offset_top = 58.0
@@ -222,9 +218,6 @@ mouse_filter = 2
 theme_type_variation = &"BracketPanel"
 theme_override_styles/panel = SubResource("MissionPanelFrame")
 
-
-material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 [node name="MissionLabel" type="Label" parent="Root" unique_id=713059633]
 layout_mode = 0
 offset_left = 1406.0
@@ -242,9 +235,9 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -82.00012
-offset_top = 38.000004
+offset_top = 47.999996
 offset_right = 15.319702
-offset_bottom = 98.32413
+offset_bottom = 97.12038
 grow_horizontal = 0
 scale = Vector2(0.43156734, 0.8925582)
 tooltip_text = "Pause"
@@ -255,13 +248,11 @@ icon_alignment = 1
 expand_icon = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Root/PauseButton" unique_id=1258856544]
-position = Vector2(48.65974, 30.250124)
-scale = Vector2(3.049874, 1.4651057)
+material = ExtResource("dither_ui")
+position = Vector2(48.660023, 24.648254)
+scale = Vector2(3.049874, 1.0341923)
 texture = SubResource("AtlasTexture_g4v7s")
 
-
-material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
 [node name="ModuleInventoryButton" type="Button" parent="Root" unique_id=73238272]
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 1
@@ -280,7 +271,7 @@ theme_override_styles/hover = SubResource("HUDButtonFrame")
 icon = SubResource("HUDInventoryIcon")
 icon_alignment = 1
 
-[node name="ShipStatsButton" type="Button" parent="Root"]
+[node name="ShipStatsButton" type="Button" parent="Root" unique_id=303966619]
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 1
 anchors_preset = 2
@@ -312,17 +303,6 @@ text = "SECTOR TRAVEL"
 [node name="SettingsPanel" parent="Root" unique_id=821862513 instance=ExtResource("12_settings_panel")]
 visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -380.0
-offset_top = -320.0
-offset_right = 380.0
-offset_bottom = 320.0
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="Minimap" parent="Root" unique_id=290863086 instance=ExtResource("19_minimap")]
 layout_mode = 1
@@ -341,6 +321,8 @@ map_range = 3200.0
 
 [node name="LongRangeSensor" parent="Root" unique_id=785900831 instance=ExtResource("20_long_range_sensor")]
 layout_mode = 1
+offset_top = -2.0
+offset_bottom = -2.0
 
 [node name="SystemMap" parent="Root" unique_id=857440598 instance=ExtResource("3_system_map")]
 visible = false
@@ -358,12 +340,13 @@ layout_mode = 1
 visible = false
 layout_mode = 1
 
-[node name="StatsScreen" parent="Root" instance=ExtResource("21_stats_panel")]
+[node name="StatsScreen" parent="Root" unique_id=1094676155 instance=ExtResource("21_stats_panel")]
 visible = false
 layout_mode = 1
 
 [node name="RunCompletePanel" type="PanelContainer" parent="Root" unique_id=593799097]
 visible = false
+material = ExtResource("dither_ui")
 layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
@@ -376,10 +359,7 @@ offset_bottom = 90.0
 theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StatusPanelFrame")
 
-
-material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
-[node name="ControllerFocus" type="Node" parent="Root/RunCompletePanel"]
+[node name="ControllerFocus" type="Node" parent="Root/RunCompletePanel" unique_id=471928663]
 script = ExtResource("99_focus")
 
 [node name="RunCompleteLabel" type="Label" parent="Root/RunCompletePanel" unique_id=1494442528]
@@ -390,6 +370,7 @@ vertical_alignment = 1
 
 [node name="DeathPanel" type="PanelContainer" parent="Root" unique_id=193884823]
 visible = false
+material = ExtResource("dither_ui")
 layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
@@ -402,10 +383,7 @@ offset_bottom = 180.0
 theme_type_variation = &"WindowPanel"
 theme_override_styles/panel = SubResource("StatusPanelFrame")
 
-
-material = ExtResource("dither_ui")
-groups = ["dither_ui_visual"]
-[node name="ControllerFocus" type="Node" parent="Root/DeathPanel"]
+[node name="ControllerFocus" type="Node" parent="Root/DeathPanel" unique_id=560833277]
 script = ExtResource("99_focus")
 
 [node name="MarginContainer" type="MarginContainer" parent="Root/DeathPanel" unique_id=1750542452]
