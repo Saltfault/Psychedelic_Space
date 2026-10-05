@@ -260,16 +260,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create "$GITHUB_REF_NAME" \
-            --repo "$GITHUB_REPOSITORY" \
+          assets=(
             build/windows-x86_64/PsychedelicSpaceGame.exe \
-            build/windows-x86_64/PsychedelicSpaceGame.pck \
-            build/windows-arm64/PsychedelicSpaceGame.exe \
-            build/windows-arm64/PsychedelicSpaceGame.pck \
-            build/PsychedelicSpace-Linux-x86_64.tar.gz \
-            build/PsychedelicSpace-Linux-ARM64.tar.gz \
-            build/macos-universal/PsychedelicSpaceGame.zip \
+            build/windows-x86_64/PsychedelicSpaceGame.pck
+            build/windows-arm64/PsychedelicSpaceGame.exe
+            build/windows-arm64/PsychedelicSpaceGame.pck
+            build/PsychedelicSpace-Linux-x86_64.tar.gz
+            build/PsychedelicSpace-Linux-ARM64.tar.gz
+            build/macos-universal/PsychedelicSpaceGame.zip
+          )
+          for asset in "${assets[@]}"; do
+            if [[ ! -s "$asset" ]]; then
+              available_assets="$(find build -type f -printf '%P, ' | cut -c1-1500)"
+              echo "::error title=Missing release asset::$asset (available: ${available_assets:-none})"
+              exit 1
+            fi
+          done
+
+          if ! gh release create \
+            --repo "$GITHUB_REPOSITORY" \
+            "$GITHUB_REF_NAME" \
+            "${assets[@]}" \
             --verify-tag \
             --title "Psychedelic Space $GITHUB_REF_NAME" \
             --generate-notes \
-            --prerelease
+            --prerelease \
+            >"$RUNNER_TEMP/gh-release-create.log" 2>&1; then
+            cat "$RUNNER_TEMP/gh-release-create.log"
+            error_summary="$(tail -n 12 "$RUNNER_TEMP/gh-release-create.log" | tr '\n' ' ')"
+            echo "::error title=GitHub release creation failed::$error_summary"
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/gh-release-create.log"
