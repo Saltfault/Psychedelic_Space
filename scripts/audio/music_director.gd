@@ -71,6 +71,25 @@ static var _entry_tween: Tween = null
 ## scene recognizes that the SAME track is already playing and lets the single
 ## shared Conductor keep playing it without a restart (menu -> ship select).
 static var _playing_track_key: StringName = &""
+## Cooldown so the keep-alive below cannot spin when play() is refused.
+var _keepalive_cooldown: float = 0.0
+
+
+## Safety net for "all music loops": if the shared player stopped while a track
+## is supposed to be running (a stream without loop metadata, a dropped
+## playback), restart it instead of going silent. This never mutates the
+## stream's loop flags at runtime (that produced playing-but-silent playback on
+## QOA streams); looping belongs to the import settings, this only catches the
+## case where they were lost.
+func _process(delta: float) -> void:
+	_keepalive_cooldown = maxf(_keepalive_cooldown - delta, 0.0)
+	if _playing_track_key == &"" or Conductor.playing or Conductor.stream == null:
+		return
+	if _keepalive_cooldown > 0.0:
+		return
+	_keepalive_cooldown = 1.5
+	Conductor.play()
+	Log.warn("Music player restart issued; the current stream ended without looping", _playing_track_key)
 
 
 func _ready() -> void:
