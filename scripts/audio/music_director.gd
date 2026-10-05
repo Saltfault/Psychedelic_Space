@@ -31,6 +31,26 @@ const SYSTEM_TRACKS: Dictionary = {
 	&"glacial": [11, 130.0],
 }
 
+## Absolute fallback library: indexed identically to track_streams. Used when the
+## scene-authored array does not survive scene instancing (indexes 0/3 were null
+## at runtime in the player's 4.7.2-steam build, so every request fell back to the
+## menu theme).
+const TRACK_STREAM_PATHS: Array[String] = [
+	"res://assets/audio/music/cosmos_cinematic_120bpm_c_minor.wav",
+	"res://assets/audio/music/cosmos_pyscho_125bpm_d_minor.wav",
+	"res://assets/audio/music/cosmos_dishonor_140bpm_e_minor.wav",
+	"res://assets/audio/music/Rain : 130 BPM : A Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Voices : 95 BPM : G Min : @_oli_oxen_.wav",
+	"res://assets/audio/music/Emotional Guitar : 150 BPM : E Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Disconnect : 144 BPM : D MINOR : @_oli_oxen_.wav",
+	"res://assets/audio/music/Mistake : 150 BPM : D# Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Rogue : 150 BPM : D Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Omens : 155 BPM : A Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/RIP : 140 : F Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Swords : 130 BPM : G Minor : @_oli_oxen_.wav",
+	"res://assets/audio/music/Forces : 130 BPM : B Minor : @_oli_oxen_.wav",
+]
+
 var _current_track_key: StringName = &""
 var _gameplay_track_key: StringName = &""
 ## Survives across scene changes so a new MusicDirector instance in the next
@@ -40,6 +60,13 @@ static var _playing_track_key: StringName = &""
 
 
 func _ready() -> void:
+	# The 13-entry library is authored on scenes/music_director.tscn; some engine
+	# builds drop it during scene instancing, so repair it here when empty.
+	if track_streams.size() != TRACK_STREAM_PATHS.size():
+		track_streams.clear()
+		for stream_path in TRACK_STREAM_PATHS:
+			track_streams.append(load(stream_path) as AudioStream)
+		Log.info("Music track library loaded from script", track_streams.size())
 	Conductor.bus = "Music"
 	# The shared music player must run while the tree is paused, or the pause
 	# menu would silence the sector theme it is meant to sit atop of.
