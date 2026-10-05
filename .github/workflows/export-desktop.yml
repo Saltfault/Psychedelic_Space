@@ -217,6 +217,17 @@ jobs:
           export_target "macOS Universal" \
             build/macos-universal/PsychedelicSpaceGame.zip macos universal
 
+          zip -q -j build/PsychedelicSpace-Windows-x86_64.zip \
+            build/windows-x86_64/PsychedelicSpaceGame.exe \
+            build/windows-x86_64/PsychedelicSpaceGame.pck
+          zip -q -j build/PsychedelicSpace-Windows-ARM64.zip \
+            build/windows-arm64/PsychedelicSpaceGame.exe \
+            build/windows-arm64/PsychedelicSpaceGame.pck
+          unzip -tq build/PsychedelicSpace-Windows-x86_64.zip
+          unzip -tq build/PsychedelicSpace-Windows-ARM64.zip
+          mv build/macos-universal/PsychedelicSpaceGame.zip \
+            build/PsychedelicSpace-macOS-Universal.zip
+
           chmod +x build/linux-x86_64/PsychedelicSpaceGame.x86_64
           chmod +x build/linux-arm64/PsychedelicSpaceGame.arm64
           tar -czf build/PsychedelicSpace-Linux-x86_64.tar.gz -C build/linux-x86_64 . || {
@@ -234,11 +245,11 @@ jobs:
           name: PsychedelicSpace-desktop-${{ github.sha }}
           if-no-files-found: error
           path: |
-            build/windows-x86_64/
-            build/windows-arm64/
+            build/PsychedelicSpace-Windows-x86_64.zip
+            build/PsychedelicSpace-Windows-ARM64.zip
             build/PsychedelicSpace-Linux-x86_64.tar.gz
             build/PsychedelicSpace-Linux-ARM64.tar.gz
-            build/macos-universal/PsychedelicSpaceGame.zip
+            build/PsychedelicSpace-macOS-Universal.zip
 
   publish-release:
     name: Publish GitHub release (GitHub only)
@@ -260,16 +271,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          source_assets=(
-            build/windows-x86_64/PsychedelicSpaceGame.exe
-            build/windows-x86_64/PsychedelicSpaceGame.pck
-            build/windows-arm64/PsychedelicSpaceGame.exe
-            build/windows-arm64/PsychedelicSpaceGame.pck
+          assets=(
+            build/PsychedelicSpace-Windows-x86_64.zip
+            build/PsychedelicSpace-Windows-ARM64.zip
             build/PsychedelicSpace-Linux-x86_64.tar.gz
             build/PsychedelicSpace-Linux-ARM64.tar.gz
-            build/macos-universal/PsychedelicSpaceGame.zip
+            build/PsychedelicSpace-macOS-Universal.zip
           )
-          for asset in "${source_assets[@]}"; do
+          for asset in "${assets[@]}"; do
             if [[ ! -s "$asset" ]]; then
               available_assets="$(find build -type f -printf '%P, ' | cut -c1-1500)"
               echo "::error title=Missing release asset::$asset (available: ${available_assets:-none})"
@@ -277,26 +286,34 @@ jobs:
             fi
           done
 
-          cp build/windows-x86_64/PsychedelicSpaceGame.exe build/PsychedelicSpaceGame-Windows-x86_64.exe
-          cp build/windows-x86_64/PsychedelicSpaceGame.pck build/PsychedelicSpaceGame-Windows-x86_64.pck
-          cp build/windows-arm64/PsychedelicSpaceGame.exe build/PsychedelicSpaceGame-Windows-ARM64.exe
-          cp build/windows-arm64/PsychedelicSpaceGame.pck build/PsychedelicSpaceGame-Windows-ARM64.pck
-          assets=(
-            build/PsychedelicSpaceGame-Windows-x86_64.exe
-            build/PsychedelicSpaceGame-Windows-x86_64.pck
-            build/PsychedelicSpaceGame-Windows-ARM64.exe
-            build/PsychedelicSpaceGame-Windows-ARM64.pck
-            build/PsychedelicSpace-Linux-x86_64.tar.gz
-            build/PsychedelicSpace-Linux-ARM64.tar.gz
-            build/macos-universal/PsychedelicSpaceGame.zip
-          )
-
           existing_release_draft="$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null || true)"
           if [[ "$existing_release_draft" == "true" ]]; then
             gh release delete "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --yes
           elif [[ "$existing_release_draft" == "false" ]]; then
-            echo "::error title=Release already published::Refusing to replace the published $GITHUB_REF_NAME release."
-            exit 1
+            existing_assets="$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')"
+            obsolete_assets=(
+              PsychedelicSpaceGame-Windows-ARM64.exe
+              PsychedelicSpaceGame-Windows-ARM64.pck
+              PsychedelicSpaceGame-Windows-x86_64.exe
+              PsychedelicSpaceGame-Windows-x86_64.pck
+              PsychedelicSpaceGame.zip
+            )
+            for obsolete in "${obsolete_assets[@]}"; do
+              if grep -Fqx "$obsolete" <<<"$existing_assets"; then
+                gh release delete-asset "$GITHUB_REF_NAME" "$obsolete" \
+                  --repo "$GITHUB_REPOSITORY" --yes
+              fi
+            done
+            if ! gh release upload "$GITHUB_REF_NAME" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --clobber \
+              >"$RUNNER_TEMP/gh-release-upload.log" 2>&1; then
+              cat "$RUNNER_TEMP/gh-release-upload.log"
+              error_summary="$(tail -n 12 "$RUNNER_TEMP/gh-release-upload.log" | tr '\n' ' ')"
+              echo "::error title=GitHub release asset update failed::$error_summary"
+              exit 1
+            fi
+            cat "$RUNNER_TEMP/gh-release-upload.log"
+            exit 0
           fi
 
           if ! gh release create \
