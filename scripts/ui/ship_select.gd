@@ -12,6 +12,7 @@ const PILOT_IDS: Array[StringName] = [&"dash", &"ram"]
 @onready var ability_icon: TextureRect = $CenterContainer/SelectionPanel/Content/PilotRow/AbilityIcon
 @onready var confirm_button: Button = $CenterContainer/SelectionPanel/Content/Confirm
 @onready var music_director: MusicDirector = $MusicDirector
+@onready var back_button: Button = $BackButton
 
 var _ship_buttons: Array[Button] = []
 var _ship_id: StringName = &"prototype_ship"
@@ -20,6 +21,7 @@ var _pilot_index: int = 0
 
 func _ready() -> void:
 	music_director.play_main_menu()
+	back_button.pressed.connect(SceneRouter.show_main_menu)
 	_ship_buttons = [
 		$CenterContainer/SelectionPanel/Content/HullButtons/Scout,
 		$CenterContainer/SelectionPanel/Content/HullButtons/Corsair,

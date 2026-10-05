@@ -3,7 +3,9 @@ extends Node
 class_name SectorGenerator
 
 const ASTEROID_CLEARANCE: float = 48.0
-const MINIMAP_SPAWN_CLEARANCE: float = 1600.0
+## Fallback clearance used when no live Minimap node can be reached; the real
+## source of truth is the Minimap group's live ``map_range`` export (3200).
+const FALLBACK_MINIMAP_CLEARANCE: float = 3200.0
 const PATROL_FORMATION_RADIUS: float = 170.0
 const OFFSCREEN_SPAWN_MARGIN: float = 150.0
 const ASTEROID_RING_CLUSTER_MINIMUM: int = 18
@@ -279,7 +281,7 @@ func _find_asteroid_position(sector: SectorRoot, cluster_center: Vector2, radius
 		var player_position: Vector2 = _player_position(sector)
 		var spawn_clearance: float = maxf(
 			_screen_world_radius(sector),
-			maxf(MINIMAP_SPAWN_CLEARANCE, _player_sensor_range()),
+			maxf(_minimap_clearance(), _player_sensor_range()),
 		) + OFFSCREEN_SPAWN_MARGIN
 		if SectorSpace.wrapped_distance(candidate, player_position) < spawn_clearance + radius + 80.0:
 			continue
@@ -434,9 +436,17 @@ func enemy_spawn_distance(sector: SectorRoot) -> float:
 		sensor_range + 400.0,
 		maxf(
 			_screen_world_radius(sector) + PATROL_FORMATION_RADIUS + OFFSCREEN_SPAWN_MARGIN,
-			MINIMAP_SPAWN_CLEARANCE + PATROL_FORMATION_RADIUS + OFFSCREEN_SPAWN_MARGIN,
+			_minimap_clearance() + PATROL_FORMATION_RADIUS + OFFSCREEN_SPAWN_MARGIN,
 		),
 	)
+
+
+## Single source of truth for "minimap range": the live Minimap node's
+## ``map_range`` export, floored at the fallback constant. Every spawner must
+## clear candidates against this, so nothing enters or leaves inside the bubble.
+func _minimap_clearance() -> float:
+	var minimap: Minimap = get_tree().get_first_node_in_group("minimap") as Minimap
+	return maxf(FALLBACK_MINIMAP_CLEARANCE, minimap.map_range) if minimap != null else FALLBACK_MINIMAP_CLEARANCE
 
 
 func _player_position(sector: SectorRoot) -> Vector2:
@@ -490,7 +500,7 @@ func _random_open_position(
 		var player_position: Vector2 = _player_position(sector)
 		var required_distance: float = maxf(
 			minimum_spawn_distance,
-			maxf(MINIMAP_SPAWN_CLEARANCE, _screen_world_radius(sector)),
+			maxf(_minimap_clearance(), _screen_world_radius(sector)),
 		)
 		if SectorSpace.wrapped_distance(candidate, player_position) < required_distance:
 			continue
@@ -504,7 +514,7 @@ func _random_open_position(
 	# Failed random placement must not hide required content on the far edge of the sector.
 	var fallback_required_distance: float = maxf(
 		minimum_spawn_distance,
-		maxf(MINIMAP_SPAWN_CLEARANCE, _screen_world_radius(sector)),
+		maxf(_minimap_clearance(), _screen_world_radius(sector)),
 	)
 	var fallback_radius: float = fallback_required_distance + 150.0
 	var fallback_player_position: Vector2 = _player_position(sector)

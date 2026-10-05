@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/ship_select.gd" id="1_ship_select"]
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
@@ -9,6 +9,9 @@
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Panels.png" id="5_panels"]
 [ext_resource type="PackedScene" path="res://scenes/world/space_background.tscn" id="8_starfield"]
 [ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="9_music_director"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_button.tscn" id="10_dither_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_option_button.tscn" id="11_dither_option"]
+[ext_resource type="PackedScene" path="res://scenes/ui/back_button.tscn" id="12_back_button"]
 
 [sub_resource type="AtlasTexture" id="SelectionPanelAtlas"]
 atlas = ExtResource("5_panels")
@@ -37,6 +40,14 @@ script = ExtResource("99_focus")
 [node name="MusicDirector" parent="." instance=ExtResource("9_music_director")]
 
 [node name="SpaceBackground" parent="." instance=ExtResource("8_starfield")]
+
+[node name="BackButton" parent="." instance=ExtResource("12_back_button")]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 154.0
+offset_bottom = 74.0
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -84,19 +95,19 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 14
 
-[node name="Scout" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+[node name="Scout" parent="CenterContainer/SelectionPanel/Content/HullButtons" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(220, 58)
 layout_mode = 2
 toggle_mode = true
 text = "SCOUT"
 
-[node name="Corsair" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+[node name="Corsair" parent="CenterContainer/SelectionPanel/Content/HullButtons" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(220, 58)
 layout_mode = 2
 toggle_mode = true
 text = "CORSAIR"
 
-[node name="Cutter" type="Button" parent="CenterContainer/SelectionPanel/Content/HullButtons"]
+[node name="Cutter" parent="CenterContainer/SelectionPanel/Content/HullButtons" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(220, 58)
 layout_mode = 2
 toggle_mode = true
@@ -116,11 +127,11 @@ theme_override_constants/separation = 12
 layout_mode = 2
 text = "HULL COLOR"
 
-[node name="ColorOption" type="OptionButton" parent="CenterContainer/SelectionPanel/Content/ColorRow"]
+[node name="ColorOption" parent="CenterContainer/SelectionPanel/Content/ColorRow" instance=ExtResource("11_dither_option")]
 custom_minimum_size = Vector2(300, 52)
 layout_mode = 2
 
-[node name="PilotPrevious" type="Button" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+[node name="PilotPrevious" parent="CenterContainer/SelectionPanel/Content/PilotRow" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 2
 text = "◀"
@@ -141,12 +152,12 @@ layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PilotNext" type="Button" parent="CenterContainer/SelectionPanel/Content/PilotRow"]
+[node name="PilotNext" parent="CenterContainer/SelectionPanel/Content/PilotRow" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 2
 text = "▶"
 
-[node name="Confirm" type="Button" parent="CenterContainer/SelectionPanel/Content"]
+[node name="Confirm" parent="CenterContainer/SelectionPanel/Content" instance=ExtResource("10_dither_button")]
 custom_minimum_size = Vector2(300, 62)
 layout_mode = 2
 size_flags_horizontal = 4

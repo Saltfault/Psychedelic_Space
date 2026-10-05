@@ -19,7 +19,7 @@
 
 [node name="Minimap" type="Control"]
 mouse_filter = 2
-map_range = 1400.0
+map_range = 3200.0
 script = ExtResource("1_script")
 marker_scene = ExtResource("5_marker")
 station_icon = ExtResource("6_station")

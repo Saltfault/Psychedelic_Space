@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="1_panels"]
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="2_icons"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_icon_button.tscn" id="3_dither_icon_button"]
 [ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
 
 [sub_resource type="AtlasTexture" id="PausePanelAtlas"]
@@ -105,7 +106,7 @@ theme_override_font_sizes/font_size = 32
 text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="ResumeButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=2147217021]
+[node name="ResumeButton" parent="Panel/MarginContainer/VBoxContainer" unique_id=2147217021 instance=ExtResource("3_dither_icon_button")]
 custom_minimum_size = Vector2(360, 62)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -115,7 +116,7 @@ theme_override_styles/hover = SubResource("PauseButtonFrame")
 text = "RESUME"
 icon = SubResource("AtlasTexture_dyovk")
 
-[node name="OptionsButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=206141894]
+[node name="OptionsButton" parent="Panel/MarginContainer/VBoxContainer" unique_id=206141894 instance=ExtResource("3_dither_icon_button")]
 custom_minimum_size = Vector2(360, 62)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -125,7 +126,7 @@ theme_override_styles/hover = SubResource("PauseButtonFrame")
 text = "OPTIONS"
 icon = SubResource("OptionsIcon")
 
-[node name="MainMenuButton" type="Button" parent="Panel/MarginContainer/VBoxContainer" unique_id=396844610]
+[node name="MainMenuButton" parent="Panel/MarginContainer/VBoxContainer" unique_id=396844610 instance=ExtResource("3_dither_icon_button")]
 custom_minimum_size = Vector2(360, 62)
 layout_mode = 2
 size_flags_horizontal = 4

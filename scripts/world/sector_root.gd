@@ -12,6 +12,9 @@ signal clear_state_changed(is_clear: bool)
 ## Player arrival point and exclusion center for generated actor placement.
 @export var spawn_position: Vector2 = Vector2(4000.0, 4000.0)
 
+## Extra pixels beyond the spawn clearance floor used by caravan/reinforcement arrivals.
+const OFFMAP_SPAWN_MARGIN: float = 150.0
+
 ## Optional persistent caravan scene spawned only in its current route sector.
 @export var caravan_scene: PackedScene
 ## Arrival-relative offset reserved for the persistent caravan's three-ship formation.
@@ -191,8 +194,20 @@ func _spawn_caravan_if_present() -> void:
 	var caravan: Node2D = caravan_scene.instantiate() as Node2D
 	if caravan == null:
 		return
-	# Keep the convoy near the arrival pocket without overlapping the player's ship.
-	caravan.global_position = SectorSpace.wrap_position(spawn_position + caravan_spawn_offset)
+	# Keep the convoy out of the minimap bubble: it travels in from the same
+	# direction as caravan_spawn_offset, but from beyond the clearance floor.
+	var convoy_direction: Vector2 = (
+		caravan_spawn_offset.normalized()
+		if caravan_spawn_offset.length_squared() > 0.001
+		else Vector2.RIGHT
+	)
+	if sector_generator != null and sector_generator.has_method("enemy_spawn_distance"):
+		var convoy_distance: float = (
+			float(sector_generator.call("enemy_spawn_distance", self)) + OFFMAP_SPAWN_MARGIN
+		)
+		caravan.global_position = SectorSpace.wrap_position(
+			spawn_position + convoy_direction * convoy_distance,
+		)
 	add_child(caravan)
 
 

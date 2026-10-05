@@ -20,6 +20,11 @@ class_name Minimap
 
 var player: PlayerShip
 var sensor: SensorComponent
+
+
+func _ready() -> void:
+	# Expose the live minimap range to spawners via a single shared group.
+	add_to_group("minimap")
 var _markers_by_id: Dictionary = {}
 
 

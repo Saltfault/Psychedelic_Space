@@ -6,6 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://dlhs02lvepq6s" path="res://assets/ui/scifi_ui/Icons.png" id="3_icons"]
 [ext_resource type="Theme" uid="uid://dxm0apnpg8h80" path="res://assets/ui/scifi_ui/scifi_settings_theme.tres" id="4_theme"]
 [ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_button.tscn" id="5_dither_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_check_button.tscn" id="6_dither_check"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dithered_option_button.tscn" id="7_dither_option"]
+[ext_resource type="PackedScene" path="res://scenes/ui/back_button.tscn" id="8_back_button"]
 
 [sub_resource type="AtlasTexture" id="SettingsPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -87,15 +91,15 @@ text = "Movement, combat, and accessibility preferences"
 layout_mode = 2
 text = "Developer tools and general preferences"
 
-[node name="DevModeToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/General" unique_id=624090448]
+[node name="DevModeToggle" parent="MarginContainer/VBoxContainer/Tabs/General" unique_id=624090448 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "ENABLE DEVELOPER CONSOLE"
 
-[node name="AutoFireToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=1669419970]
+[node name="AutoFireToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=1669419970 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "CONTINUOUS FIRE WHILE PLAYING"
 
-[node name="PauseFocusToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=410121261]
+[node name="PauseFocusToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=410121261 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "PAUSE WHEN THE GAME LOSES FOCUS"
 
@@ -117,11 +121,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "THRUST"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow" unique_id=1273668894]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow" unique_id=1273668894 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/ThrustRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -133,11 +137,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "FIRE"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow" unique_id=88623927]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow" unique_id=88623927 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/FireRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -149,11 +153,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "DASH"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow" unique_id=328704960]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow" unique_id=328704960 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/DashRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -165,11 +169,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "INTERACT"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow" unique_id=1946235888]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow" unique_id=1946235888 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/InteractRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -181,11 +185,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "SYSTEM MAP"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow" unique_id=1496997630]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow" unique_id=1496997630 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/MapRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -197,11 +201,11 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "PAUSE MENU"
 
-[node name="KeyButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow"]
+[node name="KeyButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControllerButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow"]
+[node name="ControllerButton" parent="MarginContainer/VBoxContainer/Tabs/Controls/PauseRow" instance=ExtResource("5_dither_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -220,18 +224,18 @@ theme_override_constants/separation = 10
 layout_mode = 2
 text = "WINDOW RESOLUTION"
 
-[node name="ResolutionOption" type="OptionButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=534158668]
+[node name="ResolutionOption" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=534158668 instance=ExtResource("7_dither_option")]
 layout_mode = 2
 
-[node name="FullscreenToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=1362500397]
+[node name="FullscreenToggle" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=1362500397 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "FULLSCREEN"
 
-[node name="BorderlessToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=21795832]
+[node name="BorderlessToggle" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=21795832 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "BORDERLESS WINDOW"
 
-[node name="VSyncToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=224868065]
+[node name="VSyncToggle" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=224868065 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "VERTICAL SYNC"
 
@@ -239,14 +243,14 @@ text = "VERTICAL SYNC"
 layout_mode = 2
 text = "FRAME RATE LIMIT"
 
-[node name="FPSLimitOption" type="OptionButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=26242982]
+[node name="FPSLimitOption" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" unique_id=26242982 instance=ExtResource("7_dither_option")]
 layout_mode = 2
 
 [node name="DitherHeading" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
 layout_mode = 2
 text = "GLOBAL PIXEL DITHER"
 
-[node name="DitherToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
+[node name="DitherToggle" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "ENABLE FULLSCREEN DITHER"
 
@@ -254,14 +258,14 @@ text = "ENABLE FULLSCREEN DITHER"
 layout_mode = 2
 text = "COLOR PALETTE"
 
-[node name="DitherPaletteOption" type="OptionButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
+[node name="DitherPaletteOption" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" instance=ExtResource("7_dither_option")]
 layout_mode = 2
 
 [node name="DitherModeLabel" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
 layout_mode = 2
 text = "DITHER PATTERN"
 
-[node name="DitherModeOption" type="OptionButton" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
+[node name="DitherModeOption" parent="MarginContainer/VBoxContainer/Tabs/Video/Options" instance=ExtResource("7_dither_option")]
 layout_mode = 2
 
 [node name="DitherPixelRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Video/Options"]
@@ -389,7 +393,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 metadata/_tab_index = 4
 
-[node name="MuteToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Audio" unique_id=1378683714]
+[node name="MuteToggle" parent="MarginContainer/VBoxContainer/Tabs/Audio" unique_id=1378683714 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "MUTE MASTER AUDIO"
 
@@ -471,7 +475,7 @@ metadata/_tab_index = 5
 layout_mode = 2
 text = "PERFORMANCE OVERLAY (PROFILY)"
 
-[node name="ProfilyOption" type="OptionButton" parent="MarginContainer/VBoxContainer/Tabs/Other" unique_id=1122603965]
+[node name="ProfilyOption" parent="MarginContainer/VBoxContainer/Tabs/Other" unique_id=1122603965 instance=ExtResource("7_dither_option")]
 layout_mode = 2
 
 [node name="ProfilyDescription" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Other" unique_id=1864367251]
@@ -479,7 +483,7 @@ layout_mode = 2
 text = "Hide the Profily overlay and stop its monitors."
 autowrap_mode = 2
 
-[node name="MinimapToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=492241979]
+[node name="MinimapToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=492241979 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "SHOW SECTOR MINIMAP"
 
@@ -500,23 +504,23 @@ layout_mode = 2
 text = "100%"
 horizontal_alignment = 1
 
-[node name="VibrationToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122301]
+[node name="VibrationToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122301 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "CONTROLLER VIBRATION"
 
-[node name="ReducedMotionToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122302]
+[node name="ReducedMotionToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122302 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "REDUCED MOTION"
 
-[node name="ReduceFlashingToggle" type="CheckButton" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122303]
+[node name="ReduceFlashingToggle" parent="MarginContainer/VBoxContainer/Tabs/Gameplay" unique_id=177122303 instance=ExtResource("6_dither_check")]
 layout_mode = 2
 text = "REDUCE FLASHING"
 
-[node name="ResetDefaultsButton" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Other" unique_id=1185503561]
+[node name="ResetDefaultsButton" parent="MarginContainer/VBoxContainer/Tabs/Other" unique_id=1185503561 instance=ExtResource("5_dither_button")]
 layout_mode = 2
 text = "RESTORE DEFAULT OPTIONS"
 
-[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1622468215]
+[node name="CloseButton" parent="MarginContainer/VBoxContainer" unique_id=1622468215 instance=ExtResource("8_back_button")]
 layout_mode = 2
 text = "BACK"
 icon = SubResource("BackIcon")

@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
 [ext_resource type="Texture2D" path="res://assets/ui/scifi_ui/Panels.png" id="2_panels"]
 [ext_resource type="Material" path="res://assets/materials/ui_dither_material.tres" id="dither_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/back_button.tscn" id="3_back_button"]
 
 [sub_resource type="AtlasTexture" id="StatsPanelAtlas"]
 atlas = ExtResource("2_panels")
@@ -85,10 +86,8 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 30
 text = "SHIP STATISTICS"
 
-[node name="BackButton" type="Button" parent="Panel/MarginContainer/VBoxContainer/Header"]
-custom_minimum_size = Vector2(136, 48)
+[node name="BackButton" parent="Panel/MarginContainer/VBoxContainer/Header" instance=ExtResource("3_back_button")]
 layout_mode = 2
-text = "BACK"
 
 [node name="Stats" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
