@@ -9,20 +9,20 @@ class_name MusicDirector
 
 ## Every stream index used by TRACKS/SYSTEM_TRACKS below. The array itself is
 ## authored on the MusicDirector scene (scenes/music_director.tscn):
-## 0 menu/intro theme, 1 calm loop, 2 tense loop, 3 Rain, 4 Voices, 5 Emotional
+## 0 menu/intro theme, 1 hot loop, 2 tense loop, 3 Rain, 4 Voices, 5 Emotional
 ## Guitar, 6 Disconnect, 7 Mistake, 8 Rogue, 9 Omens, 10 RIP, 11 Swords, 12 Forces.
 const TRACKS: Dictionary = {
 	&"menu": [0, 120.0],
 	&"sector_start": [3, 130.0],
-	&"sector_generic": [1, 125.0],
-	&"sector_patrol": [2, 140.0],
+	&"sector_generic": [12, 130.0],
+	&"sector_patrol": [11, 130.0],
 	&"sector_station": [4, 95.0],
 	&"sector_nebula": [6, 144.0],
 	&"sector_warp": [8, 150.0],
 	&"sector_outpost": [9, 155.0],
 	&"sector_planet": [5, 150.0],
 	&"sector_moon": [7, 150.0],
-	&"sector_star": [12, 130.0],
+	&"sector_star": [1, 125.0],
 	&"run_finished": [10, 140.0],
 }
 const SYSTEM_TRACKS: Dictionary = {
@@ -62,6 +62,7 @@ func play_sector_track(sector_id: String, has_outpost_objective: bool = false) -
 	if not TRACKS.has(track_key):
 		track_key = &"sector_generic"
 	_gameplay_track_key = track_key
+	Log.info("Sector music requested", track_key, "outpost_objective=", has_outpost_objective)
 	_play_track(track_key)
 
 
@@ -84,6 +85,7 @@ func _play_track(track_key: StringName) -> void:
 	# not restart the shared Conductor.
 	if _playing_track_key == track_key:
 		_current_track_key = track_key
+		Log.info("Music request skipped; track already playing", track_key)
 		return
 	if not TRACKS.has(track_key):
 		Log.error("Unknown music context", track_key)
