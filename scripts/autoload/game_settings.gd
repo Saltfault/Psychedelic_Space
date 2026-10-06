@@ -514,22 +514,7 @@ func _apply_display() -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		# Never let the window be larger than the desktop. Windows computes the
-		# desktop in OS-scaled units (125% desktop = 1536x864 logical on a 1080p
-		# panel), so an authored 1920x1080 window can physically cover MORE than
-		# the visible screen; content near the viewport edges then renders off
-		# the monitor entirely. Clamp to the usable area and pin to its origin.
-		var usable: Rect2i = DisplayServer.screen_get_usable_rect(
-			DisplayServer.window_get_current_screen()
-		)
-		var fitted_size: Vector2i = Vector2i(
-			mini(window_size.x, usable.size.x),
-			mini(window_size.y, usable.size.y),
-		)
-		DisplayServer.window_set_size(fitted_size)
-		if not fullscreen:
-			DisplayServer.window_set_position(usable.position)
-		# The settings persist the authored preference, not the clamped surface.
+		DisplayServer.window_set_size(window_size)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, borderless and not fullscreen)
 
 
