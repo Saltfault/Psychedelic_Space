@@ -307,7 +307,25 @@ func _enter_tree() -> void:
 	line_edit.text_submitted.connect(_on_text_entered)
 	line_edit.text_changed.connect(_on_line_edit_text_changed)
 	v_box_container.visible = false
-	process_mode = PROCESS_MODE_ALWAYS
+	process_mode = PROCESS_MODE_ALWAYS	_force_contained_layout()
+	get_viewport().size_changed.connect(_force_contained_layout)
+
+
+## Keep the console overlay inside the physical screen. Anchors are already
+## viewport-relative, but the pivot/viewport interaction between the stretch
+## viewport (canvas_items) and a scaled, borderless window allowed the panel to
+## extend past the visible screen on some machines. Scale is forced to 1 and
+## the container clips itself, so it can never overhang.
+func _force_contained_layout() -> void:
+	var clamped_height : float = clampf(_get_console_height(), 0.25, 1.0)
+	console_scale = 1.0
+	v_box_container.scale = Vector2.ONE
+	v_box_container.pivot_offset = Vector2.ZERO
+	v_box_container.clip_contents = true
+	v_box_container.anchor_right = 1.0
+	v_box_container.anchor_bottom = clamped_height
+	v_box_container.offset_right = 0.0
+	v_box_container.offset_bottom = 0.0
 
 
 ## Get the scale of the console from the settings -- if this is not in the system settings return a default value

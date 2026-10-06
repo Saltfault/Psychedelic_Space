@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="ShipDefinition" load_steps=5 format=3 uid="uid://kq14ssgpq11g"]
+[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://kq14ssgpq11g"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_hpaqf"]
 [ext_resource type="Texture2D" uid="uid://b2vqpfqqyjgc4" path="res://assets/effects/scifi_fx/scifx1_explosion_A_large_red/spritesheet.png" id="3_explosion"]
 [ext_resource type="Texture2D" uid="uid://c06n30cv1sysn" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Gold.png" id="4_hull"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
+[ext_resource type="AudioStream" uid="uid://l0xvqxga4dkn" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
 
 [resource]
 script = ExtResource("1_hpaqf")
 display_name = "Cutter"
-max_speed = 280.0
+max_speed = 580.0
 thrust_acceleration = 420.0
 linear_drag = 58.0
 turn_speed_degrees = 150.0

@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://hkr0i8837nud" path="res://assets/ui/scifi_ui/Panels.png" id="4_panels"]
 [ext_resource type="Script" uid="uid://bwbh17iq4lvxi" path="res://addons/event_audio/src/ea_event_bank_mounter.gd" id="5_audio_mounter"]
 [ext_resource type="Resource" uid="uid://cv3antahgajo7" path="res://assets/audio/event_bank.tres" id="6_audio_bank"]
+[ext_resource type="Shader" uid="uid://du4ria2xln6hh" path="res://assets/shaders/objects/pixel_dither_screen.gdshader" id="8_7suek"]
 [ext_resource type="PackedScene" uid="uid://duaa6p8tt6mlj" path="res://scenes/world/space_background.tscn" id="9_starfield"]
 [ext_resource type="PackedScene" path="res://scenes/music_director.tscn" id="10_music_director"]
 [ext_resource type="Script" uid="uid://bh5ud6dl4dfl4" path="res://scripts/ui/controller_focus_manager.gd" id="99_focus"]
@@ -53,6 +54,19 @@ region = Rect2(14, 164, 138, 43)
 [sub_resource type="AtlasTexture" id="QuitHover"]
 atlas = ExtResource("3_buttons")
 region = Rect2(162, 164, 138, 43)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_otr3d"]
+resource_local_to_scene = true
+shader = ExtResource("8_7suek")
+shader_parameter/sample_local_texture = true
+shader_parameter/effect_enabled = true
+shader_parameter/pixel_size = 1
+shader_parameter/palette_mode = 0
+shader_parameter/levels = 8
+shader_parameter/dither_mode = 1
+shader_parameter/dither_strength = 0.18
+shader_parameter/brightness = 0.0
+shader_parameter/contrast = 1.0
 
 [node name="MainMenu" type="Control" unique_id=1700166718]
 layout_mode = 3
@@ -148,6 +162,7 @@ stretch_mode = 4
 
 [node name="SettingsPanel" parent="." unique_id=1856454373 instance=ExtResource("2_settings")]
 visible = false
+material = SubResource("ShaderMaterial_otr3d")
 layout_mode = 1
 
 [node name="EventAudioBankMounter" type="Node" parent="." unique_id=72441587]

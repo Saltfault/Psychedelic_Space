@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="ShipDefinition" load_steps=5 format=3 uid="uid://day6awcngf0ba"]
+[gd_resource type="Resource" script_class="ShipDefinition" format=3 uid="uid://day6awcngf0ba"]
 
 [ext_resource type="Script" uid="uid://dtjhydxdas3kp" path="res://scripts/data/ship_definition.gd" id="1_qwri2"]
-[ext_resource type="Texture2D" path="res://assets/effects/scifi_fx/scifx1_explosion_A_large_blue/spritesheet.png" id="3_explosion"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Green.png" id="4_hull"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
+[ext_resource type="Texture2D" uid="uid://dwx7ydq3h1tqk" path="res://assets/effects/scifi_fx/scifx1_explosion_A_large_blue/spritesheet.png" id="3_explosion"]
+[ext_resource type="Texture2D" uid="uid://ca0p54x45y8si" path="res://assets/sprites/ships/guardian5/SpaceshipMegapack_Green.png" id="4_hull"]
+[ext_resource type="AudioStream" uid="uid://l0xvqxga4dkn" path="res://assets/audio/sfx/engine/engine_heavy_loop.wav" id="5_engine"]
 
 [resource]
 script = ExtResource("1_qwri2")
 display_name = "Corsair"
-max_speed = 420.0
+max_speed = 640.0
 thrust_acceleration = 620.0
 linear_drag = 42.0
 max_hull = 48.0

@@ -45,9 +45,9 @@ script = ExtResource("99_focus")
 layout_mode = 1
 anchors_preset = 0
 offset_left = 24.0
-offset_top = 24.0
+offset_top = 64.0
 offset_right = 154.0
-offset_bottom = 74.0
+offset_bottom = 114.0
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
