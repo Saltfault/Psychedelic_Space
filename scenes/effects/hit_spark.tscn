@@ -1,8 +1,6 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/effects/scifi_fx/scifx1_sparks_A_small_blue/spritesheet.png" id="1_variant"]
-[ext_resource type="Texture2D" path="res://assets/effects/scifi_fx/scifx1_sparks_A_small_violet/spritesheet.png" id="2_variant"]
-[ext_resource type="Texture2D" path="res://assets/effects/scifi_fx/scifx1_sparks_A_small_yellow/spritesheet.png" id="3_variant"]
 [ext_resource type="Script" path="res://scripts/effects/one_shot_strip.gd" id="4_one_shot"]
 
 [node name="HitSpark" type="Sprite2D"]
@@ -12,5 +10,3 @@ hframes = 10
 scale = Vector2(1.35, 1.35)
 script = ExtResource("4_one_shot")
 frames_per_second = 20.0
-texture_variants = Array[Texture2D]([ExtResource("1_variant"), ExtResource("2_variant"), ExtResource("3_variant")])
-variant_hframes = 10

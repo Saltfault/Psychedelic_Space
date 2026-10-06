@@ -307,7 +307,8 @@ func _enter_tree() -> void:
 	line_edit.text_submitted.connect(_on_text_entered)
 	line_edit.text_changed.connect(_on_line_edit_text_changed)
 	v_box_container.visible = false
-	process_mode = PROCESS_MODE_ALWAYS	_force_contained_layout()
+	process_mode = PROCESS_MODE_ALWAYS
+	_force_contained_layout()
 	get_viewport().size_changed.connect(_force_contained_layout)
 
 
@@ -759,4 +760,3 @@ func set_enable_on_release_build(enable : bool):
 	if (!enable_on_release_build):
 		if (!OS.is_debug_build()):
 			disable()
-
