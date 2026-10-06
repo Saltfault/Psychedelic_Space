@@ -89,9 +89,10 @@ func _try_use_pilot_ability() -> void:
 
 	match pilot.ability:
 		PilotDefinition.ActiveAbility.DASH:
-			# Use the pilot's authored target speed along the ship's forward axis.
-			var forward := Vector2.RIGHT.rotated(rotation)
-			velocity = forward * pilot.dash_speed
+			# Express the dash as a one-off impulse along the forward axis; the
+			# speed burst it grants is capped by the same dash speed value.
+			command_impulse = Vector2.RIGHT.rotated(rotation) * pilot.dash_speed
+			command_speed_limit = maxf(command_speed_limit, pilot.dash_speed)
 			dash_time_left = pilot.dash_duration
 			pilot_cooldown_left = pilot.cooldown
 			if GameSettings.screen_shake_strength > 0.0:

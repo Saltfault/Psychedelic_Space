@@ -14,6 +14,8 @@ signal clear_state_changed(is_clear: bool)
 
 ## Extra pixels beyond the spawn clearance floor used by caravan/reinforcement arrivals.
 const OFFMAP_SPAWN_MARGIN: float = 150.0
+## Clearance used when no SectorGenerator child provides enemy_spawn_distance().
+const MINIMAP_CLEARANCE_FALLBACK: float = 3200.0
 
 ## Optional persistent caravan scene spawned only in its current route sector.
 @export var caravan_scene: PackedScene
@@ -205,9 +207,13 @@ func _spawn_caravan_if_present() -> void:
 		var convoy_distance: float = (
 			float(sector_generator.call("enemy_spawn_distance", self)) + OFFMAP_SPAWN_MARGIN
 		)
-		caravan.global_position = SectorSpace.wrap_position(
-			spawn_position + convoy_direction * convoy_distance,
-		)
+	else:
+		# Authored fallback keeps the previous behavior when this sector has no
+		# generator child: arrive past the spawn point instead of at (0, 0).
+		var convoy_distance: float = MINIMAP_CLEARANCE_FALLBACK
+	caravan.global_position = SectorSpace.wrap_position(
+		spawn_position + convoy_direction * convoy_distance,
+	)
 	add_child(caravan)
 
 

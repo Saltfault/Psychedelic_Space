@@ -34,6 +34,14 @@ const DEV_MODE_KEY: String = "dev_mode_enabled"
 ## The hostile caravan avoids both the player start and peaceful station sectors.
 const CARAVAN_ROUTE: Array[String] = ["patrol", "nebula", "generic"]
 
+## Authored economy and pacing constants (RULE 2: no bare literals in logic).
+const STARTING_CREDITS: int = 25
+const MAIN_OBJECTIVE_REWARD_CREDITS: int = 150
+const SIDE_OBJECTIVE_REWARD_CREDITS: int = 75
+const OUTPOST_REINFORCEMENT_MAX_LEVEL: int = 3
+const SIDE_OBJECTIVE_EXPIRE_TICKS: int = 3
+const ENEMY_DIFFICULTY_GROWTH_PER_TICK: float = 1.002
+
 const CAMPAIGN_SYSTEM_IDS: Array[StringName] = [&"frontier", &"ember", &"glacial"]
 
 var current_system_index: int = 0
@@ -92,7 +100,7 @@ func reset_run() -> void:
 	current_sector_id = "start"
 	current_sector_clear = false
 	world_tick = 0
-	credits = 25
+	credits = STARTING_CREDITS
 	# A fresh run rolls a fresh map; without this the seed stays 0 across runs
 	# and system_map.generate_new_map() would rebuild the identical route.
 	run_seed = randi()
@@ -178,7 +186,7 @@ func load_saved_run() -> bool:
 	saved_map_node_id = str(config.get_value("run", "map_node_id", "node_start"))
 	saved_sector_clear = bool(config.get_value("run", "sector_clear", false))
 	world_tick = int(config.get_value("run", "world_tick", 0))
-	credits = int(config.get_value("run", "credits", 25))
+	credits = int(config.get_value("run", "credits", STARTING_CREDITS))
 	main_objective_complete = bool(config.get_value("run", "main_objective_complete", false))
 	side_objective_complete = bool(config.get_value("run", "side_objective_complete", false))
 	side_objective_expired = bool(config.get_value("run", "side_objective_expired", false))
@@ -368,7 +376,7 @@ func advance_world() -> void:
 	if outpost_alerted and not outpost_destroyed:
 		outpost_reinforcement_level = min(outpost_reinforcement_level + 1, 3)
 
-	if world_tick >= 3 and not side_objective_complete:
+	if world_tick >= SIDE_OBJECTIVE_EXPIRE_TICKS and not side_objective_complete:
 		side_objective_expired = true
 
 	run_state_changed.emit()
@@ -377,7 +385,7 @@ func advance_world() -> void:
 
 ## Return the compounded hostile-stat multiplier for the committed sector count.
 func enemy_difficulty_multiplier() -> float:
-	return pow(1.002, float(maxi(world_tick, 0)))
+	return pow(ENEMY_DIFFICULTY_GROWTH_PER_TICK, float(maxi(world_tick, 0)))
 
 
 ## Idempotently complete the main objective, persist outpost destruction, and award credits.
@@ -388,7 +396,8 @@ func complete_main_objective() -> void:
 
 	main_objective_complete = true
 	outpost_destroyed = true
-	add_credits(150)
+	run_state_changed.emit()
+	add_credits(MAIN_OBJECTIVE_REWARD_CREDITS)
 	Log.info("Main objective completed", current_sector_id)
 
 
@@ -399,7 +408,8 @@ func complete_side_objective() -> void:
 		return
 
 	side_objective_complete = true
-	add_credits(75)
+	run_state_changed.emit()
+	add_credits(SIDE_OBJECTIVE_REWARD_CREDITS)
 	Log.info("Side objective completed", current_sector_id)
 
 

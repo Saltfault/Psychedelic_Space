@@ -45,6 +45,10 @@ var command_thrust: float = 0.0
 var command_fire: bool = false
 ## Optional controller-requested speed cap; negative keeps the authored ship maximum.
 var command_speed_limit: float = -1.0
+## One shared one-off impulse hook for subclasses (Dash, ram bursts). The
+## subclass sets a direction and magnitude through the command surface instead
+## of writing velocity directly, keeping movement integration owned by BaseShip.
+var command_impulse: Vector2 = Vector2.ZERO
 
 var max_speed: float
 var thrust_acceleration: float
@@ -207,6 +211,10 @@ func _update_rotation(delta: float) -> void:
 
 
 func _update_movement(delta: float) -> void:
+	if command_impulse != Vector2.ZERO:
+		# Consume the impulse before thrust integration so it is applied once.
+		velocity += command_impulse
+		command_impulse = Vector2.ZERO
 	var forward: Vector2 = Vector2.RIGHT.rotated(rotation)
 	if command_thrust > 0.0:
 		velocity += forward * thrust_acceleration * command_thrust * delta

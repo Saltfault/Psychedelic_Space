@@ -139,7 +139,26 @@ func _attach_wrap_ghost(ghost: Node2D, scene_root: Node) -> void:
 		or not is_instance_valid(scene_root) or scene_root.is_queued_for_deletion()
 	):
 		return
+	# Ghosts are render-only: strip scripts, groups, and simulation wiring from
+	# the duplicated subtree so a copy can never collide, register lights, or be
+	# counted as a sensor contact.
+	_ghostify(ghost)
 	scene_root.add_child(ghost)
+
+
+## Recursively neutralize a wrap-ghost subtree to pure visuals.
+func _ghostify(node: Node) -> void:
+	node.script = null
+	for group: StringName in node.get_groups():
+		node.remove_from_group(group)
+	if node is CollisionObject2D:
+		(node as CollisionObject2D).monitoring = false
+		(node as CollisionObject2D).monitorable = false
+	elif node is Area2D:
+		(node as Area2D).monitoring = false
+		(node as Area2D).monitorable = false
+	for child: Node in node.get_children():
+		_ghostify(child)
 
 
 func _update_wrap_visuals() -> void:

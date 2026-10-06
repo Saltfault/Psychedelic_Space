@@ -45,7 +45,9 @@ func _on_body_entered(body: Node) -> void:
 	ship.take_damage(BUMP_DAMAGE)
 
 	# CharacterBody2D ships do not impart enough impulse on every contact, so add a gentle push.
-	var push_direction: Vector2 = global_position - ship.global_position
+	# Wrap-aware delta: a straight subtraction across a sector seam would point
+	# the long way around the torus and knock the asteroid the wrong direction.
+	var push_direction: Vector2 = SectorSpace.shortest_delta(ship.global_position, global_position)
 	if push_direction.length_squared() < 0.001:
 		push_direction = Vector2.RIGHT
 	apply_central_impulse(push_direction.normalized() * KNOCKBACK_IMPULSE)
