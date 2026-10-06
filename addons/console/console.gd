@@ -325,6 +325,8 @@ func _force_contained_layout() -> void:
 	v_box_container.clip_contents = true
 	v_box_container.anchor_right = 1.0
 	v_box_container.anchor_bottom = clamped_height
+	v_box_container.offset_left = 0.0
+	v_box_container.offset_top = 0.0
 	v_box_container.offset_right = 0.0
 	v_box_container.offset_bottom = 0.0
 
