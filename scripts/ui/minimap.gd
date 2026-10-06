@@ -113,10 +113,11 @@ func _contact_style(contact: Node2D) -> Dictionary:
 			icon = module_icon
 		"asteroid":
 			icon = asteroid_icon
-		"nebula":
-			icon = nebula_icon
 		"planet":
 			icon = planet_icon
+		# Nebulae are environment, not contacts: never rendered on the minimap.
+		"nebula":
+			return {}
 	if contact.has_meta("planet_id"):
 		var planet: PlanetDefinition = RunState.get_planet(
 			StringName(str(contact.get_meta("planet_id")))

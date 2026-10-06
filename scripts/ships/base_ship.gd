@@ -309,7 +309,7 @@ func take_damage(amount: float) -> void:
 
 	_update_shield_visual()
 	if hull_visual != null and is_instance_valid(hull_visual):
-		Juicee.flash(hull_visual, Color(1.0, 0.75, 0.8), 0.08)
+		_flash_hull_visual()
 	if team == 0:
 		if GameSettings.screen_shake_strength > 0.0:
 			Juicee.shake_camera(self, 5.0 * GameSettings.screen_shake_strength, 0.16, 22.0)
@@ -321,6 +321,28 @@ func take_damage(amount: float) -> void:
 
 	if hull <= 0.0:
 		_die()
+
+
+## Damage feedback on the hull sprite. A plain modulate flash is invisible on
+## Lit receiver materials (their fragment writes the final color directly), so
+## spawn a short-lived additive tint copy of the hull instead - visible for lit
+## and plain sprites alike, and it cleans itself up.
+func _flash_hull_visual() -> void:
+	if hull_visual.texture == null:
+		return
+	var flash := Sprite2D.new()
+	flash.texture = hull_visual.texture
+	flash.region_enabled = hull_visual.region_enabled
+	flash.region_rect = hull_visual.region_rect
+	flash.position = Vector2.ZERO
+	flash.rotation = 0.0
+	flash.scale = Vector2.ONE
+	flash.z_index = hull_visual.z_index + 1
+	flash.modulate = Color(1.0, 0.35, 0.4, 0.75)
+	hull_visual.add_child(flash)
+	var fade := flash.create_tween()
+	fade.tween_property(flash, "modulate:a", 0.0, 0.18)
+	fade.tween_callback(flash.queue_free)
 
 
 ## Restore up to amount shield points without exceeding the current maximum.

@@ -23,6 +23,13 @@ func _apply(context: Node, intensity_mult: float) -> void:
 		return
 	var cam: Camera2D = context.get_viewport().get_camera_2d()
 	if not cam:
+		# Fallback for setups where the viewport reports no current camera
+		# (multi-viewport UIs, videos off): use the nearest Camera2D under the
+		# context instead of silently skipping the shake.
+		var owned := context.find_children("*", "Camera2D", true, false)
+		if not owned.is_empty():
+			cam = owned[0] as Camera2D
+	if not cam:
 		push_warning("JuiceeShakeEffect: no Camera2D in viewport")
 		return
 
