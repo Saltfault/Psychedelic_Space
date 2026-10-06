@@ -151,12 +151,15 @@ func _ghostify(node: Node) -> void:
 	node.script = null
 	for group: StringName in node.get_groups():
 		node.remove_from_group(group)
-	if node is CollisionObject2D:
-		(node as CollisionObject2D).monitoring = false
-		(node as CollisionObject2D).monitorable = false
-	elif node is Area2D:
+	# monitoring/monitorable exist on Area2D only; CollisionObject2D is the base
+	# class, so branch on the concrete types to stay compile-safe.
+	if node is Area2D:
 		(node as Area2D).monitoring = false
 		(node as Area2D).monitorable = false
+	if node is PhysicsBody2D:
+		# Ghosts must never collide even if a future source adds a body.
+		(node as PhysicsBody2D).collision_layer = 0
+		(node as PhysicsBody2D).collision_mask = 0
 	for child: Node in node.get_children():
 		_ghostify(child)
 

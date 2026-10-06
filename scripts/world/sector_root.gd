@@ -210,7 +210,7 @@ func _spawn_caravan_if_present() -> void:
 	else:
 		# Authored fallback keeps the previous behavior when this sector has no
 		# generator child: arrive past the spawn point instead of at (0, 0).
-		var convoy_distance: float = MINIMAP_CLEARANCE_FALLBACK
+		var convoy_distance: float = MINIMAP_CLEARANCE_FALLBACK + OFFMAP_SPAWN_MARGIN
 	caravan.global_position = SectorSpace.wrap_position(
 		spawn_position + convoy_direction * convoy_distance,
 	)

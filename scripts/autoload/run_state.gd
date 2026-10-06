@@ -60,7 +60,7 @@ var current_sector_clear: bool = false
 ## Number of accepted sector transitions in this run.
 var world_tick: int = 0
 ## Spendable credits; changes emit credits_changed and run_state_changed.
-var credits: int = 25
+var credits: int = STARTING_CREDITS
 
 ## True once the outpost has been destroyed during this run.
 var main_objective_complete: bool = false
@@ -374,7 +374,7 @@ func advance_world() -> void:
 		caravan_route_index += 1
 
 	if outpost_alerted and not outpost_destroyed:
-		outpost_reinforcement_level = min(outpost_reinforcement_level + 1, 3)
+		outpost_reinforcement_level = min(outpost_reinforcement_level + 1, OUTPOST_REINFORCEMENT_MAX_LEVEL)
 
 	if world_tick >= SIDE_OBJECTIVE_EXPIRE_TICKS and not side_objective_complete:
 		side_objective_expired = true
@@ -396,7 +396,8 @@ func complete_main_objective() -> void:
 
 	main_objective_complete = true
 	outpost_destroyed = true
-	run_state_changed.emit()
+	# add_credits() itself emits run_state_changed (RULE 2's dual-signal path),
+	# so the objective-flag change is broadcast exactly once, with the credit.
 	add_credits(MAIN_OBJECTIVE_REWARD_CREDITS)
 	Log.info("Main objective completed", current_sector_id)
 
@@ -408,7 +409,7 @@ func complete_side_objective() -> void:
 		return
 
 	side_objective_complete = true
-	run_state_changed.emit()
+	# Same dual-signal path: add_credits() broadcasts run_state_changed.
 	add_credits(SIDE_OBJECTIVE_REWARD_CREDITS)
 	Log.info("Side objective completed", current_sector_id)
 
