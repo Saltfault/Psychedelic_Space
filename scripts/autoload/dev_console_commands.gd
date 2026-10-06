@@ -33,8 +33,12 @@ func _register_commands() -> void:
 	Console.add_command("kill", _kill, ["target"], 1, "Kill player, all enemies, or one enemy by runtime instance ID, node name, or YARD ship ID.")
 	Console.add_command_autocomplete_list("godmode", PackedStringArray(["on", "off", "toggle"]))
 	Console.add_command_autocomplete_list("spawn", PackedStringArray(["enemy", "module", "shield", "large_shield", "intel", "corsair", "cutter"]))
+	Console.add_command_autocomplete_list("list_enemies", PackedStringArray(["enemy", "module", "shield", "large_shield", "intel"]))
 	Console.add_command_autocomplete_list("teleport", PackedStringArray(["sector", "system", "solar_system", "start", "patrol", "station", "nebula", "outpost", "warp", "generic_system"]))
 	Console.add_command_autocomplete_list("kill", PackedStringArray(["player", "all", "corsair", "cutter"]))
+	Console.add_command("list_enemies", _list_enemies, 0, 0, "List every enemy ID registered for the spawn command.")
+	Console.add_command("list_modules", _list_modules, 0, 0, "List every module YARD ID usable with 'spawn module <id>'.")
+	Console.add_command("list_pickups", _list_pickups, 0, 0, "List every pickup kind accepted by the spawn command.")
 
 
 func _show_all_commands() -> void:
@@ -53,6 +57,39 @@ func _enemy_scene(enemy_id: String) -> PackedScene:
 	var index: int = enemy_ids.find(StringName(enemy_id))
 	return enemy_scenes[index] if index >= 0 and index < enemy_scenes.size() else null
 
+
+func _list_enemies() -> void:
+	if enemy_ids.is_empty():
+		_fail("The Developer Console scene has no enemy IDs assigned.")
+		return
+	var lines: Array[String] = []
+	for enemy_id: StringName in enemy_ids:
+		var ship: ShipDefinition = RunState.get_ship(enemy_id)
+		lines.append(str(
+			String(enemy_id),
+			" - ", ship.display_name if ship != null else "(definition missing)",
+		))
+	_say("Spawnable enemies (use 'spawn enemy <id>'):\n  " + "\n  ".join(lines))
+
+
+func _list_modules() -> void:
+	var registry: Registry = RunState.module_registry
+	if registry == null:
+		_fail("YARD module registry is missing; modules cannot be listed.")
+		return
+	var module_ids: Array[StringName] = registry.get_all_string_ids()
+	if module_ids.is_empty():
+		_fail("YARD module registry is empty.")
+		return
+	var lines: Array[String] = []
+	for module_id: StringName in module_ids:
+		var module: ModuleDefinition = registry.load_entry(module_id) as ModuleDefinition
+		lines.append(str(String(module_id), " - ", module.display_name if module != null else "(definition missing)"))
+	_say("Spawnable modules (use 'spawn module <id>'):\n  " + "\n  ".join(lines))
+
+
+func _list_pickups() -> void:
+	_say("Spawnable pickup kinds (bare 'spawn <kind>'):\n  enemy <id> - hostile ship\n  module [id] - random or specific module pickup\n  shield - shield booster pickup\n  large_shield - large shield booster pickup\n  intel - intel beacon pickup")
 
 func _say(message: String) -> void:
 	Console.print_info(message)
@@ -243,7 +280,7 @@ func _spawn(kind_text: String, id_text: String) -> void:
 			var enemy_id: String = requested_id if not requested_id.is_empty() else "corsair"
 			var enemy_scene: PackedScene = _enemy_scene(enemy_id)
 			if enemy_scene == null:
-				_fail("Unknown enemy. Available: corsair, cutter.")
+				_fail("Unknown enemy. Run list_enemies for the available IDs.")
 				return
 			node = enemy_scene.instantiate() as Node2D
 		"module":
