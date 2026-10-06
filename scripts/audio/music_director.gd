@@ -87,9 +87,9 @@ func _process(delta: float) -> void:
 		return
 	if _keepalive_cooldown > 0.0:
 		return
-	_keepalive_cooldown = 1.5
+	_keepalive_cooldown = 0.1
 	Conductor.play()
-	Log.warn("Music player restart issued; the current stream ended without looping", _playing_track_key)
+	Log.debug("Music player restart issued; the current stream ended without looping", _playing_track_key)
 
 
 func _ready() -> void:
@@ -111,6 +111,19 @@ func _ready() -> void:
 	add_to_group("music_director")
 	if not Conductor.beat.is_connected(_on_beat):
 		Conductor.beat.connect(_on_beat)
+	# Imported loop metadata is not always honored by the editor re-import, so the
+	# track-level restart comes from the player's finished signal: on reaching the
+	# end of the recording, replay from 0:00 with no polling delay.
+	if not Conductor.finished.is_connected(_on_conductor_finished):
+		Conductor.finished.connect(_on_conductor_finished)
+
+
+## Replay the active track the instant its end is reached (native looping or not).
+func _on_conductor_finished() -> void:
+	if _playing_track_key == &"" or Conductor.stream == null:
+		return
+	Conductor.play(0.0)
+	Log.debug("Track looped by replay from 0:00", _playing_track_key)
 
 
 ## Play the title-screen track.

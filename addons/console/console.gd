@@ -546,6 +546,12 @@ func toggle_console() -> void:
 		v_box_container.visible = false
 
 	if (v_box_container.visible):
+		print("[console-fit] scale=", v_box_container.scale, " global_pos=", v_box_container.global_position,
+			" size=", v_box_container.size, "anchors=", v_box_container.anchor_left, ",", v_box_container.anchor_right,
+			",", v_box_container.anchor_top, ",", v_box_container.anchor_bottom,
+			" viewport=", get_viewport().get_visible_rect().size, " window=", DisplayServer.window_get_size(),
+			" content_scale=", get_viewport().content_scale_factor,
+			" canvas_transform=", canvas_layer.get_canvas_transform())
 		was_paused_already = get_tree().paused
 		get_tree().paused = was_paused_already || pause_enabled
 		line_edit.grab_focus()
