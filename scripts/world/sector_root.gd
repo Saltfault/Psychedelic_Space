@@ -203,14 +203,13 @@ func _spawn_caravan_if_present() -> void:
 		if caravan_spawn_offset.length_squared() > 0.001
 		else Vector2.RIGHT
 	)
+	# Declared once: GDScript variables are block-scoped, so per-branch
+	# declarations would not be visible to the wrap_position call below.
+	var convoy_distance: float = MINIMAP_CLEARANCE_FALLBACK + OFFMAP_SPAWN_MARGIN
 	if sector_generator != null and sector_generator.has_method("enemy_spawn_distance"):
-		var convoy_distance: float = (
+		convoy_distance = (
 			float(sector_generator.call("enemy_spawn_distance", self)) + OFFMAP_SPAWN_MARGIN
 		)
-	else:
-		# Authored fallback keeps the previous behavior when this sector has no
-		# generator child: arrive past the spawn point instead of at (0, 0).
-		var convoy_distance: float = MINIMAP_CLEARANCE_FALLBACK + OFFMAP_SPAWN_MARGIN
 	caravan.global_position = SectorSpace.wrap_position(
 		spawn_position + convoy_direction * convoy_distance,
 	)
