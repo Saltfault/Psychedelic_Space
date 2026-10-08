@@ -22,4 +22,9 @@ func _change_to(scene: PackedScene, label: String) -> void:
 	if scene == null:
 		Log.error("SceneRouter has no saved scene assigned", label)
 		return
-	get_tree().change_scene_to_packed(scene)
+	# Route scene changes THROUGH call_deferred: a scene change triggered from
+	# inside a button-signal (or key/signal) call stack tears the current scene
+	# down while that stack is still executing, and the release-grade engine
+	# builds crash natively there (a SIGSEGV reading a freed node). Deferring
+	# lets the input stack finish first; behavior is otherwise identical.
+	get_tree().change_scene_to_packed.call_deferred(scene)

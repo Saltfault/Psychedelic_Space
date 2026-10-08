@@ -55,7 +55,7 @@ region = Rect2(14, 164, 138, 43)
 atlas = ExtResource("3_buttons")
 region = Rect2(162, 164, 138, 43)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_otr3d"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7suek"]
 resource_local_to_scene = true
 shader = ExtResource("8_7suek")
 shader_parameter/sample_local_texture = true
@@ -162,7 +162,7 @@ stretch_mode = 4
 
 [node name="SettingsPanel" parent="." unique_id=1856454373 instance=ExtResource("2_settings")]
 visible = false
-material = SubResource("ShaderMaterial_otr3d")
+material = SubResource("ShaderMaterial_7suek")
 layout_mode = 1
 
 [node name="EventAudioBankMounter" type="Node" parent="." unique_id=72441587]
